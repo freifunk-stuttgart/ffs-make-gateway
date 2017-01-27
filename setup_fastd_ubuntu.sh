@@ -72,7 +72,7 @@ EOF
 interface "$ifacebb";
 status socket "/var/run/fastd-$ifacebb.status";
 bind $EXT_IP_V4:$VPNPORTBB;
-${i}bind [$EXT_IPS_V6]:$VPNPORT;
+${i}bind [$EXT_IPS_V6]:$VPNPORTBB;
 include "../secret-bb.conf";
 include peers from "bb";
 # error|warn|info|verbose|debug|debug2
