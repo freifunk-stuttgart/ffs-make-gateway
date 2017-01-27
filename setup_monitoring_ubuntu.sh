@@ -106,7 +106,7 @@ cat <<EOF >/usr/local/bin/check-tasks
   DNSIP=\$(ifconfig br$(echo "$SEGMENTLIST" | cut -d " " -f 1) | grep 'inet [Aa]d' | cut -d: -f2 | awk '{print \$1}')  # IP Adresse des DNS Servern
   DNSANFRAGE=web.de                 # Domainname Anfrage
   DNSBACK=212.227                   # IP die als Antwort auf DNSANFRAGE zurück kommen muss
-  IFBAT="$(echo " $SEGMENTLIST" | sed 's/ / br/g')"   # Alle Fastd Interfaces
+  IFBAT="$(echo " $SEGMENTLIST" | sed 's/ / bat/g')"   # Alle Fastd Interfaces
   FASTDANZAHL=$(($(echo $SEGMENTLIST | wc -w) * 2 ))                # Anzahl der Fastd Instanzen die laufen
   OVPN=/etc/openvpn                 # Pfad zu Openvpn Konfigs
 
@@ -249,8 +249,8 @@ cat <<EOF >/usr/local/bin/check-tasks
 
       ####    openvpn pruefen
       PRG="openvpn"
-      #ip=\$(ip -o -4 addr list tun0 | awk '{print \$4}' | cut -d/ -f1)
-      ip=\$(ip -o -4 addr list tun0 | awk '{gsub("/.*","",\$4); print \$4}')
+      ip=\$(ip -o -4 addr list tun0 | awk '{print \$4}' | cut -d/ -f1)
+      #ip=\$(ip -o -4 addr list tun0 | awk '{gsub("/.*","",\$4); print \$4}')
       echo -n "check ping web.de: "
       BACK=\$(ping -c2 -I \$ip web.de 2>&1)
       ZAHL=\$?
