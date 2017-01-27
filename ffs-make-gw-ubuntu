@@ -1,0 +1,233 @@
+#!/bin/bash
+# Referenz: https://wiki.freifunk-stuttgart.net/technik:gateways:gateway-einrichten
+
+set -e
+export LC_ALL=C
+CALL="$*"
+
+print_help() {
+cat <<EOF >&2
+usage: $0 --gwid N [--vpnkey=xxxx] [--no-systemd] [--no-apt-update] [--no-apt-key] [--othergw=172.21.16.1] [--directtcp="443[ 995][...]"] [--with-lihas-firewall] [--segments N] [--gws N] [--with-backbone-vpn] [--no-log-call]
+Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
+--help:          Dieser Text
+--name:          Gatewayname
+--gwid:          Gateway ID (1-10)
+--gwsubid:       Gateway Sub-ID
+--vpnkey:        use this fastd private key (string)
+--dhcp-relay-servers: DHCP Relay Server die dieses GW benutzt, Default "10.190.128.5 10.191.255.252 10.191.255.253"
+--no-apt-update: apt-get update nicht ausfuehren
+--othergw:       IP eines anderen GWs fuer ausgehenden Traffic, z.B. 172.21.16.1 (gw04)
+--segmentlist:   Liste der Segmente, bitte in " angeben, Default "01 02 03 04"
+--email:         Mailadresse an die Meldungen geschickt werden sollen
+--no-log-call:   Aufruf nicht unter /var/log/$0 speichern
+EOF
+}
+CONFIRM=1
+DHCPRELAYSERVERS="10.190.128.5 10.191.255.252 10.191.255.253"
+DIRECTTCP=""
+GWSUBID="1"
+LOG_CALL=1
+NEEDS_APTKEY=0
+NEEDS_APTUPDATE=1
+NEEDS_SYSTEMD=1
+OPT_FWLIHAS=0
+SEGMENTLIST="01 02 03 04"
+TINC_BB=0
+VPNKEY="Wird generiert"
+EMAIL=albi@albi.info
+error() {
+  print_help
+  echo "$*"
+  exit 1
+}
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,name:,ip:,gwid:,gwsubid:,vpnkey:,othergw:,no-apt-update,no-log-call,segmentlist:,email: -- "$@"`
+if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
+eval set -- "$TEMP"
+while true ; do
+  case "$1" in
+    --name)             GWNAME=$2; shift 2;;
+    --gwid)             GWID=$2; shift 2;;
+    --gwsubid)          GWSUBID=$2; shift 2;;
+    --dhcp-relay-servers) DHCPRELAYSERVERS="$2"; shift 2;;
+    --vpnkey)           VPNKEY=$2; shift 2;;
+    --othergw)		OTHERGW_IP=$2; shift 2;;
+    --no-apt-update)	NEEDS_APTUPDATE=0; shift 1;;
+    --no-log-call)	LOG_CALL=0; shift 1;;
+    --no-confirm)	CONFIRM=0; shift 1;;
+    --segmentlist)	SEGMENTLIST="$2"; shift 2;;
+    --email)		EMAIL="$2"; shift 2;;
+    --help|-h) print_help; exit 1;;
+    --) shift ; break ;;
+    *) echo "Unknown parameter $1, try -h" ; exit 1 ;;
+  esac
+done
+SEGMENT1=$(echo $SEGMENTLIST | cut -d" " -f1)
+
+. ensureline.sh
+if [ $LOG_CALL -eq 1 ]; then
+  echo $CALL >> "/var/log/${0##*/}"
+fi
+if [ x"$GWID" == "x" ]; then
+	echo "Keine GatewayID -> kein Gateway"
+	exit 1
+fi
+GWLID=$(printf "%02i" $GWID)
+GWLSUBID=$(printf "%02i" $GWSUBID)
+LEGIP=172.21.$((4*$GWID)).$GWSUBID
+EXT_IF_V4=$(ip r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}')
+EXT_IP_V4=$(ip -4 a l dev $EXT_IF_V4 | sed -n '/ inet /{s/.*inet //; s/[\/ ].*//;p}')
+EXT_GW_V4=$(ip r l table main | sed -n '/default/{s/.*via //; s/ .*//; p}')
+EXT_IF_V6=$(ip -6 r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}')
+EXT_IPS_V6=$(ip -6 a l dev $EXT_IF_V6 | sed -n '/inet6/{s/.*inet6 //; s/\/.*//; /fe80/d; p}')
+HOSTNAME=gw${GWLID}n${GWLSUBID}
+cat <<EOF
+GatewayID (GWID): $GWID
+Gateway Sub ID (GWLSUBID): $GWLSUBID
+Hostname: $HOSTNAME
+Externes Interface v4 (EXT_IF_V4): $EXT_IF_V4
+Externe IP v4 (EXT_IP_V4): $EXT_IP_V4
+Externes Interface v6 (EXT_IF_V6): $EXT_IF_V6
+Externe IPs v6 (EXT_IP_V6): $EXT_IPS_V6
+Segmente: $SEGMENTLIST
+fastd VPN Key: bitte ablegen in /etc/fastd/secret.conf
+EOF
+if [ $CONFIRM -eq 1 ]; then
+	echo "Wenn alles richtig ist, Eingabe druecken, sonst Abbrechen mit Strg-C"
+	read x
+fi
+hostname $HOSTNAME
+if ! grep -qw $HOSTNAME /etc/hosts; then
+	sed '/^127.0.0.1/{s/^/#/}' /etc/hosts
+	ensureline "127.0.0.1 ${HOSTNAME}.freifunk-stuttgart.de $HOSTNAME localhost" /etc/hosts
+fi
+if ! grep -qw $HOSTNAME /etc/hostname; then
+	echo $HOSTNAME > /etc/hostname
+fi
+export HOSTNAME
+
+show_progress() {
+	printf 'Status: %s - %s\n' "$(date)" "$1"
+}
+if ! dpkg -S /sbin/init | awk -F: '$1 != "systemd-sysv" {exit 1}' && [ $NEEDS_SYSTEMD -eq 1 ]; then
+	echo "/sbin/init is not systemd-sysv" >&2
+	echo "use --no-systemd to overwrite" >&2
+	exit 1
+fi
+
+if [ ! -d /etc/apt/sources.list.d ]; then
+	mkdir -p /etc/apt/sources.list.d
+fi
+
+. setup_fastd_ubuntu.sh
+. setup_interface_ubuntu.sh
+. setup_system_ubuntu.sh
+. setup_tinc_ubuntu.sh
+. setup_bird_ubuntu.sh
+. setup_radvd_ubuntu.sh
+. setup_dnsmasq_ubuntu.sh
+. setup_openvpn_ubuntu.sh
+. setup_monitoring_ubuntu.sh
+
+if [ x"$NEEDS_APTKEY" == x1 ]; then add_apt_keys; fi
+if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
+
+# batadv-vis ist nicht in backports
+
+printf 'isc-dhcp-relay\tisc-dhcp-relay/servers\tstring\t%s\n' "$DHCPRELAYSERVERS" | debconf-set-selections
+printf 'isc-dhcp-relay\tisc-dhcp-relay/interfaces\tstring\t\n' | debconf-set-selections
+printf 'isc-dhcp-relay\tisc-dhcp-relay/options\tstring\t-q -a\n' | debconf-set-selections
+apt -y install munin-node mutt apache2 ntp python-psutil jq sysfsutils linux-image-generic dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
+
+show_progress setup_system_sysctl
+setup_system_sysctl
+show_progress setup_system_sysfs
+setup_system_sysfs
+setup_system_routing
+show_progress setup_system_routing
+#setup_fastd
+#show_progress setup_fastd
+
+# Networking
+ensureline "source-directory interfaces.d" /etc/network/interfaces
+# Segmente loeschen und neu anlegen
+rm -f /etc/network/interfaces.d/br[0-8][0-9]
+#for seg in $SEGMENTLIST ; do
+setup_interface_segxx
+show_progress setup_interface_segxx
+#done
+
+setup_tinc_config
+show_progress setup_tinc_config
+setup_tinc_key
+show_progress setup_tinc_key
+setup_fastd_config
+show_progress setup_fastd_config
+setup_bird
+show_progress setup_bird
+setup_radvd
+show_progress setup_radvd
+setup_dnsmasq
+show_progress setup_dnsmasq
+setup_openvpn
+show_progress setup_openvpn
+
+# Monitoring
+setup_monitoring_updateff
+show_progress setup_monitoring_updateff
+setup_monitoring_checktasks
+show_progress setup_monitoring_checktasks
+setup_monitoring_munin
+show_progress setup_monitoring_munin
+
+
+# info
+cat <<EOF
+
+   Folgendes ist nun noch zu tun:
+   ==============================
+EOF
+if [ $(cat /etc/openvpn/00.conf | wc -l) -le 5 ] ; then
+cat <<EOF
+*  Openvpn Config /etc/openvpn/00.conf bis 03.ovpn anpassen
+
+EOF
+fi
+if [ ! -e /etc/fastd/secret.conf ]; then
+cat <<EOF
+*  Fastd Gateway Private Key in /etc/fast/secret.conf speichern
+
+EOF
+fi
+if [ ! -e /etc/fastd/peers/vpn$SEGMENT1/bb/${HOSTNAME}s$SEGMENT1 ]; then
+cat <<EOF
+*  Fastd Gateway-BB Public Key (/etc/fastd/$HOSTNAME) nach Github kopieren
+   https://github.com/freifunk-stuttgart/peers-ffs/tree/master/vpn$SEGMENT1/bb/${HOSTNAME}s$SEGMENT1
+EOF
+cat /etc/fastd/$HOSTNAME
+echo ""
+fi
+if [ ! -e /etc/tinc/ffsbb/hosts/$HOSTNAME ]; then
+cat <<EOF
+4. Datei /etc/tinc/ffsbb/hosts.1/$HOSTNAME nach Git kopieren
+   https://github.com/freifunk-stuttgart/tinc-ffsbb/tree/master/hosts/
+EOF
+cat /etc/tinc/ffsbb/hosts.1/$HOSTNAME
+echo ""
+fi
+# pruefe Scaleway/dhcp Internet
+if [ $(cat /etc/network/interfaces | grep "iface eth0 inet dhcp" | wc -l) -gt 0 ]; then
+cat <<-EOF
+*  Vermutlich hast du einen Scaleway Server
+   bitte füge folgende Zeilen in /etc/network/interfaces nach folgender Zeile hinzu:
+iface eth0 inet dhcp
+EOF
+for seg in $SEGMENTLIST; do 
+cat <<-EOF
+  post-up /sbin/ifup br$seg  || true
+  post-up /sbin/ifup bat$seg || true
+EOF
+done
+echo ""
+fi
+
+exit
