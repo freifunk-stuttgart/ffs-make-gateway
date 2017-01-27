@@ -44,11 +44,17 @@ fi
     if [ ! -d $dirbb/bb ]; then
       ln -s /etc/fastd/peers/$iface/bb $dirbb/bb
     fi
+    # ip6 pruefen
+    if [ -z "$EXT_IPS_V6"]; then
+	i="#"
+    else
+	i=""
+    fi
 cat <<-EOF >$dir/fastd.conf
 interface "$iface";
 status socket "/var/run/fastd-$iface.status";
 bind $EXT_IP_V4:$VPNPORT;
-$(test -z "$EXT_IP_V6" && echo -n "#")bind $EXT_IP_V6:$VPNPORT;
+${i}bind $EXT_IPS_V6:$VPNPORT;
 include "../secret.conf";
 include peers from "peers";
 # error|warn|info|verbose|debug|debug2
