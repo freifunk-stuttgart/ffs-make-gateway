@@ -23,3 +23,18 @@ Example:
 ### Geplante Features
 * eigener DHCP-Server (obsolet, ersetzt durch zentrale DHCP-Server)
 * eigenes Ausleitungs VPN
+
+
+# ffs-make-gateway-ubuntu
+
+Setzt auf einem leeren Ubuntu 16.04 Server ein Freifunk-Gateway auf.
+
+Beispiele:
+* Erstellen eine Gateways der in Segment 3 arbeitet
+git clone https://github.com/freifunk-stuttgart/ffs-make-gateway.git
+cd ffs-make-gateway
+./ffs-make-gw-ubuntu --gwid 6 --gwsubid 2 --segmentlist "03"
+
+Nachdem das Script ohne Fehler gelaufen ist, ist ein reboot nötig.
+
+
