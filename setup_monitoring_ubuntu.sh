@@ -93,7 +93,7 @@ while : ; do
 done
 EOF
 chmod +x /usr/local/bin/update-ff
-ensureline "/usr/local/bin/update-ff &" /etc/rc.local
+ensureline_insert "/usr/local/bin/update-ff &" /etc/rc.local
 }
 
 setup_monitoring_checktasks() {
@@ -329,7 +329,6 @@ cat <<EOF >/usr/local/bin/check-tasks
 
 EOF
 chmod +x /usr/local/bin/check-tasks
-ensureline "/usr/local/bin/check-tasks &" /etc/rc.local
-
+ensureline_insert "/usr/local/bin/check-tasks &" /etc/rc.local
 }
 
