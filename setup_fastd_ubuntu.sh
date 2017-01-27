@@ -54,7 +54,7 @@ cat <<-EOF >$dir/fastd.conf
 interface "$iface";
 status socket "/var/run/fastd-$iface.status";
 bind $EXT_IP_V4:$VPNPORT;
-${i}bind $EXT_IPS_V6:$VPNPORT;
+${i}bind [$EXT_IPS_V6]:$VPNPORT;
 include "../secret.conf";
 include peers from "peers";
 # error|warn|info|verbose|debug|debug2
@@ -72,7 +72,7 @@ EOF
 interface "$ifacebb";
 status socket "/var/run/fastd-$ifacebb.status";
 bind $EXT_IP_V4:$VPNPORTBB;
-${i}bind $EXT_IPS_V6:$VPNPORT;
+${i}bind [$EXT_IPS_V6]:$VPNPORT;
 include "../secret-bb.conf";
 include peers from "bb";
 # error|warn|info|verbose|debug|debug2
