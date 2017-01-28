@@ -208,7 +208,7 @@ echo ""
 fi
 if [ ! -e /etc/tinc/ffsbb/hosts/$HOSTNAME ]; then
 cat <<EOF
-4. Datei /etc/tinc/ffsbb/hosts.1/$HOSTNAME nach Git kopieren
+*  Datei /etc/tinc/ffsbb/hosts.1/$HOSTNAME nach Git kopieren
    https://github.com/freifunk-stuttgart/tinc-ffsbb/tree/master/hosts/
 EOF
 cat /etc/tinc/ffsbb/hosts.1/$HOSTNAME
@@ -229,5 +229,8 @@ EOF
 done
 echo ""
 fi
+cat <<-EOF
+*  reboot
 
+EOF
 exit
