@@ -63,7 +63,7 @@ fi
 
 setup_monitoring_vnstat() {
 replaceline "BandwidthDetection 1" "BandwidthDetection 0" /etc/vnstat.conf
-if [ ! -e /var/lib/vnstat/tun ]; then 
+if [ ! -e /var/lib/vnstat/tun ]; then
   vnstat -u -i tun0
   vnstat -u -i tun0
   sleep 2

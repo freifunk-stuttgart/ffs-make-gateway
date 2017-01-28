@@ -43,7 +43,7 @@ fi
       ln -s /etc/fastd/peers/$iface/bb $dirbb/bb
     fi
     # ip6 pruefen
-    if [ -z "$EXT_IPS_V6"]; then
+    if [ -z "$EXT_IPS_V6" ]; then
 	i="#"
     else
 	i=""
