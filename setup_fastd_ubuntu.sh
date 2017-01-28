@@ -13,12 +13,13 @@ cat <<-EOF >/etc/fastd/secret-bb.conf
 secret "$(cat /etc/fastd/gateway-bb.key | grep "Secret" | cut -d" " -f2)";
 EOF
 fi
+# bb public key
+keybbpublic=$(cat /etc/fastd/gateway-bb.key | grep "Public" | cut -d" " -f2)
 cat <<-EOF >/etc/fastd/$HOSTNAME
 #MAC: 02:00:38:$SEGMENT1:$GWLID:$GWLSUBID
 key "$(cat /etc/fastd/gateway-bb.key | grep "Public" | cut -d" " -f2)";
 remote "$HOSTNAME.freifunk-stuttgart.de" port $((9040 + $SEGMENT1));
 EOF
-
 # gatewaykey
 if [ "$VPNKEY" != "Wird generiert" ]; then
   cat <<EOF >/etc/fastd/secret.conf
@@ -27,9 +28,9 @@ EOF
 fi
 
 # Might do separate fastd for ipv4 and ipv6
-  for seg in $SEGMENTLIST; do
-    VPNPORT=$((10040 + ${seg#0}))
-    VPNPORTBB=$((9040 + ${seg#0}))
+for seg in $SEGMENTLIST; do
+    vpnport=$((10040 + ${seg#0}))
+    vpnportbb=$((9040 + ${seg#0}))
     dir=/etc/fastd/vpn$seg
     dirbb=${dir}bb
     iface="vpn${seg}"
@@ -48,11 +49,17 @@ fi
     else
 	i=""
     fi
+# fastd bb config fuer git
+cat <<-EOF >/etc/fastd/${HOSTNAME}s$seg
+#MAC: 02:00:38:$seg:$GWLID:$GWLSUBID
+key "$keybbpublic";
+remote "$HOSTNAME.freifunk-stuttgart.de" port $vpnportbb;
+EOF
 cat <<-EOF >$dir/fastd.conf
 interface "$iface";
 status socket "/var/run/fastd-$iface.status";
-bind $EXT_IP_V4:$VPNPORT;
-${i}bind [$EXT_IPS_V6]:$VPNPORT;
+bind $EXT_IP_V4:$vpnport;
+${i}bind [$EXT_IPS_V6]:$vpnport;
 include "../secret.conf";
 include peers from "peers";
 # error|warn|info|verbose|debug|debug2
@@ -69,8 +76,8 @@ EOF
     cat <<-EOF >$dirbb/fastd.conf
 interface "$ifacebb";
 status socket "/var/run/fastd-$ifacebb.status";
-bind $EXT_IP_V4:$VPNPORTBB;
-${i}bind [$EXT_IPS_V6]:$VPNPORTBB;
+bind $EXT_IP_V4:$vpnportbb;
+${i}bind [$EXT_IPS_V6]:$vpnportbb;
 include "../secret-bb.conf";
 include peers from "bb";
 # error|warn|info|verbose|debug|debug2
