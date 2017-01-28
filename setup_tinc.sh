@@ -61,6 +61,8 @@ iface ffsbb inet static
 
 iface ffsbb inet6 static
     address fd21:b4dc:4b00::a38:$(($GWID*10+$GWSUBID))
+    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
+    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
     netmask 64
 
 EOF
