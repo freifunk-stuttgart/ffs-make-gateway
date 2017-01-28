@@ -2,7 +2,7 @@
 export LC_ALL=C
 NSUPDATE=nsupdate
 TIMEOUT=300
-DDNS_KEYFILE=/etc/bind/keys/Kgw05.freifunk-stuttgart.de.+165+50977.key
+DDNS_KEYFILE=/etc/bind/keys/Kgw.freifunk-stuttgart.de.+165+50977.key
 DDNS_SERVER=dns1.lihas.de
 DDNS_DOMAIN=freifunk-stuttggart.de
 DDNS_HOSTBASE=gw05
@@ -11,11 +11,11 @@ DOIPV4=1
 DOIPV6=1
 SEGMENTS=""
 GW_INSTANCE=""
-
-OPTS="-k $DDNS_KEYFILE -t $TIMEOUT"
 if [ -e /etc/default/freifunk ]; then
 	. /etc/default/freifunk
 fi
+
+OPTS="-k $DDNS_KEYFILE -t $TIMEOUT"
 
 print_help() {
 cat <<-EOF >&2
