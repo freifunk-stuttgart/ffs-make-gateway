@@ -108,11 +108,6 @@ export HOSTNAME
 show_progress() {
 	printf 'Status: %s - %s\n' "$(date)" "$1"
 }
-if ! dpkg -S /sbin/init | awk -F: '$1 != "systemd-sysv" {exit 1}' && [ $NEEDS_SYSTEMD -eq 1 ]; then
-	echo "/sbin/init is not systemd-sysv" >&2
-	echo "use --no-systemd to overwrite" >&2
-	exit 1
-fi
 
 if [ ! -d /etc/apt/sources.list.d ]; then
 	mkdir -p /etc/apt/sources.list.d
@@ -138,23 +133,19 @@ printf 'isc-dhcp-relay\tisc-dhcp-relay/interfaces\tstring\t\n' | debconf-set-sel
 printf 'isc-dhcp-relay\tisc-dhcp-relay/options\tstring\t-q -a\n' | debconf-set-selections
 apt -y install munin-node mutt apache2 ntp python-psutil jq sysfsutils linux-image-generic dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
 
-show_progress setup_system_sysctl
 setup_system_sysctl
-show_progress setup_system_sysfs
+show_progress setup_system_sysctl
 setup_system_sysfs
+show_progress setup_system_sysfs
 setup_system_routing
 show_progress setup_system_routing
-#setup_fastd
-#show_progress setup_fastd
 
 # Networking
 ensureline "source-directory interfaces.d" /etc/network/interfaces
 # Segmente loeschen und neu anlegen
 rm -f /etc/network/interfaces.d/br[0-8][0-9]
-#for seg in $SEGMENTLIST ; do
 setup_interface_segxx
 show_progress setup_interface_segxx
-#done
 
 setup_tinc_config
 show_progress setup_tinc_config

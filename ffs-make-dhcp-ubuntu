@@ -1,0 +1,142 @@
+#!/bin/bash
+# Referenz: https://wiki.freifunk-stuttgart.net/technik:gateways:gateway-einrichten
+
+set -e
+export LC_ALL=C
+CALL="$*"
+
+print_help() {
+cat <<EOF >&2
+usage: $0 --dhcpid N [--no-apt-update] [--segmentlist N] [--no-log-call]
+Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
+--help:          Dieser Text
+--dhcpid:        DHCP Server ID (1-4)
+--no-apt-update: apt-get update nicht ausfuehren
+--segmentlist:   Liste der Segmente, bitte in " angeben, Default "01 02 03 04"
+--email:         Mailadresse an die Meldungen geschickt werden sollen
+--no-log-call:   Aufruf nicht unter /var/log/$0 speichern
+EOF
+}
+CONFIRM=1
+LOG_CALL=1
+NEEDS_APTUPDATE=1
+SEGMENTLIST="01 02 03 04"
+EMAIL=albi@albi.info
+error() {
+  print_help
+  echo "$*"
+  exit 1
+}
+TEMP=`getopt -o h --long help,dhcpid:,no-apt-update,no-log-call,segmentlist:,email: -- "$@"`
+if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
+eval set -- "$TEMP"
+while true ; do
+  case "$1" in
+    --name)             GWNAME=$2; shift 2;;
+    --dhcpid)           DHCPID=$2; shift 2;;
+    --no-apt-update)	NEEDS_APTUPDATE=0; shift 1;;
+    --no-log-call)	LOG_CALL=0; shift 1;;
+    --no-confirm)	CONFIRM=0; shift 1;;
+    --segmentlist)	SEGMENTLIST="$2"; shift 2;;
+    --email)		EMAIL="$2"; shift 2;;
+    --help|-h) print_help; exit 1;;
+    --) shift ; break ;;
+    *) echo "Unknown parameter $1, try -h" ; exit 1 ;;
+  esac
+done
+SEGMENT1=$(echo $SEGMENTLIST | cut -d" " -f1)
+
+. ensureline.sh
+if [ $LOG_CALL -eq 1 ]; then
+  echo $CALL >> "/var/log/${0##*/}"
+fi
+if [ x"$DHCPID" == "x" ]; then
+	echo "Keine DHCPID -> kein DHCP Server"
+	exit 1
+fi
+DHCPLID=$(printf "%02i" $DHCPID)
+LEGIP=172.21.$((4*$DHCPID)).$GWSUBID
+EXT_IF_V4=$(ip r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}')
+EXT_IP_V4=$(ip -4 a l dev $EXT_IF_V4 | sed -n '/ inet /{s/.*inet //; s/[\/ ].*//;p}')
+EXT_GW_V4=$(ip r l table main | sed -n '/default/{s/.*via //; s/ .*//; p}')
+EXT_IF_V6=$(ip -6 r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}')
+EXT_IPS_V6=$(ip -6 a l dev $EXT_IF_V6 | sed -n '/inet6/{s/.*inet6 //; s/\/.*//; /fe80/d; p}')
+HOSTNAME=dhcp${DHCPLID}
+cat <<EOF
+DHCPServerID (DHCPID): $DHCPID
+Hostname: $HOSTNAME
+Externes Interface v4 (EXT_IF_V4): $EXT_IF_V4
+Externe IP v4 (EXT_IP_V4): $EXT_IP_V4
+Externes Interface v6 (EXT_IF_V6): $EXT_IF_V6
+Externe IPs v6 (EXT_IP_V6): $EXT_IPS_V6
+Segmente: $SEGMENTLIST
+EOF
+if [ $CONFIRM -eq 1 ]; then
+	echo "Wenn alles richtig ist, Eingabe druecken, sonst Abbrechen mit Strg-C"
+	read x
+fi
+hostname $HOSTNAME
+if ! grep -qw $HOSTNAME /etc/hosts; then
+	sed '/^127.0.0.1/{s/^/#/}' /etc/hosts
+	ensureline "127.0.0.1 ${HOSTNAME}.freifunk-stuttgart.de $HOSTNAME localhost" /etc/hosts
+fi
+if ! grep -qw $HOSTNAME /etc/hostname; then
+	echo $HOSTNAME > /etc/hostname
+fi
+export HOSTNAME
+
+show_progress() {
+	printf 'Status: %s - %s\n' "$(date)" "$1"
+}
+
+if [ ! -d /etc/apt/sources.list.d ]; then
+	mkdir -p /etc/apt/sources.list.d
+fi
+
+. setup_tinc_ubuntu.sh
+. setup_bird_ubuntu.sh
+. setup_dnsmasq_ubuntu.sh
+. setup_monitoring_ubuntu.sh
+
+if [ x"$NEEDS_APTKEY" == x1 ]; then add_apt_keys; fi
+if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
+
+apt -y install munin-node mutt ntp python-psutil jq dnsmasq git tinc vnstat isc-dhcp-server bird dnsutils
+
+setup_tinc_config
+show_progress setup_tinc_config
+setup_tinc_key
+show_progress setup_tinc_key
+setup_bird
+show_progress setup_bird
+setup_dnsmasq
+show_progress setup_dnsmasq
+
+# Monitoring
+setup_monitoring_updateff
+show_progress setup_monitoring_updateff
+setup_monitoring_checktasks
+show_progress setup_monitoring_checktasks
+setup_monitoring_munin
+show_progress setup_monitoring_munin
+
+
+# info
+cat <<EOF
+
+   Folgendes ist nun noch zu tun:
+   ==============================
+EOF
+if [ ! -e /etc/tinc/ffsbb/hosts/$HOSTNAME ]; then
+cat <<EOF
+*  Datei /etc/tinc/ffsbb/hosts.1/$HOSTNAME nach Git kopieren
+   https://github.com/freifunk-stuttgart/tinc-ffsbb/tree/master/hosts/
+EOF
+cat /etc/tinc/ffsbb/hosts.1/$HOSTNAME
+echo ""
+fi
+cat <<-EOF
+*  reboot
+
+EOF
+exit
