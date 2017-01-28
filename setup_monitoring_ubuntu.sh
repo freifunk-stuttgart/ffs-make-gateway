@@ -24,8 +24,12 @@ ensureline_exp "allow ^10\.191\.255\.241$" /etc/munin/munin-node.conf
 ensureline_exp "allow ^10\.191\.255\.242$" /etc/munin/munin-node.conf
 ensureline_exp "allow ^10\.191\.255\.243$" /etc/munin/munin-node.conf
 
-ensureline_tr "\[fastdall]" /etc/munin/plugin-conf.d/munin-node
-ensureline "  user root" /etc/munin/plugin-conf.d/munin-node
+# fix fuer ens3 Lan Device
+if [ "$EXT_IF_V4" = "ens3" ]; then
+  ensureline_tr "\[if_ens3]" /etc/munin/plugin-conf.d/munin-node
+  ensureline "  env.speed 1000" /etc/munin/plugin-conf.d/munin-node
+fi
+
 # tun0 in Statistic
 if [ ! -e /etc/munin/plugins/if_tun0 ]; then
   ln -s '/usr/share/munin/plugins/if_' '/etc/munin/plugins/if_tun0'
