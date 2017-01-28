@@ -169,6 +169,8 @@ setup_monitoring_checktasks
 show_progress setup_monitoring_checktasks
 setup_monitoring_munin
 show_progress setup_monitoring_munin
+setup_monitoring_vnstat
+show_progress setup_monitoring_vnstat
 
 
 # info

@@ -61,6 +61,17 @@ fi
 
 }
 
+setup_monitoring_vnstat() {
+replaceline "BandwidthDetection 1" "BandwidthDetection 0" /etc/vnstat.conf
+if [ ! -e /var/lib/vnstat/tun ]; then 
+  vnstat -u -i tun0
+  vnstat -u -i tun0
+  sleep 2
+  chown vnstat:vnstat /var/lib/vnstat/tun0
+  chown vnstat:vnstat /var/lib/vnstat/.tun0
+fi
+}
+
 setup_monitoring_updateff() {
 if [ ! -e /usr/local/bin/update_peers.py ]; then
   wget https://raw.githubusercontent.com/poldy79/FfsScripts/master/update_peers.py -nd -P /usr/local/bin/
