@@ -37,8 +37,8 @@ chmod +x /etc/openvpn/openvpn-down
 # Config anpassen
 ensureline "route-noexec" /etc/openvpn/00.conf
 ensureline "script-security 2" /etc/openvpn/00.conf
-ensureline "up \"openvpn-up\"" /etc/openvpn/00.conf
-ensureline "down \"openvpn-down\"" /etc/openvpn/00.conf
+ensureline_tr "up \"openvpn-up\"" /etc/openvpn/00.conf
+ensureline_tr "down \"openvpn-down\"" /etc/openvpn/00.conf
 
 }
 

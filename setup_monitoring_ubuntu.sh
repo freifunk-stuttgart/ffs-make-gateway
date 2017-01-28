@@ -20,11 +20,11 @@ setup_monitoring_munin() {
 
 setup_monitoring_statuspl
 
-ensureline "allow ^10\.191\.255\.241$" /etc/munin/munin-node.conf
-ensureline "allow ^10\.191\.255\.242$" /etc/munin/munin-node.conf
-ensureline "allow ^10\.191\.255\.243$" /etc/munin/munin-node.conf
+ensureline_exp "allow ^10\.191\.255\.241$" /etc/munin/munin-node.conf
+ensureline_exp "allow ^10\.191\.255\.242$" /etc/munin/munin-node.conf
+ensureline_exp "allow ^10\.191\.255\.243$" /etc/munin/munin-node.conf
 
-ensureline "\[fastdall]" /etc/munin/plugin-conf.d/munin-node
+ensureline_tr "\[fastdall]" /etc/munin/plugin-conf.d/munin-node
 ensureline "  user root" /etc/munin/plugin-conf.d/munin-node
 
 cat <<EOF >/usr/share/munin/plugins/fastdall
