@@ -24,8 +24,6 @@ if [ "$VPNKEY" != "Wird generiert" ]; then
   cat <<EOF >/etc/fastd/secret.conf
 secret "$VPNKEY";
 EOF
-else
-  VPNKEY=$(sed -n '/secret/{ s/.* "//; s/".*//; p}' /etc/fastd/secret.conf)
 fi
 
 # Might do separate fastd for ipv4 and ipv6
