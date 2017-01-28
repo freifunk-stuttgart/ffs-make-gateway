@@ -26,7 +26,10 @@ ensureline_exp "allow ^10\.191\.255\.243$" /etc/munin/munin-node.conf
 
 ensureline_tr "\[fastdall]" /etc/munin/plugin-conf.d/munin-node
 ensureline "  user root" /etc/munin/plugin-conf.d/munin-node
-
+# tun0 in Statistic
+if [ ! -e /etc/munin/plugins/if_tun0 ]; then
+  ln -s '/usr/share/munin/plugins/if_' '/etc/munin/plugins/if_tun0'
+fi
 cat <<EOF >/usr/share/munin/plugins/fastdall
 #!/bin/sh
 
