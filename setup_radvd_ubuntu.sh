@@ -1,6 +1,7 @@
 setup_radvd() {
+rm -f /etc/radvd.conf
 for seg in $SEGMENTLIST ; do
-cat <<EOF >/etc/radvd.conf
+cat <<EOF >>/etc/radvd.conf
 interface br$seg
 {
   AdvSendAdvert on;
