@@ -10,7 +10,7 @@ cat <<EOF >&2
 usage: $0 --dhcpid N [--no-apt-update] [--segmentlist N] [--no-log-call]
 Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --help:          Dieser Text
---dhcpid:        DHCP Server ID (1-4)
+--dhcpid:        DHCP Server ID (1-3)
 --no-apt-update: apt-get update nicht ausfuehren
 --segmentlist:   Liste der Segmente, bitte in " angeben, Default "01 02 03 04"
 --email:         Mailadresse an die Meldungen geschickt werden sollen
@@ -19,7 +19,7 @@ EOF
 }
 CONFIRM=1
 LOG_CALL=1
-NEEDS_APTUPDATE=1
+NEEDS_APTUPDATE=0
 SEGMENTLIST="01 02 03 04"
 EMAIL=albi@albi.info
 error() {
@@ -97,20 +97,24 @@ fi
 . setup_bird_ubuntu.sh
 . setup_dnsmasq_ubuntu.sh
 . setup_monitoring_ubuntu.sh
+. setup_iscdhcpserver_ubuntu.sh
 
 if [ x"$NEEDS_APTKEY" == x1 ]; then add_apt_keys; fi
 if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
 
-apt -y install munin-node mutt ntp python-psutil jq dnsmasq git tinc vnstat isc-dhcp-server bird dnsutils
+#apt -y install munin-node mutt ntp python-psutil jq dnsmasq git tinc vnstat isc-dhcp-server bird dnsutils
 
+setup_iscdhcpserver_config
+show_progress setup_iscdhcpserver_config
+exit
 setup_tinc_config
 show_progress setup_tinc_config
 setup_tinc_key
 show_progress setup_tinc_key
 setup_bird
 show_progress setup_bird
-setup_dnsmasq
-show_progress setup_dnsmasq
+#setup_dnsmasq
+#show_progress setup_dnsmasq
 
 # Monitoring
 setup_monitoring_updateff

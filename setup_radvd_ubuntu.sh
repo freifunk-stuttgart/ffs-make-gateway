@@ -1,11 +1,6 @@
 setup_radvd() {
 for seg in $SEGMENTLIST ; do
-  routeliste+="  route fd21:b4dc:4b$seg::/64 {};\n"
-done
-
-rm -f /etc/radvd.conf
-for seg in $SEGMENTLIST ; do
-cat <<EOF >>/etc/radvd.conf
+cat <<EOF >/etc/radvd.conf
 interface br$seg
 {
   AdvSendAdvert on;
@@ -16,8 +11,9 @@ interface br$seg
   AdvDefaultLifetime 0;
   prefix fd21:b4dc:4b$seg::/64 {};
   RDNSS fd21:b4dc:4b$seg::a38:$GWID$GWSUBID {};
+  route fd21:b4dc:4b00::/40 {};\n"
+
 EOF
-echo -e "$routeliste};\n" >>/etc/radvd.conf
 done
 
 }
