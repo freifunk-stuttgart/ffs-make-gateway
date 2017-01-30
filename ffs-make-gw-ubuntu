@@ -131,7 +131,7 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
 printf 'isc-dhcp-relay\tisc-dhcp-relay/servers\tstring\t%s\n' "$DHCPRELAYSERVERS" | debconf-set-selections
 printf 'isc-dhcp-relay\tisc-dhcp-relay/interfaces\tstring\t\n' | debconf-set-selections
 printf 'isc-dhcp-relay\tisc-dhcp-relay/options\tstring\t-q -a\n' | debconf-set-selections
-apt -y install munin-node mutt apache2 ntp python-psutil jq sysfsutils linux-image-generic dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
+apt -y install collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils linux-image-generic dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
 
 setup_system_sysctl
 show_progress setup_system_sysctl
@@ -171,7 +171,8 @@ setup_monitoring_munin
 show_progress setup_monitoring_munin
 setup_monitoring_vnstat
 show_progress setup_monitoring_vnstat
-
+setup_monitoring_collectd
+show_progress setup_monitoring_collectd
 
 # info
 cat <<EOF
