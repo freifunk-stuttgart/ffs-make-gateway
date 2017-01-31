@@ -60,7 +60,7 @@ router id 10.191.255.$GWID$GWSUBID;      # eigene IP im tincbb
 # Filter definieren
 filter ffs_filter {
   krt_metric = 100;
-  if net ~ [ fd21:b4dc:4b00::/56+ ] then accept;
+  if net ~ [ fd21:b4dc:4b00::/40+ ] then accept;
   else reject;
 }
 
