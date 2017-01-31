@@ -97,7 +97,7 @@ fi
 . setup_bird_ubuntu.sh
 . setup_dnsmasq_ubuntu.sh
 . setup_monitoring_ubuntu.sh
-. setup_iscdhcpserver_ubuntu.sh
+. setup_dhcp_ubuntu.sh
 
 if [ x"$NEEDS_APTKEY" == x1 ]; then add_apt_keys; fi
 if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi

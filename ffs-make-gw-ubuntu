@@ -120,6 +120,7 @@ fi
 . setup_bird_ubuntu.sh
 . setup_radvd_ubuntu.sh
 . setup_dnsmasq_ubuntu.sh
+. setup_dhcp_ubuntu.sh
 . setup_openvpn_ubuntu.sh
 . setup_monitoring_ubuntu.sh
 
@@ -128,9 +129,6 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
 
 # batadv-vis ist nicht in backports
 
-printf 'isc-dhcp-relay\tisc-dhcp-relay/servers\tstring\t%s\n' "$DHCPRELAYSERVERS" | debconf-set-selections
-printf 'isc-dhcp-relay\tisc-dhcp-relay/interfaces\tstring\t\n' | debconf-set-selections
-printf 'isc-dhcp-relay\tisc-dhcp-relay/options\tstring\t-q -a\n' | debconf-set-selections
 apt -y install collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils linux-image-generic dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
 
 setup_system_sysctl
@@ -159,6 +157,8 @@ setup_radvd
 show_progress setup_radvd
 setup_dnsmasq
 show_progress setup_dnsmasq
+setup_iscdhcprelay_config
+show_progress setup_iscdhcprelay_config
 setup_openvpn
 show_progress setup_openvpn
 

@@ -1,3 +1,18 @@
+setup_iscdhcprelay_config() {
+# default config neu schreiben
+cat <<-EOF >/etc/default/isc-dhcp-relay
+# geschrieben von ffs-make-gateway-ubuntu
+SERVERS="10.191.255.251 10.191.255.252 10.191.255.253"
+
+# On what interfaces should the DHCP relay (dhrelay) serve DHCP requests?
+INTERFACES="ffsbb$(echo " $SEGMENTLIST" | sed 's/ / br/g')"
+
+# Additional options that are passed to the DHCP relay daemon?
+OPTIONS=""
+EOF
+}
+
+
 setup_iscdhcpserver_config() {
 start=$(($DHCPID * 4 ))
 stop=$(($start + 3 ))
