@@ -31,7 +31,7 @@ for ipv in ip4 ip6; do
       if [ $i -eq 0 ]; then
         VPNPORT=10037
       else
-        VPNPORT=1004$i
+        VPNPORT=$((10040+$i))
       fi
       if [ $ipv == ip6 ]; then
         dir=/etc/fastd/vpn${seg}ip6
