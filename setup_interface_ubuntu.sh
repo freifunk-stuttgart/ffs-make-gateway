@@ -25,7 +25,7 @@ allow-hotplug vpn$seg
 iface vpn$seg inet6 manual
   hwaddress 02:00:38:$seg:$GWLID:$GWLSUBID
   pre-up          /sbin/modprobe batman-adv || true
-  pre-up          /sbin/ip link set \$IFACE address 02:00:38:00:$GWLID:$GWLSUBID up || true
+  pre-up          /sbin/ip link set \$IFACE address 02:00:38:$seg:$GWLID:$GWLSUBID up || true
   post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
   post-up         /sbin/ip link set dev bat$seg up || true
 
@@ -33,7 +33,7 @@ allow-hotplug vpn${seg}bb
 iface vpn${seg}bb inet6 manual
   hwaddress 02:00:35:$seg:$GWLID:$GWLSUBID
   pre-up          /sbin/modprobe batman-adv || true
-  pre-up          /sbin/ip link set \$IFACE address 02:00:35:00:$GWLID:$GWLSUBID up || true
+  pre-up          /sbin/ip link set \$IFACE address 02:00:35:$seg:$GWLID:$GWLSUBID up || true
   post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
   post-up         /sbin/ip link set dev bat$seg up || true
 
