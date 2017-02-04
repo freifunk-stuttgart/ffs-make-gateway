@@ -147,7 +147,7 @@ cat <<EOF >/usr/local/bin/check-tasks
 
       ####    fastd pruefen
       PRG="fastd"
-      BACK=\$(ifconfig | grep vpn | wc -l)
+      BACK=\$(ifconfig -a | grep vpn | wc -l)
       echo -n "check \$PRG: "
       if [ "\$BACK" != \$FASTDANZAHL ] ; then
           echo "Error"

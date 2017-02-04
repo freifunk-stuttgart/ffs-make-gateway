@@ -129,8 +129,11 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
 
 # batadv-vis ist nicht in backports
 
-apt -y install collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils linux-image-generic dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
-
+apt -y install postfix collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils linux-image-generic dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
+# ubuntu
+if [ $(cat /etc/apt/sources.list | grep jessie | wc -l) -le 1 ]; then
+  apt -y install linux-image-generic
+fi
 setup_system_sysctl
 show_progress setup_system_sysctl
 setup_system_sysfs
