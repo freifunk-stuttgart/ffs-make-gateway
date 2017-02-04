@@ -230,7 +230,7 @@ if [ x$FASTD_SPLIT == x1 ]; then
 fi
 for seg in $(seq 1 $SEGMENTS); do
   if [ x$FASTD_SPLIT == x1 ]; then
-    systemctl enable fastd@vpn$(printf "%02i" $seg)ip6.service"; "
+    systemctl enable fastd@vpn$(printf "%02i" $seg)ip6.service
   fi
   systemctl enable fastd@vpn$(printf "%02i" $seg).service 
   systemctl enable fastd@bb$(printf "%02i" $seg).service 
