@@ -11,7 +11,7 @@ ConnectTo = dhcp01
 ConnectTo = dhcp02
 ConnectTo = dhcp03
 ConnectTo = gw01n01
-ConnectTo = gw05
+ConnectTo = gw01n03
 ConnectTo = gw08n02
 ConnectTo = gw08n03
 Mode = switch
@@ -24,6 +24,7 @@ ip addr add 10.191.255.$GWID$GWSUBID/24 broadcast 10.191.255.255 dev \$INTERFACE
 ip link set \$INTERFACE up
 ip rule add iif \$INTERFACE table stuttgart priority 7000
 ip route add 10.191.255.0/24 proto kernel scope link src 10.191.255.$GWID$GWSUBID dev \$INTERFACE table stuttgart
+ip route add 10.190.0.0/15 dev \$INTERFACE table stuttgart
 ip addr add fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/64 dev \$INTERFACE
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE table stuttgart
 service isc-dhcp-server restart
