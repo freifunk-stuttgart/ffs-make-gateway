@@ -225,7 +225,13 @@ systemctl daemon-reload
 update-rc.d fastd disable
 systemctl enable fastd@vpn00.service 
 systemctl enable fastd@bb00.service 
+if [ x$FASTD_SPLIT == x1 ]; then
+  systemctl enable fastd@vpn00ip6.service 
+fi
 for seg in $(seq 1 $SEGMENTS); do
+  if [ x$FASTD_SPLIT == x1 ]; then
+    systemctl enable fastd@vpn$(printf "%02i" $seg)ip6.service"; "
+  fi
   systemctl enable fastd@vpn$(printf "%02i" $seg).service 
   systemctl enable fastd@bb$(printf "%02i" $seg).service 
 done
@@ -282,6 +288,9 @@ if [ x"$OPT_FWLIHAS" == x1 ]; then
   echo systemctl start firewall-lihas
 fi
 for i in $(seq 0 4); do
+  if [ x$FASTD_SPLIT == x1 ]; then
+    echo -n systemctl start fastd@vpn$(printf "%02i" $seg)ip6.service"; "
+  fi
   echo -n systemctl start fastd@vpn$(printf "%02i" $seg).service"; "
   echo -n systemctl start fastd@bb$(printf "%02i" $seg).service"; "
 done
