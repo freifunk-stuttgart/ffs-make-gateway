@@ -78,10 +78,10 @@ setup_fastd_bb() {
   fi
   for i in $(seq 0 $SEGMENTS); do
     seg=$(printf '%02i' $i)
-    mkdir -p /etc/fastd/bb$seg
-    cat <<-EOF >/etc/fastd/bb$seg/fastd.conf
+    mkdir -p /etc/fastd/vpn${seg}bb
+    cat <<-EOF >/etc/fastd/vpn${seg}bb/fastd.conf
 	log to syslog level warn;
-	interface "bb$seg";
+	interface "vpn${seg}bb";
 	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
 	method "salsa2012+umac";  
 	bind $(printf '0.0.0.0:9%03i' $i);
@@ -89,25 +89,25 @@ setup_fastd_bb() {
 	include "/etc/fastd/fastdbb.key";
 	mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
 	on verify "/root/freifunk/unclaimed.py";
-	status socket "/var/run/fastd/fastd-bb$seg.sock";
+	status socket "/var/run/fastd/fastd-vpn${seg}bb.sock";
 	include peers from "/etc/fastd/ffs-vpn/peers/vpn$seg/bb";
 EOF
-    VPNBBPUB=$(fastd -c /etc/fastd/bb$seg/fastd.conf --show-key --machine-readable)
+    VPNBBPUB=$(fastd -c /etc/fastd/vpn${seg}bb/fastd.conf --show-key --machine-readable)
     if [ ! -e /root/git/peers-ffs/vpn$seg/bb/$HOSTNAME ] || ! grep $VPNBBPUB /root/git/peers-ffs/vpn$seg/bb/$HOSTNAME; then
       cat <<-EOF >/root/git/peers-ffs/vpn$seg/bb/${HOSTNAME}s$seg
 	key "$VPNBBPUB";
 	remote "${HOSTNAME}.freifunk-stuttgart.de" port $(printf '9%03i' $i);
 EOF
     fi
-    cat <<-EOF >/etc/network/interfaces.d/bb$seg
-	allow-hotplug bb$seg
-	iface bb$seg inet6 manual
-		hwaddress 02:00:37:$seg:$GWLID:$GWLSUBID
-		pre-up		/sbin/modprobe batman_adv || true
-	        pre-up          /sbin/ip link set \$IFACE address 02:00:37:$seg:$GWLID:$GWLSUBID up || true
-	        post-up         /sbin/ip link set dev \$IFACE up || true
-	        post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
-EOF
+#    cat <<-EOF >/etc/network/interfaces.d/vpn${seg}bb
+#	allow-hotplug bb$seg
+#	iface bb$seg inet6 manual
+#		hwaddress 02:00:37:$seg:$GWLID:$GWLSUBID
+#		pre-up		/sbin/modprobe batman_adv || true
+#	        pre-up          /sbin/ip link set \$IFACE address 02:00:37:$seg:$GWLID:$GWLSUBID up || true
+#	        post-up         /sbin/ip link set dev \$IFACE up || true
+#	        post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
+#EOF
   done
   (
     cd /root/git/peers-ffs
