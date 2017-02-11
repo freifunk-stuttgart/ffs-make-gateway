@@ -45,7 +45,10 @@ if [ ! -e /etc/tinc/ffsbb/rsa_key.priv ]; then
   ensureline "port = 6551" /etc/tinc/ffsbb/hosts/$HOSTNAME
 fi
 # debug auf 2
-ensureline "EXTRA=\"-d 2\"" /etc/default/tinc
+cat <<EOF >/etc/default/tinc
+# Debuglevel auf 2
+EXTRA="-d 2"
+EOF
 # tinc aktivieren
 ensureline "ffsbb" /etc/tinc/nets.boot
 }
