@@ -55,13 +55,8 @@ class/net/br01/bridge/hash_max = 4096
 class/net/br02/bridge/hash_max = 4096
 class/net/br03/bridge/hash_max = 4096
 class/net/br04/bridge/hash_max = 4096
-class/net/batbr00/bridge/hash_max = 4096
-class/net/batbr01/bridge/hash_max = 4096
-class/net/batbr02/bridge/hash_max = 4096
-class/net/batbr03/bridge/hash_max = 4096
-class/net/batbr04/bridge/hash_max = 4096
 EOF
-service sysfsutils restart
+service sysfsutils restart || true
 }
 
 setup_system_routing() {
