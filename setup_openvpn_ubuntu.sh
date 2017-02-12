@@ -9,8 +9,7 @@ echo "Config rotieren!"
 mv \$ovpn/00.conf \$ovpn/00.ovpn
 mv \$ovpn/01.ovpn \$ovpn/00.conf
 mv \$ovpn/02.ovpn \$ovpn/01.ovpn
-mv \$ovpn/03.ovpn \$ovpn/02.ovpn
-mv \$ovpn/00.ovpn \$ovpn/03.ovpn
+mv \$ovpn/00.ovpn \$ovpn/02.ovpn
 service \$prg restart
 EOF
 chmod +x /usr/local/bin/switch-vpn

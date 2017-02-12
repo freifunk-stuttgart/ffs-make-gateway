@@ -299,8 +299,7 @@ cat <<EOF >/usr/local/bin/check-tasks
               mv \$OVPN/00.conf \$OVPN/00.ovpn
               mv \$OVPN/01.ovpn \$OVPN/00.conf
               mv \$OVPN/02.ovpn \$OVPN/01.ovpn
-              mv \$OVPN/03.ovpn \$OVPN/02.ovpn
-              mv \$OVPN/00.ovpn \$OVPN/03.ovpn
+              mv \$OVPN/00.ovpn \$OVPN/02.ovpn
               service \$PRG restart
               ANTWORT+="\$PRG Config gewechselt nach \$(cat \$OVPN/00.conf | grep remote)\n\n"
           fi
