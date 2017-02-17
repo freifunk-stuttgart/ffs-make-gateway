@@ -38,10 +38,10 @@ ensureline "route-noexec" /etc/openvpn/00.conf
 ensureline "script-security 2" /etc/openvpn/00.conf
 ensureline_tr "up \"openvpn-up\"" /etc/openvpn/00.conf
 ensureline_tr "down \"openvpn-down\"" /etc/openvpn/00.conf
-ensureline "sndbuf 393216" /etc/openvpn/00.ovpn
-ensureline "rcvbuf 393216" /etc/openvpn/00.ovpn
-ensureline_tr "push \"sndbuf 393216\"" /etc/openvpn/00.ovpn
-ensureline_tr "push \"rcvbuf 393216\"" /etc/openvpn/00.ovpn
+ensureline "sndbuf 393216" /etc/openvpn/00.conf
+ensureline "rcvbuf 393216" /etc/openvpn/00.conf
+ensureline_tr "push \"sndbuf 393216\"" /etc/openvpn/00.conf
+ensureline_tr "push \"rcvbuf 393216\"" /etc/openvpn/00.conf
 ensureline "route-noexec" /etc/openvpn/01.ovpn
 ensureline "script-security 2" /etc/openvpn/01.ovpn
 ensureline_tr "up \"openvpn-up\"" /etc/openvpn/01.ovpn
