@@ -36,8 +36,8 @@ cd ffs-make-gateway
 Erstellen eine Gateways gw06n02.freifunk-stuttgart.de der in Segment 3 arbeitet:  
 ./ffs-make-gw-ubuntu --email fehler@ffs.ovh --gwid 6 --gwsubid 2 --segmentlist "03"  
 
-Erstellen eine Gateways gw08n06.freifunk-stuttgart.de der in den Segmenten 1 3 4 5 6 8 15 arbeitet:  
-./ffs-make-gw-ubuntu --email fehler@ffs.ovh --gwid 8 --gwsubid 6 --segmentlist "01 03 04 05 06 08 15"
+Erstellen eine Gateways gw08n06.freifunk-stuttgart.de der in den Segmenten 1 2 3 4 5 6 7 8 9 10 arbeitet:  
+./ffs-make-gw-ubuntu --email fehler@ffs.ovh --gwid 8 --gwsubid 6 --segmentlist "01 02 03 04 05 06 07 08 09 10"  
 
 Nachdem das Script ohne Fehler gelaufen ist, ist ein reboot nötig.
 
