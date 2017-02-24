@@ -137,6 +137,7 @@ fi
 . setup_ffsconfiggenerator.sh
 . setup_firewall.sh
 . setup_interface.sh
+. setup_monitoring_ubuntu.sh
 . setup_monitoring.sh
 . setup_system.sh
 . setup_tinc.sh
@@ -261,6 +262,7 @@ show_progress setup_bird
 
 # Monitoring
 setup_monitoring
+setup_monitoring_collectd
 show_progress setup_monitoring
 
 # Uplink VPN

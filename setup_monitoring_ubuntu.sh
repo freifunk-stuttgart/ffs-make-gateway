@@ -358,6 +358,7 @@ LoadPlugin syslog
     LogLevel info
 </Plugin>
 
+LoadPlugin conntrack
 LoadPlugin cpu
 LoadPlugin df
 LoadPlugin disk
