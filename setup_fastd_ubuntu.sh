@@ -27,10 +27,11 @@ secret "$VPNKEY";
 EOF
 fi
 
-# alte Verzeichnisse löschen
+# alte Verzeichnisse und Dateien löschen
 rm -rf /etc/fastd/bb[0-6][0-9]
 rm -rf /etc/fastd/vpn[0-6][0-9]
 rm -rf /etc/fastd/vpn[0-6][0-9]bb
+rm /etc/fastd/${HOSTNAME}s[0-6][0-9]
 
 # fastd Verzeichnisse anlegen
 for seg in $SEGMENTLIST; do
