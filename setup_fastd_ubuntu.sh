@@ -27,7 +27,12 @@ secret "$VPNKEY";
 EOF
 fi
 
-# Might do separate fastd for ipv4 and ipv6
+# alte Verzeichnisse löschen
+rm -rf /etc/fastd/bb[0-6][0-9]
+rm -rf /etc/fastd/vpn[0-6][0-9]
+rm -rf /etc/fastd/vpn[0-6][0-9]bb
+
+# fastd Verzeichnisse anlegen
 for seg in $SEGMENTLIST; do
     vpnport=$((10040 + ${seg#0}))
     vpnportbb=$((9040 + ${seg#0}))
