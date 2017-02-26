@@ -29,8 +29,8 @@ iface vpn$seg inet6 manual
   post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
   post-up         /sbin/ip link set dev bat$seg up || true
 
-allow-hotplug vpn${seg}bb
-iface vpn${seg}bb inet6 manual
+allow-hotplug bb${seg}
+iface bb${seg} inet6 manual
   hwaddress 02:00:35:$seg:$GWLID:$GWLSUBID
   pre-up          /sbin/modprobe batman-adv || true
   pre-up          /sbin/ip link set \$IFACE address 02:00:35:$seg:$GWLID:$GWLSUBID up || true

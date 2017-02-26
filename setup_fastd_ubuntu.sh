@@ -32,9 +32,9 @@ for seg in $SEGMENTLIST; do
     vpnport=$((10040 + ${seg#0}))
     vpnportbb=$((9040 + ${seg#0}))
     dir=/etc/fastd/vpn$seg
-    dirbb=${dir}bb
+    dirbb=/etc/fastd/bb$seg
     iface="vpn${seg}"
-    ifacebb=${iface}bb
+    ifacebb="bb${seg}"
     mkdir -p $dir
     mkdir -p $dirbb
     if [ ! -d $dir/peers ]; then
