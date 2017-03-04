@@ -110,7 +110,7 @@ while : ; do
    # Segmentinfo generieren
 #   rm \$WWW/seg/*
 #   for seg in $SEGMENTLIST; do
-#     echo "\$seg" >\$WWW/seg/\s${seg}
+#     echo "\$seg" >\$WWW/seg/s\${seg}
 #     find \$FASTD/vpn\${seg}/peers/ -type f | xargs -i basename {} | xargs -i ln -s \$WWW/seg/s\${seg} \$WWW/seg/{}
 #   done
    echo "*** fertig ***"
