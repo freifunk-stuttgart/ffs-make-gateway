@@ -108,10 +108,10 @@ while : ; do
      status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
    done
    # Segmentinfo generieren
-#   rm $WWW/seg/*
+#   rm \$WWW/seg/*
 #   for seg in $SEGMENTLIST; do
-#     echo "$seg" >$WWW/seg/s${seg}
-#     find $FASTD/vpn${seg}/peers/ -type f | xargs -i basename {} | xargs -i ln -s $WWW/seg/s${seg} $WWW/seg/{}
+#     echo "\$seg" >\$WWW/seg/\s${seg}
+#     find \$FASTD/vpn\${seg}/peers/ -type f | xargs -i basename {} | xargs -i ln -s \$WWW/seg/s\${seg} \$WWW/seg/{}
 #   done
    echo "*** fertig ***"
    sleep 120
