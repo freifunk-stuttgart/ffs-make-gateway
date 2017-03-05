@@ -15,7 +15,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --gwsubid:       Gateway Sub-ID
 --vpnkey:        use this fastd private key (string)
 --directtcp:     Liste der TCP-Ports die direkt ausgeleitet werden, durch Leerzeichen getrennt (Quoting nicht vergessen)
---dhcp-relay-servers: DHCP Relay Server die dieses GW benutzt, Default "10.190.128.5 10.191.255.252 10.191.255.253"
+--dhcp-relay-servers: DHCP Relay Server die dieses GW benutzt, Default "10.190.128.251 10.191.255.252 10.191.255.253"
 --no-apt-update: apt-get update nicht ausfuehren
 --othergw:       IP eines anderen GWs fuer ausgehenden Traffic, z.B. 172.21.16.1 (gw04)
 --segmentlist:   Liste der Segmente, bitte in " angeben, Default "01 02 03 04"
@@ -24,7 +24,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 EOF
 }
 CONFIRM=1
-DHCPRELAYSERVERS="10.190.128.5 10.191.255.252 10.191.255.253"
+DHCPRELAYSERVERS="10.190.128.251 10.191.255.252 10.191.255.253"
 DIRECTTCP="22 587 993 995 443"
 GWSUBID="1"
 LOG_CALL=1
