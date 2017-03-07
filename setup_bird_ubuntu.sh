@@ -88,7 +88,7 @@ protocol ospf ffsBackbone {
                               # Uplinks aus dem Weg zu gehen
       import filter ffs_filter;
       export filter ffs_filter;
-      area 0.0.0.0 {          # Backbone-Area
+      area 1 {          # Backbone-Area
           external{
                   ::/0;
           };

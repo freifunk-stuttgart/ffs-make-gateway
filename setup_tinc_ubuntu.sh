@@ -12,10 +12,10 @@ ConnectTo = dhcp02
 ConnectTo = dhcp03
 ConnectTo = gw01n03
 ConnectTo = gw05n02
-ConnectTo = gw08n02
 ConnectTo = gw08n03
 Mode = switch
 Port = 6551
+IndirectData = yes
 #GraphDumpFile = /tmp/ffsbb.gv
 EOF
 cat <<EOF >/etc/tinc/ffsbb/tinc-up
