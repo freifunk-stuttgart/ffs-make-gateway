@@ -88,7 +88,7 @@ cat <<EOF >/etc/tinc/ffsl3/tinc-up
 ip addr add 10.191.254.$GWID$GWSUBID/24 broadcast 10.191.255.255 dev \$INTERFACE
 ip link set \$INTERFACE up
 ip rule add iif \$INTERFACE table stuttgart priority 7000
-ip route add 10.191.254.0/24 dev $INTERFACE table stuttgart
+ip route add 10.191.254.0/24 dev \$INTERFACE table stuttgart
 
 ip route add 10.191.255.0/24 proto kernel scope link src 10.191.255.$GWID$GWSUBID dev \$INTERFACE table stuttgart
 ip route add 10.190.0.0/15 dev \$INTERFACE
