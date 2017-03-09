@@ -154,6 +154,8 @@ setup_tinc_config
 show_progress setup_tinc_config
 setup_tinc_key
 show_progress setup_tinc_key
+setup_tinc_config
+show_progress setup_tincl3_config
 setup_tincl3_key
 show_progress setup_tincl3_key
 setup_fastd_config
