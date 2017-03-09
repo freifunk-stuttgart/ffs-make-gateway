@@ -82,6 +82,7 @@ ConnectTo = gw05n02
 ConnectTo = gw08n05
 Mode = router
 Port = 6552
+DeviceType = tap
 #GraphDumpFile = /tmp/ffsl3.gv
 EOF
 cat <<EOF >/etc/tinc/ffsl3/tinc-up
