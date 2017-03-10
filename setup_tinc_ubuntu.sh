@@ -128,11 +128,15 @@ if [ ! -d /etc/tinc/ffsl3/hosts.1 ]; then
   mv /etc/tinc/ffsl3/hosts /etc/tinc/ffsl3/hosts.1
   ln -s /root/tinc-ffsl3/ffsl3/hosts /etc/tinc/ffsl3/hosts
 fi
-# hosts config aktualisieren
+# hosts config subnet hinzufuegen
 cp -f /etc/tinc/ffsl3/hosts.1/$HOSTNAME /etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
+cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
+subnet = fd21:b4dc:4b00::a39:$GWLID$GWLSUBID/128
+subnet = fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/128
+EOF
 for seg in $SEGMENTLIST; do
 cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
-subnet = fd21:b4dc:4b$seg::a39:$GWLID$GWLSUBID/128
+subnet = fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/128
 subnet = fd21:b4dc:4b$seg::/64
 EOF
 done
