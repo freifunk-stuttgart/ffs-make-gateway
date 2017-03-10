@@ -39,7 +39,7 @@ ip rule del to 172.21.0.0/18 table stuttgart
 EOF
 chmod +x /etc/tinc/ffsbb/tinc-down
 # hosts Datei anpassen nur einmal
-if [ ! -e /etc/tinc/ffsbb/rsa_key.priv ]; then
+if [ ! -e /etc/tinc/ffsbb/hosts/$HOSTNAME ]; then
   ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsbb/hosts/$HOSTNAME
   ensureline "port = 6551" /etc/tinc/ffsbb/hosts/$HOSTNAME
 fi
@@ -106,7 +106,7 @@ ip rule del iif \$INTERFACE table stuttgart priority 7000
 EOF
 chmod +x /etc/tinc/ffsl3/tinc-down
 # hosts Datei anpassen nur einmal
-if [ ! -e /etc/tinc/ffsl3/rsa_key.priv ]; then
+if [ ! -e /etc/tinc/ffsl3/hosts/$HOSTNAME ]; then
   ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsl3/hosts/$HOSTNAME
   ensureline "port = 6552" /etc/tinc/ffsl3/hosts/$HOSTNAME
 fi
@@ -126,7 +126,15 @@ setup_tincl3_key() {
 # key verschieben
 if [ ! -d /etc/tinc/ffsl3/hosts.1 ]; then
   mv /etc/tinc/ffsl3/hosts /etc/tinc/ffsl3/hosts.1
-  ln -s /root/tinc-ffsl3/hosts /etc/tinc/ffsl3/hosts
+  ln -s /root/tinc-ffsl3/ffsl3/hosts /etc/tinc/ffsl3/hosts
 fi
+# hosts config aktualisieren
+cp -f /etc/tinc/ffsl3/hosts.1/$HOSTNAME /etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
+for seg in $SEGMENTLIST; do
+cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
+subnet = fd21:b4dc:4b$seg::a39:$GWLID$GWLSUBID/128
+subnet = fd21:b4dc:4b$seg::/64
+EOF
+done
 }
 
