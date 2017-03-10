@@ -87,12 +87,12 @@ DeviceType = tap
 EOF
 cat <<EOF >/etc/tinc/ffsl3/tinc-up
 #!/bin/sh
-ip addr add 10.191.254.$GWID$GWSUBID/24 broadcast 10.191.255.255 dev \$INTERFACE
+ip addr add 10.191.254.$GWID$GWSUBID/24 broadcast 10.191.254.255 dev \$INTERFACE
 ip link set \$INTERFACE up
 ip rule add iif \$INTERFACE table stuttgart priority 7000
 ip route add 10.191.254.0/24 dev \$INTERFACE table stuttgart
 
-ip route add 10.191.255.0/24 proto kernel scope link src 10.191.255.$GWID$GWSUBID dev \$INTERFACE table stuttgart
+ip route add 10.191.254.0/24 proto kernel scope link src 10.191.254.$GWID$GWSUBID dev \$INTERFACE table stuttgart
 ip route add 10.190.0.0/15 dev \$INTERFACE
 ip route add 10.190.0.0/15 dev \$INTERFACE table stuttgart
 ip addr add fd21:b4dc:4b00::a39:$GWLID$GWLSUBID/128 dev \$INTERFACE metric 512
@@ -131,6 +131,7 @@ fi
 # hosts config subnet hinzufuegen
 cp -f /etc/tinc/ffsl3/hosts.1/$HOSTNAME /etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
 cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
+subnet = 10.191.254.$GWID$GWSUBID
 subnet = fd21:b4dc:4b00::a39:$GWLID$GWLSUBID/128
 subnet = fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/128
 EOF
