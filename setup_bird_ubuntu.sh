@@ -1,5 +1,6 @@
 setup_bird() {
 cat <<-EOF >/etc/bird/bird.conf
+off
 router id 10.191.255.$GWID$GWSUBID;      # eigene IP im tincbb
 
 # Filter definieren
