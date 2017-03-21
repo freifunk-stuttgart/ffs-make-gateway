@@ -41,10 +41,7 @@ if (packet(24, 4) != 00:00:00:00) {
 }
 
 subnet 10.191.255.0 netmask 255.255.255.0 {}
-EOF
-
-cat <<-EOF >>/etc/dhcp/dhcpd.conf
-subnet 172.21.0.0 netmask 255.255.192.0 { pool { range 172.21.28.11 172.21.31.254; allow all clients; } }
+subnet 172.21.0.0 netmask 255.255.192.0 { pool { range 172.21.$start.11 172.21.$stop.254; allow all clients; } }
 EOF
 
 for seg in $SEGMENTLIST ; do
