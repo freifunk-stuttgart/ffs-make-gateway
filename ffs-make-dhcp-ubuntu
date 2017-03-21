@@ -12,7 +12,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --help:          Dieser Text
 --dhcpid:        DHCP Server ID (1-3)
 --no-apt-update: apt-get update nicht ausfuehren
---segmentlist:   Liste der Segmente, bitte in " angeben, Default "01 02 03 04"
+--segmentlist:   Liste der Segmente, bitte in " angeben, Default "01 02 .. 16"
 --email:         Mailadresse an die Meldungen geschickt werden sollen
 --no-log-call:   Aufruf nicht unter /var/log/$0 speichern
 EOF
@@ -20,7 +20,7 @@ EOF
 CONFIRM=1
 LOG_CALL=1
 NEEDS_APTUPDATE=0
-SEGMENTLIST="01 02 03 04 05 06 07 08 09 10 11 12"
+SEGMENTLIST="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16"
 EMAIL=albi@albi.info
 error() {
   print_help
@@ -106,11 +106,15 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
 
 setup_iscdhcpserver_config
 show_progress setup_iscdhcpserver_config
+#setup_tinc_config
+#show_progress setup_tinc_config
+#setup_tinc_key
+#show_progress setup_tinc_key
+setup_tincl3_config
+show_progress setup_tincl3_config
+setup_tincl3_key
+show_progress setup_tincl3_key
 exit
-setup_tinc_config
-show_progress setup_tinc_config
-setup_tinc_key
-show_progress setup_tinc_key
 setup_bird
 show_progress setup_bird
 #setup_dnsmasq
