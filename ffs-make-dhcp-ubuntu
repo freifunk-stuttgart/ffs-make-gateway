@@ -114,19 +114,18 @@ setup_tincl3_config
 show_progress setup_tincl3_config
 setup_tincl3_key
 show_progress setup_tincl3_key
-exit
-setup_bird
-show_progress setup_bird
+#setup_bird
+#show_progress setup_bird
 #setup_dnsmasq
 #show_progress setup_dnsmasq
 
 # Monitoring
-setup_monitoring_updateff
-show_progress setup_monitoring_updateff
-setup_monitoring_checktasks
-show_progress setup_monitoring_checktasks
-setup_monitoring_munin
-show_progress setup_monitoring_munin
+#setup_monitoring_updateff
+#show_progress setup_monitoring_updateff
+#setup_monitoring_checktasks
+#show_progress setup_monitoring_checktasks
+#setup_monitoring_munin
+#show_progress setup_monitoring_munin
 
 
 # info
@@ -135,12 +134,12 @@ cat <<EOF
    Folgendes ist nun noch zu tun:
    ==============================
 EOF
-if [ ! -e /etc/tinc/ffsbb/hosts/$HOSTNAME ]; then
+if [ ! -e /etc/tinc/ffsl3/hosts/$HOSTNAME ]; then
 cat <<EOF
-*  Datei /etc/tinc/ffsbb/hosts.1/$HOSTNAME nach Git kopieren
-   https://github.com/freifunk-stuttgart/tinc-ffsbb/tree/master/hosts/
+*  Datei /etc/tinc/ffsl3/hosts.1/$HOSTNAME nach Git kopieren
+   https://github.com/freifunk-stuttgart/tinc-ffsl3/tree/master/hosts/
 EOF
-cat /etc/tinc/ffsbb/hosts.1/$HOSTNAME
+cat /etc/tinc/ffsl3/hosts.1/$HOSTNAME
 echo ""
 fi
 cat <<-EOF

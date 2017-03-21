@@ -38,11 +38,6 @@ ip rule del to 10.190.0.0/15 table stuttgart
 ip rule del to 172.21.0.0/18 table stuttgart
 EOF
 chmod +x /etc/tinc/ffsbb/tinc-down
-# hosts Datei anpassen nur einmal
-if [ ! -e /etc/tinc/ffsbb/hosts/$HOSTNAME ]; then
-  ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsbb/hosts/$HOSTNAME
-  ensureline "port = 6551" /etc/tinc/ffsbb/hosts/$HOSTNAME
-fi
 # debug auf 2
 cat <<EOF >/etc/default/tinc
 # Debuglevel auf 2
@@ -53,14 +48,17 @@ ensureline "ffsbb" /etc/tinc/nets.boot
 }
 
 setup_tinc_key() {
-  if [ ! -e /etc/tinc/ffsbb/rsa_key.priv ]; then
-    echo | tincd -n ffsbb -K 4096
-  fi
+if [ ! -e /etc/tinc/ffsbb/rsa_key.priv ]; then
+  echo | tincd -n ffsbb -K 4096
+fi
 # key verschieben
 if [ ! -d /etc/tinc/ffsbb/hosts.1 ]; then
   mv /etc/tinc/ffsbb/hosts /etc/tinc/ffsbb/hosts.1
   ln -s /root/tinc-ffsbb/hosts /etc/tinc/ffsbb/hosts
 fi
+# hosts Datei anpassen
+ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsbb/hosts.1/$HOSTNAME
+ensureline "port = 6551" /etc/tinc/ffsbb/hosts.1/$HOSTNAME
 }
 
 
@@ -103,11 +101,6 @@ cat <<EOF >/etc/tinc/ffsl3/tinc-down
 ip rule del iif \$INTERFACE table stuttgart priority 7000
 EOF
 chmod +x /etc/tinc/ffsl3/tinc-down
-# hosts Datei anpassen nur einmal
-if [ ! -e /etc/tinc/ffsl3/hosts/$HOSTNAME ]; then
-  ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsl3/hosts/$HOSTNAME
-  ensureline "port = 6552" /etc/tinc/ffsl3/hosts/$HOSTNAME
-fi
 # debug auf 2
 cat <<EOF >/etc/default/tinc
 # Debuglevel auf 2
@@ -118,14 +111,17 @@ ensureline "ffsl3" /etc/tinc/nets.boot
 }
 
 setup_tincl3_key() {
-  if [ ! -e /etc/tinc/ffsl3/rsa_key.priv ]; then
-    echo | tincd -n ffsl3 -K 4096
-  fi
+if [ ! -e /etc/tinc/ffsl3/rsa_key.priv ]; then
+  echo | tincd -n ffsl3 -K 4096
+fi
 # key verschieben
 if [ ! -d /etc/tinc/ffsl3/hosts.1 ]; then
   mv /etc/tinc/ffsl3/hosts /etc/tinc/ffsl3/hosts.1
   ln -s /root/tinc-ffsl3/ffsl3/hosts /etc/tinc/ffsl3/hosts
 fi
+# hosts Datei anpassen
+ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsl3/hosts.1/$HOSTNAME
+ensureline "port = 6552" /etc/tinc/ffsl3/hosts.1/$HOSTNAME
 # hosts config subnet hinzufuegen
 cp -f /etc/tinc/ffsl3/hosts.1/$HOSTNAME /etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
 cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
