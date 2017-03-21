@@ -62,6 +62,10 @@ EXT_GW_V4=$(ip r l table main | sed -n '/default/{s/.*via //; s/ .*//; p}')
 EXT_IF_V6=$(ip -6 r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}')
 EXT_IPS_V6=$(ip -6 a l dev $EXT_IF_V6 | sed -n '/inet6/{s/.*inet6 //; s/\/.*//; /fe80/d; p}')
 HOSTNAME=dhcp${DHCPLID}
+GWID=2
+GWLID=02
+GWSUBID=5$DHCPID
+GWLSUBID=5$DHCPID
 cat <<EOF
 DHCPServerID (DHCPID): $DHCPID
 Hostname: $HOSTNAME
@@ -70,6 +74,7 @@ Externe IP v4 (EXT_IP_V4): $EXT_IP_V4
 Externes Interface v6 (EXT_IF_V6): $EXT_IF_V6
 Externe IPs v6 (EXT_IP_V6): $EXT_IPS_V6
 Segmente: $SEGMENTLIST
+$GWLID$GWLSUBID
 EOF
 if [ $CONFIRM -eq 1 ]; then
 	echo "Wenn alles richtig ist, Eingabe druecken, sonst Abbrechen mit Strg-C"
@@ -136,10 +141,10 @@ cat <<EOF
 EOF
 if [ ! -e /etc/tinc/ffsl3/hosts/$HOSTNAME ]; then
 cat <<EOF
-*  Datei /etc/tinc/ffsl3/hosts.1/$HOSTNAME nach Git kopieren
+*  Datei /etc/tinc/ffsl3/hosts.1/$HOSTNAME.tinc nach Git kopieren
    https://github.com/freifunk-stuttgart/tinc-ffsl3/tree/master/hosts/
 EOF
-cat /etc/tinc/ffsl3/hosts.1/$HOSTNAME
+cat /etc/tinc/ffsl3/hosts.1/$HOSTNAME.tinc
 echo ""
 fi
 cat <<-EOF
