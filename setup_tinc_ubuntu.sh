@@ -44,7 +44,7 @@ cat <<EOF >/etc/default/tinc
 EXTRA="-d 2"
 EOF
 # tinc aktivieren
-ensureline "ffsbb" /etc/tinc/nets.boot
+echo "ffsbb" >>/etc/tinc/nets.boot
 }
 
 setup_tinc_key() {
@@ -85,13 +85,13 @@ DeviceType = tap
 EOF
 cat <<EOF >/etc/tinc/ffsl3/tinc-up
 #!/bin/sh
-ip addr add 10.191.254.$GWID$GWSUBID/24 broadcast 10.191.254.255 dev \$INTERFACE
+ip addr add 10.191.255.$GWID$GWSUBID/24 broadcast 10.191.255.255 dev \$INTERFACE
 ip link set \$INTERFACE up
 ip rule add iif \$INTERFACE table stuttgart priority 7000
-ip route add 10.191.254.0/24 proto kernel scope link src 10.191.254.$GWID$GWSUBID dev \$INTERFACE table stuttgart
+ip route add 10.191.255.0/24 proto kernel scope link src 10.191.255.$GWID$GWSUBID dev \$INTERFACE table stuttgart
 ip route add 10.190.0.0/15 dev \$INTERFACE metric 512
 ip route add 10.190.0.0/15 dev \$INTERFACE metric 512 table stuttgart
-ip addr add fd21:b4dc:4b00::a39:$GWLID$GWLSUBID/128 dev \$INTERFACE metric 512
+ip addr add fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/128 dev \$INTERFACE metric 512
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE metric 512
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE metric 512 table stuttgart
 EOF
@@ -107,7 +107,7 @@ cat <<EOF >/etc/default/tinc
 EXTRA="-d 2"
 EOF
 # tinc aktivieren
-ensureline "ffsl3" /etc/tinc/nets.boot
+echo "ffsl3" >>/etc/tinc/nets.boot
 }
 
 setup_tincl3_key() {
@@ -125,12 +125,15 @@ ensureline "port = 6552" /etc/tinc/ffsl3/hosts.1/$HOSTNAME
 # hosts config subnet hinzufuegen
 cp -f /etc/tinc/ffsl3/hosts.1/$HOSTNAME /etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
 cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
-subnet = 10.191.254.$GWID$GWSUBID
-subnet = fd21:b4dc:4b00::a39:$GWLID$GWLSUBID/128
+subnet = 10.191.255.$GWID$GWSUBID/32
 subnet = fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/128
 EOF
 for seg in $SEGMENTLIST; do
+netz=$((${seg#0} - 1))
+netz=$(($netz * 8))
 cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
+subnet = 10.190.$netz.$GWID$GWSUBID/32
+subnet = 10.190.$netz.0/21
 subnet = fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/128
 subnet = fd21:b4dc:4b$seg::/64
 EOF
