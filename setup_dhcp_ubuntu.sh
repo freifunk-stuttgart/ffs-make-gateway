@@ -5,7 +5,7 @@ cat <<-EOF >/etc/default/isc-dhcp-relay
 SERVERS="10.191.255.251 10.191.255.252 10.191.255.253"
 
 # On what interfaces should the DHCP relay (dhrelay) serve DHCP requests?
-INTERFACES="ffsbb$(echo " $SEGMENTLIST" | sed 's/ / br/g')"
+INTERFACES="ffsl3$(echo " $SEGMENTLIST" | sed 's/ / br/g')"
 
 # Additional options that are passed to the DHCP relay daemon?
 OPTIONS=""
