@@ -194,18 +194,18 @@ cat <<EOF >/usr/local/bin/check-tasks
           echo "OK"
       fi
 
-      ####    bird pruefen
-      PRG="bird"
-      BACK=\$(pgrep -x \$PRG)
-      echo -n "check \$PRG: "
-      if [ -z "\$BACK" ] ; then
-          echo "Error"
-          ANTWORT+="Fehler: \$PRG nicht gestartet\nFehler: \$BACK\n\n"
-          service \$PRG restart
-          sleep 5
-      else
-          echo "OK"
-      fi
+#      ####    bird pruefen
+#      PRG="bird"
+#      BACK=\$(pgrep -x \$PRG)
+#      echo -n "check \$PRG: "
+#      if [ -z "\$BACK" ] ; then
+#          echo "Error"
+#          ANTWORT+="Fehler: \$PRG nicht gestartet\nFehler: \$BACK\n\n"
+#          service \$PRG restart
+#          sleep 5
+#      else
+#          echo "OK"
+#      fi
 
 #      ####    bird6 pruefen
 #      PRG="bird6"

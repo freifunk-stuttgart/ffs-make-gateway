@@ -119,7 +119,7 @@ fi
 . setup_interface_ubuntu.sh
 . setup_system_ubuntu.sh
 . setup_tinc_ubuntu.sh
-. setup_bird_ubuntu.sh
+#. setup_bird_ubuntu.sh
 . setup_radvd_ubuntu.sh
 . setup_dnsmasq_ubuntu.sh
 . setup_dhcp_ubuntu.sh
@@ -131,7 +131,8 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
 
 # batadv-vis ist nicht in backports
 
-apt -y install postfix collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
+#apt -y install postfix collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
+apt -y install postfix collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay radvd dnsutils
 # ubuntu
 if [ $(cat /etc/apt/sources.list | grep jessie | wc -l) -le 1 ]; then
   apt -y install linux-image-generic
@@ -161,8 +162,10 @@ setup_tincl3_key
 show_progress setup_tincl3_key
 setup_fastd_config
 show_progress setup_fastd_config
-setup_bird
-show_progress setup_bird
+rm -f /etc/bird/bird.conf
+rm -f /etc/bird/bird6.conf
+#setup_bird
+#show_progress setup_bird
 setup_radvd
 show_progress setup_radvd
 setup_dnsmasq
