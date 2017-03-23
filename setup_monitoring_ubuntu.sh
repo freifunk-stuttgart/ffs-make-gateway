@@ -103,7 +103,13 @@ while : ; do
    back=\$( git pull )
    echo "tinc-ffsbb: \$back"
    tincd -n ffsbb -k HUP
-   tincd -n ffsbb -k WINCH
+#   tincd -n ffsbb -k WINCH
+   ## ffsl3 aktualisieren
+   cd /root/tinc-ffsl3/
+   back=\$( git pull )
+   echo "tinc-ffsl3: \$back"
+   tincd -n ffsl3 -k HUP
+#   tincd -n ffsl3 -k WINCH
    # Status veroeffentlichen
    for i in \$VPNS; do
      status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
