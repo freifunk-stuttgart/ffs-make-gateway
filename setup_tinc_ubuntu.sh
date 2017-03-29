@@ -28,7 +28,7 @@ ip route add 10.190.0.0/15 dev \$INTERFACE metric 256 table stuttgart
 ip addr add fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/128 dev \$INTERFACE
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE metric 1024
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE metric 1024 table stuttgart
-service isc-dhcp-server restart
+service isc-dhcp-relay restart
 EOF
 chmod +x /etc/tinc/ffsbb/tinc-up
 cat <<EOF >/etc/tinc/ffsbb/tinc-down
@@ -93,7 +93,7 @@ ip route add 10.190.0.0/15 dev \$INTERFACE metric 512 table stuttgart
 ip addr add fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/128 dev \$INTERFACE
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE metric 512
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE metric 512 table stuttgart
-service isc-dhcp-server restart
+service isc-dhcp-relay restart
 EOF
 chmod +x /etc/tinc/ffsl3/tinc-up
 cat <<EOF >/etc/tinc/ffsl3/tinc-down
