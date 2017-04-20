@@ -71,7 +71,7 @@ if [ ! -d /etc/tinc/ffsl3 ]; then
 fi
 cat <<EOF >/etc/tinc/ffsl3/tinc.conf
 Name = $HOSTNAME
-ConnectTo = dhcp01
+#ConnectTo = dhcp01
 ConnectTo = dhcp02
 ConnectTo = dhcp03
 ConnectTo = gw05n01
