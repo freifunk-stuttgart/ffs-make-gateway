@@ -11,8 +11,8 @@ ConnectTo = dhcp01
 ConnectTo = dhcp02
 ConnectTo = dhcp03
 ConnectTo = gw05n01
-ConnectTo = gw08n04
-ConnectTo = gw08n05
+#ConnectTo = gw08n04
+#ConnectTo = gw08n05
 Mode = switch
 Port = 6551
 #GraphDumpFile = /tmp/ffsbb.gv
@@ -106,6 +106,10 @@ cat <<EOF >/etc/default/tinc
 # Debuglevel auf 2
 EXTRA="-d 2"
 EOF
+# tinc conf.d einrichten
+if [ ! -d /etc/tinc/ffsl3/conf.d ]; then
+  ln -s /root/tinc-ffsl3/ffsl3/conf.d /etc/tinc/ffsl3/conf.d
+fi
 # tinc aktivieren
 echo "ffsl3" >>/etc/tinc/nets.boot
 }
