@@ -213,12 +213,12 @@ EOF
 cat /etc/fastd/$HOSTNAME
 echo ""
 fi
-if [ ! -e /etc/tinc/ffsbb/hosts/$HOSTNAME ]; then
+if [ ! -e /etc/tinc/ffsl3/hosts/$HOSTNAME ]; then
 cat <<EOF
-*  Datei /etc/tinc/ffsbb/hosts.1/$HOSTNAME nach Git kopieren
-   https://github.com/freifunk-stuttgart/tinc-ffsbb/tree/master/hosts/
+*  Datei /etc/tinc/ffsl3/hosts.1/$HOSTNAME nach Git kopieren
+   https://github.com/freifunk-stuttgart/tinc-ffsl3/tree/master/hosts/
 EOF
-cat /etc/tinc/ffsbb/hosts.1/$HOSTNAME
+cat /etc/tinc/ffsl3/hosts.1/$HOSTNAME
 echo ""
 fi
 # pruefe Scaleway/dhcp Internet
