@@ -146,6 +146,7 @@ cat <<EOF >/usr/local/bin/check-tasks
   VPNERROR=0
   VPNDOWN=1
   EMAILZAHL=0
+  dhcppause=10
 
   if [ -n "\$1" ]; then
       TESTMODE=\$1
@@ -196,8 +197,26 @@ cat <<EOF >/usr/local/bin/check-tasks
           ANTWORT+="Fehler: \$PRG nicht gestartet\nFehler: \$BACK\n\n"
           service \$PRG restart
           sleep 5
+          dhcppause=10
       else
           echo "OK"
+      fi
+      if [ "$dhcppause" -gt 0 ] ; then
+         ((dhcppause--))
+      else
+        echo -n "check $PRG: "
+        tcpdump -n -i any port 67 or port 68 -c 20 2>/dev/null |
+        awk 'BEGIN {req=0; rep=0; answer=0}
+             $7 ~ /^Request$/ {req++}
+             $7 ~ /^Reply,$/ {rep++}
+             $3 ~ /67$/ && $5 ~ /68:$/ {answer++}
+             END {print "Request:" req "  Reply:" rep "  Answer:" answer; exit answer}'
+        if [ $? == 0 ]; then
+          ANTWORT+="Fehler: $PRG leitet keine Daten durch\n\n"
+          service $PRG restart
+          sleep 5
+          dhcppause=10
+        fi
       fi
 
 #      ####    bird pruefen
