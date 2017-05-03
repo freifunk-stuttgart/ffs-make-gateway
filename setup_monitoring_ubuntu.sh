@@ -201,7 +201,7 @@ cat <<EOF >/usr/local/bin/check-tasks
       else
           echo "OK"
       fi
-      if [ "$dhcppause" -gt 0 ] ; then
+      if [ "\$dhcppause" -gt 0 ] ; then
          ((dhcppause--))
       else
         echo -n "check $PRG: "
