@@ -127,15 +127,15 @@ fi
 ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsl3/hosts.1/$HOSTNAME
 ensureline "port = 6552" /etc/tinc/ffsl3/hosts.1/$HOSTNAME
 # hosts config subnet hinzufuegen
-cp -f /etc/tinc/ffsl3/hosts.1/$HOSTNAME /etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
-cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
+cp -f /etc/tinc/ffsl3/hosts.1/$HOSTNAME /etc/tinc/ffsl3/${HOSTNAME}
+cat <<EOF >>/etc/tinc/ffsl3/${HOSTNAME}
 subnet = 10.191.255.$GWID$GWSUBID/32
 subnet = fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/128
 EOF
 for seg in $SEGMENTLIST; do
 netz=$((${seg#0} - 1))
 netz=$(($netz * 8))
-cat <<EOF >>/etc/tinc/ffsl3/hosts.1/${HOSTNAME}.tinc
+cat <<EOF >>/etc/tinc/ffsl3/${HOSTNAME}
 subnet = 10.190.$netz.$GWID$GWSUBID/32
 subnet = 10.190.$netz.0/21
 subnet = fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/128
