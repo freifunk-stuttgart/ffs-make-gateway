@@ -213,7 +213,7 @@ EOF
 cat /etc/fastd/$HOSTNAME
 echo ""
 fi
-if [ ! -e /etc/tinc/ffsl3/hosts/$HOSTNAME ] || [ diff /etc/tinc/ffsl3/$HOSTNAME /etc/tinc/ffsl3/hosts/$HOSTNAME | wc -l -gt 0 ]; then
+if [ ! -e /etc/tinc/ffsl3/hosts/$HOSTNAME ] || [ $(diff /etc/tinc/ffsl3/$HOSTNAME /etc/tinc/ffsl3/hosts/$HOSTNAME | wc -l) -gt 0 ]; then
 cat <<EOF
 *  Datei /etc/tinc/ffsl3/$HOSTNAME nach Git kopieren
    https://github.com/freifunk-stuttgart/tinc-ffsl3/tree/master/hosts/
