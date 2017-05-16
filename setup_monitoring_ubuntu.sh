@@ -98,11 +98,11 @@ while : ; do
    back=\$( git pull )
    echo "fastd-peers: \$back"
    /usr/local/bin/update_peers.py --repo /etc/fastd/peers
-   ## ffsbb aktualisieren
-   cd /root/tinc-ffsbb/
-   back=\$( git pull )
-   echo "tinc-ffsbb: \$back"
-   tincd -n ffsbb -k HUP
+#   ## ffsbb aktualisieren
+#   cd /root/tinc-ffsbb/
+#   back=\$( git pull )
+#   echo "tinc-ffsbb: \$back"
+#   tincd -n ffsbb -k HUP
 #   tincd -n ffsbb -k WINCH
    ## ffsl3 aktualisieren
    cd /root/tinc-ffsl3/
