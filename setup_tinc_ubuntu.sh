@@ -57,7 +57,7 @@ if [ ! -d /etc/tinc/ffsbb/hosts.1 ]; then
   ln -s /root/tinc-ffsbb/hosts /etc/tinc/ffsbb/hosts
 fi
 # hosts Datei anpassen
-ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsbb/hosts.1/$HOSTNAME
+ensureline "address = $HOSTNAME.gw.freifunk-stuttgart.de" /etc/tinc/ffsbb/hosts.1/$HOSTNAME
 ensureline "port = 6551" /etc/tinc/ffsbb/hosts.1/$HOSTNAME
 }
 
@@ -124,7 +124,7 @@ if [ ! -d /etc/tinc/ffsl3/hosts.1 ]; then
   ln -s /root/tinc-ffsl3/ffsl3/hosts /etc/tinc/ffsl3/hosts
 fi
 # hosts Datei anpassen
-ensureline "address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsl3/hosts.1/$HOSTNAME
+ensureline "address = $HOSTNAME.gw.freifunk-stuttgart.de" /etc/tinc/ffsl3/hosts.1/$HOSTNAME
 ensureline "port = 6552" /etc/tinc/ffsl3/hosts.1/$HOSTNAME
 # hosts config subnet hinzufuegen
 cp -f /etc/tinc/ffsl3/hosts.1/$HOSTNAME /etc/tinc/ffsl3/${HOSTNAME}
