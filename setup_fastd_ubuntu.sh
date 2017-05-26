@@ -36,15 +36,22 @@ rm -f  /etc/fastd/${HOSTNAME}s[0-6][0-9]
 # fastd Verzeichnisse anlegen
 for seg in $SEGMENTLIST; do
     vpnport=$((10040 + ${seg#0}))
+    vpnportvpx=$((10140 + ${seg#0}))
     vpnportbb=$((9040 + ${seg#0}))
     dir=/etc/fastd/vpn$seg
+    dirvpx=/etc/fastd/vpx$seg
     dirbb=/etc/fastd/bb$seg
     iface="vpn${seg}"
+    ifacevpx="vpx${seg}"
     ifacebb="bb${seg}"
     mkdir -p $dir
+    mkdir -p $dirvpx
     mkdir -p $dirbb
     if [ ! -d $dir/peers ]; then
       ln -s /etc/fastd/peers/$iface/peers $dir/peers
+    fi
+    if [ ! -d $dirvpx/peers ]; then
+      ln -s /etc/fastd/peers/$iface/peers $dirvpx/peers
     fi
     if [ ! -d $dirbb/bb ]; then
       ln -s /etc/fastd/peers/$iface/bb $dirbb/bb
@@ -74,12 +81,30 @@ hide ip addresses yes;
 hide mac addresses yes;
 method "salsa2012+umac";    # new method (faster)
 method "salsa2012+gmac";
-#method "null+salsa2012+umac";
+method "null+salsa2012+umac";
 mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
 #peer limit 60;
 EOF
 
-    cat <<-EOF >$dirbb/fastd.conf
+cat <<-EOF >$dirvpx/fastd.conf
+interface "$ifacevpx";
+status socket "/var/run/fastd-$ifacevpx.status";
+bind $EXT_IP_V4:$vpnportvpx;
+${i}bind [$EXT_IPS_V6]:$vpnportvpx;
+include "../secret.conf";
+include peers from "peers";
+# error|warn|info|verbose|debug|debug2
+log level info;
+hide ip addresses yes;
+hide mac addresses yes;
+method "salsa2012+umac";    # new method (faster)
+method "salsa2012+gmac";
+method "null+salsa2012+umac";
+mtu 1312; # 1492 - IPv4/IPv6 Header - fastd Header...
+#peer limit 60;
+EOF
+
+cat <<-EOF >$dirbb/fastd.conf
 interface "$ifacebb";
 status socket "/var/run/fastd-$ifacebb.status";
 bind $EXT_IP_V4:$vpnportbb;
