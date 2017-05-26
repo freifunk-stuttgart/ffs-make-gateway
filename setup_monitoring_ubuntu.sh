@@ -168,7 +168,7 @@ cat <<EOF >/usr/local/bin/check-tasks
           echo "Error"
           ANTWORT+="Fehler: \$PRG nicht gestartet\nFehler: \$BACK\n\n"
           service \$PRG stop
-          sleep 1
+          sleep 5
           service \$PRG start
           sleep 5
       else
