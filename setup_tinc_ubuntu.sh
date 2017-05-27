@@ -44,7 +44,7 @@ cat <<EOF >/etc/default/tinc
 EXTRA="-d 2"
 EOF
 # tinc aktivieren
-echo "ffsbb" >>/etc/tinc/nets.boot
+enshureline "ffsbb" /etc/tinc/nets.boot
 }
 
 setup_tinc_key() {

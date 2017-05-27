@@ -151,7 +151,6 @@ rm -f /etc/network/interfaces.d/br[0-8][0-9]
 setup_interface_segxx
 show_progress setup_interface_segxx
 
-rm -f /etc/tinc/nets.boot
 #setup_tinc_config
 #show_progress setup_tinc_config
 #setup_tinc_key
