@@ -162,8 +162,8 @@ setup_tincl3_key
 show_progress setup_tincl3_key
 setup_fastd_config
 show_progress setup_fastd_config
-rm -f /etc/bird/bird.conf
-rm -f /etc/bird/bird6.conf
+#rm -f /etc/bird/bird.conf
+#rm -f /etc/bird/bird6.conf
 #setup_bird
 #show_progress setup_bird
 setup_radvd
