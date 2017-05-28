@@ -36,7 +36,7 @@ rm -f  /etc/fastd/${HOSTNAME}s[0-6][0-9]
 # fastd Verzeichnisse anlegen
 for seg in $SEGMENTLIST; do
     vpnport=$((10040 + ${seg#0}))
-    vpnportvpx=$((10140 + ${seg#0}))
+    vpnportvpx=$((10000 + ${seg#0}))
     vpnportbb=$((9040 + ${seg#0}))
     dir=/etc/fastd/vpn$seg
     dirvpx=/etc/fastd/vpx$seg
