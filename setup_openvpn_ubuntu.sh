@@ -22,7 +22,7 @@ ip route add 128.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
 # NAT aktivieren und NAT Tabelle vergroessern, wird benötigt wenn NICHT Berlin
 iptables -t nat -A POSTROUTING -o \$dev -j MASQUERADE
 sysctl -w net.netfilter.nf_conntrack_max=500000
-exit 0
+#exit 0
 
 # https+Mailports direkt ausleiten
 ip rule add fwmark 0x2000 lookup direct priority 6000
