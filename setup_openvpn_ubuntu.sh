@@ -23,7 +23,10 @@ ip route add 128.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
 iptables -t nat -A POSTROUTING -o \$dev -j MASQUERADE
 sysctl -w net.netfilter.nf_conntrack_max=500000
 #exit 0
+EOF
 
+if [ "x$DIRECTTCP" != "x" ]; then
+cat <<-EOF >/etc/openvpn/openvpn-up
 # https+Mailports direkt ausleiten
 ip rule add fwmark 0x2000 lookup direct priority 6000
 iptables -t mangle -A PREROUTING -j MARK --set-xmark 0x0/0xffffffff
@@ -36,6 +39,7 @@ done
 ip route show table main | while read ROUTE ; do ip route add table direct \$ROUTE ; done
 exit 0
 EOF
+fi
 chmod +x /etc/openvpn/openvpn-up
 cat <<-EOF >/etc/openvpn/openvpn-down
 #!/bin/sh
