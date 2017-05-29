@@ -26,7 +26,7 @@ sysctl -w net.netfilter.nf_conntrack_max=500000
 EOF
 
 if [ "x$DIRECTTCP" != "x" ]; then
-cat <<-EOF >/etc/openvpn/openvpn-up
+cat <<-EOF >>/etc/openvpn/openvpn-up
 # https+Mailports direkt ausleiten
 ip rule add fwmark 0x2000 lookup direct priority 6000
 iptables -t mangle -A PREROUTING -j MARK --set-xmark 0x0/0xffffffff
