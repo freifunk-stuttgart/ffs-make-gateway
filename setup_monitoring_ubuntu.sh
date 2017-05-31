@@ -201,19 +201,22 @@ cat <<EOF >/usr/local/bin/check-tasks
       else
           echo "OK"
       fi
+
+      ####    isc-dhcp-relay pruefen
+      PRG="isc-dhcp-relay"
       if [ "\$dhcppause" -gt 0 ] ; then
          ((dhcppause--))
       else
-        echo -n "check $PRG: "
+        echo -n "check \$PRG: "
         tcpdump -n -i any port 67 or port 68 -c 20 2>/dev/null |
         awk 'BEGIN {req=0; rep=0; answer=0}
-             $7 ~ /^Request$/ {req++}
-             $7 ~ /^Reply,$/ {rep++}
-             $3 ~ /67$/ && $5 ~ /68:$/ {answer++}
+             \$7 ~ /^Request\$/ {req++}
+             \$7 ~ /^Reply,\$/ {rep++}
+             \$3 ~ /67\$/ && \$5 ~ /68:\$/ {answer++}
              END {print "Request:" req "  Reply:" rep "  Answer:" answer; exit answer}'
         if [ \$? == 0 ]; then
-          ANTWORT+="Fehler: $PRG leitet keine Daten durch\n\n"
-          service $PRG restart
+          ANTWORT+="Fehler: \$PRG leitet keine Daten durch\n\n"
+          service \$PRG restart
           sleep 5
           dhcppause=10
         fi
