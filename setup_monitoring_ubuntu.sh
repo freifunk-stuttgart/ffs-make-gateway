@@ -219,6 +219,8 @@ cat <<EOF >/usr/local/bin/check-tasks
           service \$PRG restart
           sleep 5
           dhcppause=10
+        else
+          echo "OK"
         fi
       fi
 
