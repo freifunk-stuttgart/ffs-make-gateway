@@ -213,7 +213,7 @@ cat <<EOF >/usr/local/bin/check-tasks
              \$7 ~ /^Request\$/ {req++}
              \$7 ~ /^Reply,\$/ {rep++}
              \$3 ~ /67\$/ && \$5 ~ /68:\$/ {answer++}
-             END {print "Request:" req "  Reply:" rep "  Answer:" answer; exit answer}'
+             END {print "Request:" req "  Reply:" rep "  Answer:" answer; exit rep}'
         if [ \$? == 0 ]; then
           ANTWORT+="Fehler: \$PRG leitet keine Daten durch\n\n"
           service \$PRG restart
