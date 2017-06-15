@@ -117,7 +117,7 @@ hide ip addresses yes;
 hide mac addresses yes;
 method "salsa2012+umac";    # new method (faster)
 method "salsa2012+gmac";
-#method "null+salsa2012+umac";
+method "null+salsa2012+umac";
 mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
 #peer limit 60;
 EOF
