@@ -177,7 +177,7 @@ cat <<EOF >/usr/local/bin/check-tasks
 
       ####    tinc pruefen
       PRG="tinc"
-      BACK=\$(pgrep -f "tincd .*\-n ffsl3")
+      BACK=\$(pgrep -x "tincd")
       echo -n "check \$PRG: "
       if [ -z "\$BACK" ] ; then
           echo "Error"
