@@ -16,7 +16,7 @@ no-hosts
 cache-size=4096
 #log-queries
 # .ffs/ffstg.de Weiterleitung
-server=/ffs/172.21.2.60
+server=/ffs/10.191.255.41
 server=/ffstg.de/51.254.139.175
 # Forward DNS requests via wan-vpn
 server=85.214.20.141 #@tun0 # FoeBud
