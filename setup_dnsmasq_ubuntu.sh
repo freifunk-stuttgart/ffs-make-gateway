@@ -1,13 +1,14 @@
 setup_dnsmasq() {
 rm -f /etc/dnsmasq.d/dns
-for seg in $SEGMENTLIST ; do
+#for seg in $SEGMENTLIST ; do
+#cat <<EOF >>/etc/dnsmasq.d/dns
+#interface=br$seg
+#interface=bat$seg
+#interface=vpn$seg
+#EOF
+#done
 cat <<EOF >>/etc/dnsmasq.d/dns
-interface=br$seg
-interface=bat$seg
-interface=vpn$seg
-EOF
-done
-cat <<EOF >>/etc/dnsmasq.d/dns
+except-interface=$EXT_IF_V4
 bind-interfaces
 log-facility=/var/log/dnsmasq.log
 
