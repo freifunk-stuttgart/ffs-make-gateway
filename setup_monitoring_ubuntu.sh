@@ -209,7 +209,7 @@ cat <<EOF >/usr/local/bin/check-tasks
          ((dhcppause--))
       else
         echo -n "check \$PRG: "
-        tcpdump -n -i any port 67 or port 68 -c 20 2>/dev/null |
+        tcpdump -n -i any port 67 or port 68 -c 50 2>/dev/null |
         awk 'BEGIN {req=0; rep=0; answer=0}
              \$7 ~ /^Request\$/ {req++}
              \$7 ~ /^Reply,\$/ {rep++}
