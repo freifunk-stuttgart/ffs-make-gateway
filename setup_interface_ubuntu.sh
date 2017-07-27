@@ -17,8 +17,8 @@ iface br$seg inet static
   post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
   pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
   # default route is unreachable. Nur einmal
-  post-up         /sbin/ip route add unreachable default table stuttgart || true
-  post-down       /sbin/ip route del unreachable default table stuttgart || true
+  post-up         /sbin/ip route add unreachable default table stuttgart metric 9999 || true
+  post-down       /sbin/ip route del unreachable default table stuttgart metric 9999 || true
 
 iface br$seg inet6 static
   address fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID
