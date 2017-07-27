@@ -8,9 +8,10 @@ iface br$seg inet static
   hwaddress 02:00:39:$seg:$GWLID:$GWLSUBID
   address 10.190.$netz.$GWID$GWSUBID
   netmask 255.255.248.0
-  pre-up          /sbin/brctl addbr \$IFACE || true
+  bridge_ports bat$seg
+#  pre-up          /sbin/brctl addbr \$IFACE || true
   up              /sbin/ip address add fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
-  post-down       /sbin/brctl delbr \$IFACE || true
+#  post-down       /sbin/brctl delbr \$IFACE || true
   # be sure all incoming traffic is handled by the appropriate rt_table
   post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
   pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
