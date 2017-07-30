@@ -1,39 +1,114 @@
 setup_tinc_base() {
-if [ ! -d /etc/tinc/ffsbb/.git ]; then
-  mkdir -p /etc/tinc
-  git clone git+ssh://git@github.com/freifunk-stuttgart/tinc-ffsbb /etc/tinc/ffsbb
-fi
-if [ ! -e /etc/tinc/ffsbb/tinc.conf ]; then
-    ln -s $TINCBASE/tinc.conf.sample /etc/tinc/ffsbb/tinc.conf
-fi
-if [ ! -e /etc/tinc/ffsbb/subnet-up ]; then
-    ln -s $TINCBASE/subnet-up.sample /etc/tinc/ffsbb/subnet-up
-fi
-if [ ! -e /etc/tinc/ffsbb/subnet-down ]; then
-    ln -s $TINCBASE/subnet-down.sample /etc/tinc/ffsbb/subnet-down
-fi
+  mkdir -p /var/lib/ffs/git
+  if [ ! -e /etc/systemd/system/tincd\@.service ]; then
+    cat <<-'EOF' >/etc/systemd/system/tincd\@.service
+	[Unit]
+	Description=tincd (connection %I)
+	After=network.target
+	
+	[Service]
+	Type=simple
+	ExecStart=/usr/sbin/tincd -n %I -D
+	Restart=always
+	
+	[Install]
+	WantedBy=multi-user.target
+	EOF
+    systemctl daemon-reload
+  fi
+  if [ ! -d /var/lib/ffs/git/tinc ]; then
+    git clone https://github.com/freifunk-stuttgart/tinc.git /var/lib/ffs/git/tinc
+  else
+    ( cd /var/lib/ffs/git/tinc && git pull )
+  fi
+  for tinc in $TINCNETS; do
+    for ref_file in tinc.conf.sample subnet-up.sample subnet-down.sample conf.d hosts; do
+      dst_file=${ref_file%.sample}
+      if [ ! -e /etc/tinc/ffsl3/$dst_file ]; then
+        ln -s $TINCBASE/tinc/$tinc/tinc.conf.sample /etc/tinc/$tinc/tinc.conf
+      fi
+    done
+    if [ ! -e /etc/tinc/$tinc/rsa_key.priv ]; then
+      ln -s /etc/tinc/rsa_key.priv /etc/tinc/$tinc/
+    fi
+    systemctl enable tincd@$tinc.service
+  done
+  if [ x$TINC_FFSBB = x1 ]; then
+    if [ ! -d /var/lib/ffs/git/tinc-ffsbb ]; then
+      git clone https://github.com/freifunk-stuttgart/tinc-ffsbb /var/lib/ffs/git/tinc-ffsbb
+    else
+      ( cd /var/lib/ffs/git/tinc-ffsbb && git pull )
+    fi
+    mkdir -p /etc/tinc/ffsbb
+    if [ ! -e /etc/tinc/ffsbb/tinc.conf ]; then
+      ln -s $TINCBASE/ffsbb/tinc.conf.sample /etc/tinc/ffsbb/tinc.conf
+    fi
+    if [ ! -e /etc/tinc/ffsbb/subnet-up ]; then
+      ln -s $TINCBASE/ffsbb/subnet-up.sample /etc/tinc/ffsbb/subnet-up
+    fi
+    if [ ! -e /etc/tinc/ffsbb/subnet-down ]; then
+      ln -s $TINCBASE/ffsbb/subnet-down.sample /etc/tinc/ffsbb/subnet-down
+    fi
+    if [ ! -e /etc/tinc/ffsbb/subnet-down ]; then
+      ln -s $TINCBASE/ffsbb/conf.d /etc/tinc/ffsbb/conf.d
+    fi
+    if [ ! -e /etc/tinc/ffsbb/hosts ]; then
+      ln -s $TINCBASE/ffsbb/hosts /etc/tinc/ffsbb/hosts
+    fi
+    systemctl enable tincd@ffsbb.service
+  fi
 }
 setup_tinc_config() {
-  ensureline "PMTUDiscovery = yes" /etc/tinc/ffsbb/hosts/$HOSTNAME
-  ensureline "Digest = sha256" /etc/tinc/ffsbb/hosts/$HOSTNAME
-  ensureline "ClampMSS = yes" /etc/tinc/ffsbb/hosts/$HOSTNAME
-  ensureline "Address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsbb/hosts/$HOSTNAME
-  ensureline "Port = 119${GWLID}" /etc/tinc/ffsbb/hosts/$HOSTNAME
-  ensureline "ConnectTo = $HOSTNAME" /etc/tinc/ffsbb/tinc.conf.sample
-  if [ ! -e /etc/tinc/ffsbb/conf.d/$HOSTNAME ]; then
-    echo ConnectTo = $HOSTNAME > /etc/tinc/ffsbb/conf.d/$HOSTNAME
-    ( cd /etc/tinc/ffsbb && git add conf.d/$HOSTNAME )
+  for tinc in $TINCNETS; do
+    cat <<-EOF >/etc/tinc/$tinc/hosts/$HOSTNAME
+	Digest = sha256
+	Address = $HOSTNAME.gw.freifunk-stuttgart.de
+	Port = 110$GWID$GWSUBID
+	EOF
+    for $segment in $SEGMENTLIST; do
+      IPv4seg=$((${segment#0} * 8))
+      if [ $IPv4seg -gt 255 ]; then
+        IPv4seg=$(($IPv4seg-256))
+        IPv4segbase=191
+      else
+        IPv4segbase=190
+      fi
+      cat <<-EOF >>/etc/tinc/$tinc/hosts/$HOSTNAME
+	Subnet = 10.$IPv4segbase.$IPv4seg.$GWID$GWSUBID
+	Subnet = fd21:b4dc:4b$segment::/64
+	Subnet = fd21:b4dc:4b$segment::a38:$(printf '%i%02i' $GWID $GWSUBID)
+	EOF
+      cat /etc/tinc/rsa_key.pub >>/etc/tinc/$tinc/hosts/$HOSTNAME
+    done
+    cat <<-EOF >/etc/tinc/$tinc/conf.d/$HOSTNAME
+	ConnectTo = $HOSTNAME
+	EOF
+    cat 
+  done
+  if [ x$TINC_FFSBB = x1 ]; then
+    ensureline "PMTUDiscovery = yes" /etc/tinc/ffsbb/hosts/$HOSTNAME
+    ensureline "Digest = sha256" /etc/tinc/ffsbb/hosts/$HOSTNAME
+    ensureline "ClampMSS = yes" /etc/tinc/ffsbb/hosts/$HOSTNAME
+    ensureline "Address = $HOSTNAME.freifunk-stuttgart.de" /etc/tinc/ffsbb/hosts/$HOSTNAME
+    ensureline "Port = 119${GWLID}" /etc/tinc/ffsbb/hosts/$HOSTNAME
+    ensureline "ConnectTo = $HOSTNAME" /etc/tinc/ffsbb/tinc.conf.sample
+    if [ ! -e /etc/tinc/ffsbb/conf.d/$HOSTNAME ]; then
+      echo ConnectTo = $HOSTNAME > /etc/tinc/ffsbb/conf.d/$HOSTNAME
+      ( cd $TINCBASE/ffsbb && git add conf.d/$HOSTNAME )
+    fi
   fi
 }
 setup_tinc_key() {
   if [ ! -e /etc/tinc/rsa_key.priv ]; then
     echo | tincd -K 4096
   fi
-  if [ ! -e /etc/tinc/ffsbb/rsa_key.priv ]; then
-    cp /etc/tinc/rsa_key.priv /etc/tinc/ffsbb/
-  fi
-  if ! grep -q "BEGIN RSA PUBLIC KEY" /etc/tinc/ffsbb/hosts/$HOSTNAME; then
-    cat /etc/tinc/rsa_key.pub >> /etc/tinc/ffsbb/hosts/$HOSTNAME
+  if [ x$TINC_FFSBB = x1 ]; then
+    if [ ! -e /etc/tinc/ffsbb/rsa_key.priv ]; then
+      ln -s /etc/tinc/rsa_key.priv /etc/tinc/ffsbb/
+    fi
+    if ! grep -q "BEGIN RSA PUBLIC KEY" /etc/tinc/ffsbb/hosts/$HOSTNAME; then
+      cat /etc/tinc/rsa_key.pub >> /etc/tinc/ffsbb/hosts/$HOSTNAME
+    fi
   fi
 }
 setup_tinc_git_push() {
@@ -46,11 +121,7 @@ fi
 setup_tinc_interface() {
 cat <<EOF >/etc/network/interfaces.d/ffsbb
 allow-hotplug ffsbb
-auto ffsbb
 iface ffsbb inet static
-    tinc-net ffsbb
-    tinc-mlock yes
-    tinc-pidfile /var/run/tinc.ffsbb.pid
     address 10.191.255.$(($GWID*10+$GWSUBID))
     netmask 255.255.255.0
     broadcast 10.191.255.255
@@ -67,86 +138,18 @@ iface ffsbb inet6 static
 
 EOF
 }
-setup_tinc_segments() {
-  OLDDIR=$(pwd)
-  mkdir -p /root/git
-  cd /root/git
-  if [ ! -d /root/git/tinc ]; then
-    git clone git@github.com:freifunk-stuttgart/tinc.git
-    cd tinc
-  else
-    cd /root/git/tinc && git pull
-  fi
-  if [ ! -e /etc/tinc/rsa_key.priv ]; then
-    echo | tincd -K 4096
-  fi
-
-  for seg in $(seq 0 $SEGMENTS); do
-    net=$(printf "ffsl2s%02i" $seg)
-    ensureline "PMTUDiscovery = yes" /root/git/tinc/$net/hosts/$HOSTNAME
-    ensureline "Digest = sha256" /root/git/tinc/$net/hosts/$HOSTNAME
-    ensureline "ClampMSS = yes" /root/git/tinc/$net/hosts/$HOSTNAME
-    ensureline "Address = $HOSTNAME.freifunk-stuttgart.de" /root/git/tinc/$net/hosts/$HOSTNAME
-    ensureline "Port = 12${GWID}$(printf '%02i' $seg)" /root/git/tinc/$net/hosts/$HOSTNAME
-    ensureline "ConnectTo = $HOSTNAME" /root/git/tinc/$net/tinc.conf.sample
-    if ! grep -q "BEGIN RSA PUBLIC KEY" /root/git/tinc/$net/hosts/$HOSTNAME; then
-      cat /etc/tinc/rsa_key.pub >> /root/git/tinc/$net/hosts/$HOSTNAME
-    fi
-    mkdir -p /root/git/tinc/$net/conf.d
-#    if [ ! -e /root/git/tinc/$net/conf.d/$HOSTNAME ]; then
-#      echo ConnectTo = $HOSTNAME > /root/git/tinc/$net/conf.d/$HOSTNAME
-#    fi
-    git add $net/hosts/$HOSTNAME $net/conf.d
-  done
-  git commit -m $HOSTNAME -a || true
-  git push
-  for seg in $(seq 0 $SEGMENTS); do
-    net=$(printf "ffsl2s%02i" $seg)
-cat << EOF > /etc/network/interfaces.d/$net
-auto $net
-iface $net inet manual
-	tinc-net $net
-	tinc-mlock 1
-	tinc-pidfile /var/run/tinc.$net
-	hwaddress	02:00:37:$(printf "%02i" $seg):$GWLID:$GWLSUBID
-        pre-up          /sbin/modprobe batman_adv || true
-        post-up         /sbin/ip link set $net address 02:00:37:$(printf "%02i" $seg):$GWLID:$GWLSUBID up || true
-        post-up         /sbin/ip link set dev $net up || true
-        post-up         /usr/sbin/batctl -m bat$(printf "%02i" $seg) if add $net || true
-
-EOF
-  done
-  cd $OLDPWD
-
-  mkdir -p /usr/local/bin
-cat <<'EOF' >/usr/local/bin/tinc-segments
-#/bin/bash
-cd /root/git/tinc
-git pull
-for net in ffsl2s00 ffsl2s01 ffsl2s02 ffsl2s03 ffsl2s04; do
-  if [ ! -d /etc/tinc/$net ]; then
-    mkdir /etc/tinc/$net
-  fi
-  rsync -rlHpogDtSvx --delete \
-    --exclude=rsa_key.priv \
-    --exclude=tinc.conf \
-    --exclude=subnet-up \
-    --exclude=subnet-down \
-    --exclude=host-up \
-    --exclude=host-down \
-    /root/git/tinc/$net/. \
-    /etc/tinc/$net/
-done
-killall -HUP tincd || true
-EOF
-chmod +x /usr/local/bin/tinc-segments
-/usr/local/bin/tinc-segments
-for net in ffsl2s00 ffsl2s01 ffsl2s02 ffsl2s03 ffsl2s04; do
-    if [ ! -e /etc/tinc/$net/rsa_key.priv ]; then
-        cp /etc/tinc/rsa_key.priv /etc/tinc/$net/
-    fi
-    if [ ! -e /etc/tinc/$net/tinc.conf ]; then
-        ln -s /etc/tinc/$net/tinc.conf.sample /etc/tinc/$net/tinc.conf
-    fi
-done
+setup_tinc_update() {
+  cat <<-EOF >/usr/local/bin/tinc_update.sh
+	LC_ALL=C
+	cd $TINCBASE/ffsbb
+	if ! git pull 2>&1 | grep 'Already up-to-date' >/dev/null; then
+	    systemctl reload tinc@ffsbb
+	fi
+	for tinc in $TINCNETS; do
+	cd $TINCBASE/\$tinc
+	if ! git pull 2>&1 | grep 'Already up-to-date' >/dev/null; then
+	    systemctl reload tinc@\$tinc
+	fi
+	EOF
+  chmod +x /usr/local/bin/tinc_update.sh
 }

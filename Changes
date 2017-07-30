@@ -1,0 +1,71 @@
+# Variable Daten sollten eigentlich nach /var/lib, hier /var/lib/ffs
+
+Aenderungen durch Merge von ffs-make-gw, ffs-make-gw-ubuntu und FfsConfigGenerator:AA
+fastd
+  Statusfile /var/run/fastd-vpn${seg}${segext}.sock -> /var/run/fastd/fastd-vpn${seg}${segext}.sock
+    segext ist leer oder 'bb'
+    /var/run/fastd kann einem User fastd gehoeren und so weniger Aerger machen wenn fastd nicht als root laufen soll, ausserdem wird /var/run uebersichtlicher
+  Secret Files in /etc/fastd/secret_vpn${segext}.key
+  Mehrere offizielle IPv4/IPv6 Adressen sind moeglich
+  Interfacenamen: vpnSEG, vpnSEGbb, vpnSEGip6
+  Update von https://raw.githubusercontent.com/poldy79/FfsScripts/master/update_peers.py via cron
+  ANPASSUNG noetig: setup_monitoring_ubuntu.sh
+  ANPASSUNG noetig: tinc Aktualisierung
+tinc
+  Start ueber unit file, Interfaceconfig mit allow-hotplug
+bird
+  Aufsplitten der Konfiguration, so dass weitere bird-Funktionalitaet unabhaengig benutzt werden kann
+  Kernel table heisst nun tk_stuttgart statt kernel1
+  In den Kernel wird niemals eine Defaultroute geschrieben
+
+Fertige Funktionen:
+setup_alfred_startup (deleted, obsolete)
+setup_fastd
+setup_fastd_bb
+setup_fastd_config
+setup_fastd_key
+setup_fastd_status (deleted)
+setup_fastd_update
+setup_monitoring_updateff (split)
+setup_tinc_segments (deleted)
+setup_tinc_update (new)
+
+Funktionen:
+add_apt_keys
+add_apt_preference
+add_apt_repositories
+ensureline
+ensureline_exp
+ensureline_insert
+ensureline_tr
+error
+print_help
+replaceline
+setup_batman_dkms
+setup_batman_names
+setup_bird
+setup_dnsmasq
+setup_ffsconfiggenerator_config
+setup_firewall
+setup_interface_seg00
+setup_interface_segxx
+setup_iscdhcprelay_config
+setup_iscdhcpserver_config
+setup_monitoring
+setup_monitoring_checktasks
+setup_monitoring_collectd
+setup_monitoring_munin
+setup_monitoring_statuspl
+setup_monitoring_vnstat
+setup_openvpn
+setup_radvd
+setup_system_routing
+setup_system_sysctl
+setup_system_sysfs
+setup_tinc_base
+setup_tinc_config
+setup_tinc_git_push
+setup_tinc_interface
+setup_tinc_key
+show_progress
+system_setup_sysfs

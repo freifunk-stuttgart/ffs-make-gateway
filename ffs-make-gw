@@ -210,29 +210,21 @@ show_progress setup_interface_segxx
 
 cd "$OLDPWD"
 
-TINCBASE=/etc/tinc/ffsbb
+TINCBASE=/var/lib/ffs/git
+TINCNETS=ffsl3
 setup_tinc_base
 show_progress setup_tinc_base
 cd $TINCBASE
-setup_tinc_config
-show_progress setup_tinc_config
 setup_tinc_key
 show_progress setup_tinc_key
-if [ x"$TINCBASE" != x"/etc/tinc/ffsbb" ]; then
-    rsync -rlHpogDtSvx /etc/tinc/ffsbb/hosts/$HOSTNAME  $TINCBASE/ffsbb/hosts/
-fi
+setup_tinc_config
+show_progress setup_tinc_config
 setup_tinc_git_push
 show_progress setup_tinc_git_push
 setup_tinc_interface
 show_progress setup_tinc_interface
 setup_tinc_update
 show_progress setup_tinc_update
-
-#setup_tincl3_config
-#show_progress setup_tincl3_config
-#setup_tincl3_key
-#show_progress setup_tincl3_key
-
 
 if [ ! -d /root/git/peers-ffs/.git ]; then
   mkdir -p /root/git
