@@ -119,36 +119,72 @@ if [ x$TINC_BB == x1 ]; then
 fi
 }
 setup_tinc_interface() {
-cat <<EOF >/etc/network/interfaces.d/ffsbb
-allow-hotplug ffsbb
-iface ffsbb inet static
-    address 10.191.255.$(($GWID*10+$GWSUBID))
-    netmask 255.255.255.0
-    broadcast 10.191.255.255
-    post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
-    pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
-    post-up         /sbin/ip route add 10.191.255.0/24 dev \$IFACE table stuttgart || true
-    post-down       /sbin/ip route del 10.191.255.0/24 dev \$IFACE table stuttgart || true
-
-iface ffsbb inet6 static
-    address fd21:b4dc:4b00::a38:$(($GWID*10+$GWSUBID))
-    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
-    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
-    netmask 64
-
-EOF
+  if [ x$TINC_FFSBB = x1 ]; then
+    cat <<-EOF >/etc/network/interfaces.d/ffsbb
+	allow-hotplug ffsbb
+	iface ffsbb inet static
+	    address 10.191.255.$(($GWID*10+$GWSUBID))
+	    netmask 255.255.255.0
+	    broadcast 10.191.255.255
+	    post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+	    post-up         /sbin/ip route add 10.191.255.0/24 dev \$IFACE table stuttgart || true
+	    post-down       /sbin/ip route del 10.191.255.0/24 dev \$IFACE table stuttgart || true
+	
+	iface ffsbb inet6 static
+	    address fd21:b4dc:4b00::a38:$(($GWID*10+$GWSUBID))
+	    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
+	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
+	    netmask 64
+	
+	EOF
+    cat <<-EOF >/etc/network/interfaces.d/ffsl3
+	allow-hotplug ffsl3
+	iface ffsbb inet static
+	    address 10.191.254.$(($GWID*10+$GWSUBID))
+	    netmask 255.255.255.0
+	    broadcast 10.191.254.255
+	    post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
+	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
+	
+	EOF
+  else
+    cat <<-EOF >/etc/network/interfaces.d/ffsl3
+	allow-hotplug ffsbb
+	iface ffsbb inet static
+	    address 10.191.254.$(($GWID*10+$GWSUBID))
+	    netmask 255.255.255.0
+	    broadcast 10.191.254.255
+	    post-up         /sbin/ip addr add 10.191.255.$(($GWID*10+$GWSUBID)) dev \$IFACE || true
+	    post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
+	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
+	
+	iface ffsbb inet6 static
+	    address fd21:b4dc:4b00::a38:$(($GWID*10+$GWSUBID))
+	    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
+	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
+	    netmask 64
+	
+	EOF
+  fi
 }
 setup_tinc_update() {
   cat <<-EOF >/usr/local/bin/tinc_update.sh
 	LC_ALL=C
-	cd $TINCBASE/ffsbb
-	if ! git pull 2>&1 | grep 'Already up-to-date' >/dev/null; then
+	if [ x$TINC_FFSBB = x1 ]; then
+	  cd $TINCBASE/ffsbb
+	  if ! git pull 2>&1 | grep 'Already up-to-date' >/dev/null; then
 	    systemctl reload tinc@ffsbb
+	  fi
 	fi
 	for tinc in $TINCNETS; do
 	cd $TINCBASE/\$tinc
 	if ! git pull 2>&1 | grep 'Already up-to-date' >/dev/null; then
-	    systemctl reload tinc@\$tinc
+	  systemctl reload tinc@\$tinc
 	fi
 	EOF
   chmod +x /usr/local/bin/tinc_update.sh
