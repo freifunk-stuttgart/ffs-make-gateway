@@ -7,7 +7,7 @@ CALL="$*"
 
 print_help() {
 cat <<EOF >&2
-usage: $0 --gwid N [--vpnkey=xxxx] [--no-systemd] [--no-apt-update] [--no-apt-key] [--othergw=172.21.16.1] [--directtcp="443[ 995][...]"] [--with-lihas-firewall] [--segments N] [--gws N] [--with-backbone-vpn] [--no-log-call]
+usage: $0 --gwid N [--vpnkey=xxxx] [--no-systemd] [--no-apt-update] [--no-apt-key] [--othergw=172.21.16.1] [--directtcp="443[ 995][...]"] [--with-lihas-firewall] [--segments N] [--gws N] [--with-backbone-vpn] [--no-log-call] [--www=/var/www/html]
 Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --help:          Dieser Text
 --name:          Gatewayname
@@ -23,8 +23,11 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --no-systemd:    Nicht aufd systemd bestehen, dann muss man alles int-Zeugs von hand machen
 --othergw:       IP eines anderen GWs fuer ausgehenden Traffic, z.B. 172.21.16.1 (gw04)
 --segments:      Anzahl Segmente, Default 4
+--segmentlist:   Liste der Segmente, bitte in " angeben, Default "00 01 02 03 04"
+--email:         Mailadresse an die Meldungen geschickt werden sollen
 --with-lihas-firewall: Installiere LiHAS Firewall fuer policy routing
 --with-backbone-vpn: Nimm das backbone-tinc, github-Schreibzugriff auf git+ssh://git@github.com/freifunk-stuttgart/tinc-ffsbb wird benoetigt
+--www:           Webroot
 --no-log-call:   Aufruf nicht unter /var/log/$0 speichern
 EOF
 }
@@ -39,37 +42,40 @@ NEEDS_APTUPDATE=1
 NEEDS_SYSTEMD=1
 OPT_FWLIHAS=0
 SEGMENTS=4
-SEGMENTLIST="01 02 03 04"
+SEGMENTLIST=""
 TINC_BB=0
 VPNKEY="Wird generiert"
+WWWPFAD="/var/www/html"
 error() {
   print_help
   echo "$*"
   exit 1
 }
-TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall -- "$@"`
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall -- "$@"`
 if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 while true ; do
   case "$1" in
-    --dhcp-relay-servers) DHCPRELAYSERVERS="$2"; shift 2;;
-    --directtcp)	DIRECTTCP="$2"; shift 2;;
-    --fastdsplit)	FASTD_SPLIT="1"; shift 1;;
-    --gwid)             GWID=$2; shift 2;;
-    --gws)              GWS=$2; shift 2;;
-    --gwsubid)          GWSUBID=$2; shift 2;;
-    --name)             GWNAME=$2; shift 2;;
-    --no-apt-key)	NEEDS_APTKEY=0; shift 1;;
-    --no-apt-update)	NEEDS_APTUPDATE=0; shift 1;;
-    --no-confirm)	CONFIRM=0; shift 1;;
-    --no-log-call)	LOG_CALL=0; shift 1;;
-    --no-systemd)	NEEDS_SYSTEMD=0; shift 1;;
-    --othergw)		OTHERGW_IP=$2; shift 2;;
-    --segmentlist)		SEGMENTLIST="$2"; shift 2;;
-    --segments)		SEGMENTS="$2"; shift 2;;
-    --vpnkey)           VPNKEY=$2; shift 2;;
-    --with-backbone-vpn) TINC_BB=1; shift 1;;
+    --dhcp-relay-servers)	DHCPRELAYSERVERS="$2"; shift 2;;
+    --directtcp)					DIRECTTCP="$2"; shift 2;;
+    --email)							EMAIL="$2"; shift 2;;
+    --fastdsplit)					FASTD_SPLIT="1"; shift 1;;
+    --gwid)								GWID=$2; shift 2;;
+    --gws)								GWS=$2; shift 2;;
+    --gwsubid)						GWSUBID=$2; shift 2;;
+    --name)								GWNAME=$2; shift 2;;
+    --no-apt-key)					NEEDS_APTKEY=0; shift 1;;
+    --no-apt-update)			NEEDS_APTUPDATE=0; shift 1;;
+    --no-confirm)					CONFIRM=0; shift 1;;
+    --no-log-call)				LOG_CALL=0; shift 1;;
+    --no-systemd)					NEEDS_SYSTEMD=0; shift 1;;
+    --othergw)						OTHERGW_IP=$2; shift 2;;
+    --segmentlist)				SEGMENTLIST="$2"; shift 2;;
+    --segments)						SEGMENTS="$2"; shift 2;;
+    --vpnkey)             VPNKEY=$2; shift 2;;
+    --with-backbone-vpn)  TINC_BB=1; shift 1;;
     --with-lihas-firewall) OPT_FWLIHAS=1; shift 1;;
+    --www)                WWWPFAD=$2; shift 2;;
     --help|-h) print_help; exit 1;;
     --) shift ; break ;;
     *) echo "Unknown parameter $1, try -h" ; exit 1 ;;
@@ -82,6 +88,20 @@ fi
 if [ x"$GWID" == "x" ]; then
 	echo "Keine GatewayID -> kein Gateway"
 	exit 1
+fi
+if [ x"$SEGMENTLIST" == x ]; then
+	SEGMENTLIST=$(
+    for segment in $(seq 0 $SEGMENTS); do
+      printf '%02i ' $segment
+    done
+  )
+else
+  # Alle Segmente zweistellig
+  SEGMENTLIST=$(
+    for segment in $(sed 's/\b0//' <<< $SEGMENTLIST); do
+      printf '%02i ' $segment
+    done
+  )
 fi
 GWLID=$(printf "%02i" $GWID)
 GWLSUBID=$(printf "%02i" $GWSUBID)
@@ -102,6 +122,8 @@ Externes Interface v4 (EXT_IF_V4): $EXT_IF_V4
 Externe IP v4 (EXT_IP_V4): $EXT_IP_V4
 Externes Interface v6 (EXT_IF_V6): $EXT_IF_V6
 Externe IPs v6 (EXT_IP_V6): $EXT_IPS_V6
+Segmente: $SEGMENTLIST
+Email: $EMAIL
 fastd VPN Key: $VPNKEY
 EOF
 if [ $CONFIRM -eq 1 ]; then
@@ -132,13 +154,12 @@ if [ ! -d /etc/apt/sources.list.d ]; then
 fi
 
 . add_repositories.sh
-. setup_alfred.sh
 . setup_batman.sh
 . setup_bird.sh
 . setup_fastd.sh
 . setup_ffsconfiggenerator.sh
 . setup_firewall.sh
-. setup_interface.sh
+. setup_interface_ubuntu.sh
 . setup_monitoring_ubuntu.sh
 . setup_monitoring.sh
 . setup_system.sh
@@ -154,7 +175,7 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt-get update; fi
 printf 'isc-dhcp-relay\tisc-dhcp-relay/servers\tstring\t%s\n' "$DHCPRELAYSERVERS" | debconf-set-selections
 printf 'isc-dhcp-relay\tisc-dhcp-relay/interfaces\tstring\t\n' | debconf-set-selections
 printf 'isc-dhcp-relay\tisc-dhcp-relay/options\tstring\t-q -a\n' | debconf-set-selections
-apt-get -y install resolvconf bind9 build-essential bridge-utils git batctl fastd alfred alfred-json openvpn tinc vnstat vnstati python-pip bind9 radvd conntrack $([ "x$OPT_FWLIHAS" == "x1" ] && echo firewall-lihas) isc-dhcp-relay apt-transport-https libjson-xs-perl libdata-dump-perl sysfsutils check-mk-agent jq xinetd bird equivs socat apache2
+apt-get -y install resolvconf bind9 build-essential bridge-utils git batctl fastd openvpn tinc vnstat vnstati python-pip bind9 radvd conntrack $([ "x$OPT_FWLIHAS" == "x1" ] && echo firewall-lihas) isc-dhcp-relay apt-transport-https libjson-xs-perl libdata-dump-perl sysfsutils check-mk-agent jq xinetd bird equivs socat apache2
 
 show_progress setup_batman_dkms
 setup_batman_dkms
@@ -169,9 +190,6 @@ show_progress setup_fastd
 
 # Networking
 ensureline "source-directory interfaces.d" /etc/network/interfaces
-# Legacy Segment
-setup_interface_seg00
-show_progress setup_interface_seg00
 
 OLDDIR=$(pwd)
 mkdir -p /root/git
@@ -182,9 +200,14 @@ show_progress setup_ffsconfiggenerator_config
 ./gen_config.py --gwnum $GWID --instance $GWSUBID
 show_progress ./gen_config.py --gwnum $GWID --instance $GWSUBID
 # Deploy FfsConfigGenerator results
-rsync -rlHpogDtvx --exclude etc/fastd etc /
-sed -i "s/\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):$GWLID:00/\1:\2:\3:\4:$GWLID:$GWLSUBID/" /etc/network/interfaces.d/ffs-seg*
-sed -i '/listen-on/d' /etc/bind/named.conf.options
+# rsync -rlHpogDtvx --exclude etc/fastd etc /
+#sed -i "s/\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):$GWLID:00/\1:\2:\3:\4:$GWLID:$GWLSUBID/" /etc/network/interfaces.d/ffs-seg*
+#sed -i '/listen-on/d' /etc/bind/named.conf.options
+# FfsConfigGenerator Netzwerk ersetzt durch interne Version
+rm -f /etc/network/interfaces.d/br[0-8][0-9]
+setup_interface_segxx
+show_progress setup_interface_segxx
+
 cd "$OLDPWD"
 
 TINCBASE=/etc/tinc/ffsbb
@@ -202,9 +225,14 @@ setup_tinc_git_push
 show_progress setup_tinc_git_push
 setup_tinc_interface
 show_progress setup_tinc_interface
-# Disabled, fast bbNN macht das nun
-#setup_tinc_segments
-#show_progress setup_tinc_segments
+setup_tinc_update
+show_progress setup_tinc_update
+
+#setup_tincl3_config
+#show_progress setup_tincl3_config
+#setup_tincl3_key
+#show_progress setup_tincl3_key
+
 
 if [ ! -d /root/git/peers-ffs/.git ]; then
   mkdir -p /root/git
@@ -238,17 +266,12 @@ for seg in $(seq 1 $SEGMENTS); do
   systemctl enable fastd@vpn$(printf "%02i" $seg).service 
   systemctl enable fastd@vpn$(printf "%02i" $seg)bb.service 
 done
-setup_alfred_startup
-show_progress setup_alfred_startup
 
 # fastd /usr/local/bin/fastd-update + cronjob
 setup_fastd_update
 show_progress setup_fastd_update
 setup_fastd_bb
 show_progress setup_fastd_bb
-# /usr/local/bin/fastd-status
-setup_fastd_status
-show_progress setup_fastd_status
 
 # sysfs
 system_setup_sysfs
