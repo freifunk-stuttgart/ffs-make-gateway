@@ -41,19 +41,19 @@ setup_tinc_base() {
     fi
     mkdir -p /etc/tinc/ffsbb
     if [ ! -e /etc/tinc/ffsbb/tinc.conf ]; then
-      ln -s $TINCBASE/ffsbb/tinc.conf.sample /etc/tinc/ffsbb/tinc.conf
+      ln -s $TINCBASE/tinc-ffsbb/tinc.conf.sample /etc/tinc/ffsbb/tinc.conf
     fi
     if [ ! -e /etc/tinc/ffsbb/subnet-up ]; then
-      ln -s $TINCBASE/ffsbb/subnet-up.sample /etc/tinc/ffsbb/subnet-up
+      ln -s $TINCBASE/tinc-ffsbb/subnet-up.sample /etc/tinc/ffsbb/subnet-up
     fi
     if [ ! -e /etc/tinc/ffsbb/subnet-down ]; then
-      ln -s $TINCBASE/ffsbb/subnet-down.sample /etc/tinc/ffsbb/subnet-down
+      ln -s $TINCBASE/tinc-ffsbb/subnet-down.sample /etc/tinc/ffsbb/subnet-down
     fi
     if [ ! -e /etc/tinc/ffsbb/subnet-down ]; then
-      ln -s $TINCBASE/ffsbb/conf.d /etc/tinc/ffsbb/conf.d
+      ln -s $TINCBASE/tinc-ffsbb/conf.d /etc/tinc/ffsbb/conf.d
     fi
     if [ ! -e /etc/tinc/ffsbb/hosts ]; then
-      ln -s $TINCBASE/ffsbb/hosts /etc/tinc/ffsbb/hosts
+      ln -s $TINCBASE/tinc-ffsbb/hosts /etc/tinc/ffsbb/hosts
     fi
     systemctl enable tincd@ffsbb.service
   fi
@@ -85,6 +85,16 @@ setup_tinc_config() {
 	EOF
     cat 
   done
+  (
+    cd $TINCNETS/tinc
+    if LC_ALL=C git status | egrep -q "($HOSTNAME|ahead)"; then
+      git add .
+      git commit -m "add/update $HOSTNAME" -a
+      git remote set-url origin git@github.com:freifunk-stuttgart/tinc.git
+      git push
+      git remote set-url origin https://github.com/freifunk-stuttgart/tinc
+    fi
+  )
   if [ x$TINC_FFSBB = x1 ]; then
     ensureline "PMTUDiscovery = yes" /etc/tinc/ffsbb/hosts/$HOSTNAME
     ensureline "Digest = sha256" /etc/tinc/ffsbb/hosts/$HOSTNAME
@@ -96,6 +106,16 @@ setup_tinc_config() {
       echo ConnectTo = $HOSTNAME > /etc/tinc/ffsbb/conf.d/$HOSTNAME
       ( cd $TINCBASE/ffsbb && git add conf.d/$HOSTNAME )
     fi
+    (
+      cd $TINCNETS/tinc-ffsbb
+      if LC_ALL=C git status | egrep -q "($HOSTNAME|ahead)"; then
+        git add .
+        git commit -m "add/update $HOSTNAME" -a
+        git remote set-url origin git@github.com:freifunk-stuttgart/tinc-ffsbb.git
+        git push
+        git remote set-url origin https://github.com/freifunk-stuttgart/tinc-ffsbb
+      fi
+    )
   fi
 }
 setup_tinc_key() {
@@ -152,8 +172,8 @@ setup_tinc_interface() {
 	EOF
   else
     cat <<-EOF >/etc/network/interfaces.d/ffsl3
-	allow-hotplug ffsbb
-	iface ffsbb inet static
+	allow-hotplug ffsl3
+	iface ffsl3 inet static
 	    address 10.191.254.$(($GWID*10+$GWSUBID))
 	    netmask 255.255.255.0
 	    broadcast 10.191.254.255
@@ -163,7 +183,7 @@ setup_tinc_interface() {
 	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	
-	iface ffsbb inet6 static
+	iface ffsl3 inet6 static
 	    address fd21:b4dc:4b00::a38:$(($GWID*10+$GWSUBID))
 	    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
 	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
