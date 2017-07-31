@@ -68,6 +68,15 @@ if ! host www.freifunk-stuttgart.de 127.0.0.1 > /dev/null 2>&1; then
 	killall -9 named
 	/usr/sbin/service bind9 restart
 fi
+tcpdump -n -i any port 67 or port 68 -c 20 2>/dev/null |
+awk 'BEGIN {req=0; rep=0; answer=0} 
+     $7 ~ /^Request$/ {req++} 
+     $7 ~ /^Reply$/ {rep++} 
+     $3 ~ /67$/ && $5 ~ /68:$/ {answer++} 
+     END {print req " " rep " " answer; exit answer}' >/dev/null
+if [ $? == 0 ]; then
+    systemctl restart isc-dhcp-relay.service
+fi
 ) 2>&1 | logger --tag "$0"
 EOF
 chmod +x /usr/local/bin/gw-watchdog
