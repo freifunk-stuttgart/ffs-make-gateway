@@ -97,15 +97,15 @@ setup_fastd_bb() {
 	}
 EOF
     VPNBBPUB=$(fastd -c /etc/fastd/vpn${seg}${segext}/fastd.conf --show-key --machine-readable)
-    if [ ! -e /root/git/peers-ffs/vpn$seg/$group/$HOSTNAME ] || ! grep $VPNBBPUB /root/git/peers-ffs/vpn$seg/$group/$HOSTNAME; then
-      cat <<-EOF >/root/git/peers-ffs/vpn$seg/$group/${HOSTNAME}s$seg
+    if [ ! -e $FFSGIT/peers-ffs/vpn$seg/$group/$HOSTNAME ] || ! grep $VPNBBPUB $FFSGIT/peers-ffs/vpn$seg/$group/$HOSTNAME; then
+      cat <<-EOF >$FFSGIT/peers-ffs/vpn$seg/$group/${HOSTNAME}s$seg
 	key "$VPNBBPUB";
 	remote "${HOSTNAME}.freifunk-stuttgart.de" port $(printf '9%03i' $segnum);
 EOF
     fi
   done
   (
-    cd /root/git/peers-ffs
+    cd $FFSGIT/peers-ffs
     if LC_ALL=C git status | egrep -q "($HOSTNAME|ahead)"; then
       git add .
       git commit -m "$group $HOSTNAME" -a

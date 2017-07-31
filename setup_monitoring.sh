@@ -1,14 +1,42 @@
-setup_monitoring() {
-mkdir -p /etc/check_mk
-[ ! -e /etc/check_mk/mrpe.cfg ] && touch /etc/check_mk/mrpe.cfg
-sed -i '/^ffs-gw-dhcpsrv/d; /^ffs-vpn_batman/d' /etc/check_mk/mrpe.cfg
-ensureline "ffs-bird /etc/check_mk/ffs/ffs-bird" /etc/check_mk/mrpe.cfg
-ensureline "ffs-bird6 /etc/check_mk/ffs/ffs-bird6" /etc/check_mk/mrpe.cfg
-for seg in $(seq 0 $SEGMENTS); do
-  ensureline "fastd-$(printf "%02i" $seg) /etc/check_mk/ffs/ffs-check-fastdpeers --fastdsocket=/var/run/fastd/fastd-vpn$(printf "%02i" $seg).sock" /etc/check_mk/mrpe.cfg
-  ensureline "alfred-$(printf "%02i" $seg) /etc/check_mk/ffs/ffs-check-alfred --interface $(printf "%02i" $seg)" /etc/check_mk/mrpe.cfg
-done
+setup_monitoring_updateff() {
+  mkdir -p /var/www/html/data
+  cat >/usr/local/bin/update-ff <<-EOF
+	#!/bin/bash
+	export LC_ALL=C
+	WWWPFAD="$WWWPFAD"
+	git -C $FFSGIT/tinc-ffsbb pull > /dev/null
+	git -C $FFSGIT/tinc pull > /dev/null
+	killall -HUP tincd
+	
+	TEMPDIR=\$(mktemp -d /dev/shm/fastd-status-export.XXXXXXXXXX)
+	FASTD_STATUS_OUTDIR='\$WWWPFAD/fastd'
+	if [ -e /etc/default/freifunk ]; then
+	        . /etc/default/freifunk
+	fi
+	if [ ! -d "$FASTD_STATUS_OUTDIR" ]; then
+	  if [ -e "$FASTD_STATUS_OUTDIR" ]; then
+	    echo "'$FASTD_STATUS_OUTDIR' exists and is no directory" >&2
+	    exit 1
+	  fi
+	  mkdir -p "$FASTD_STATUS_OUTDIR"
+	fi
+	
+	# find all active fastd status sockets
+	for fastdsocket in \$(find /etc/fastd/ -name fastd.conf |
+	xargs sed -n '/^status\s\+socket\s\+"/{s#^status\s\+socket\s\+"\([^"]\+\)";#\1#; p}'); do
+	  if fuser -s $fastdsocket 2>/dev/null; then
+	    # active fastd
+	    fastdname=\$(sed 's#^.*/##; s#^fastd-##; s#\.sock$##' <<<$fastdsocket)
+	    /usr/local/bin/fastd-clean.py -i <(socat "$fastdsocket" -) -o "$FASTD_STATUS_OUTDIR"/"$fastdname".json.new
+	    mv "$FASTD_STATUS_OUTDIR"/"$fastdname".json.new "$FASTD_STATUS_OUTDIR"/"$fastdname".json
+	  fi
+	done
+	rm -rf \$TEMPDIR
+EOF
+  chmod +x /usr/local/bin/update-ff
+  ensureline_insert "/usr/local/bin/update-ff &" /etc/rc.local
 }
+setup_monitoring() {
 cat <<'EOF' >/usr/local/bin/gw-watchdog
 #!/bin/bash
 
@@ -81,17 +109,4 @@ fi
 EOF
 chmod +x /usr/local/bin/gw-watchdog
 ensureline "* * * * * root /usr/local/bin/gw-watchdog" /etc/cron.d/gw-watchdog
-apt-get -y install munin-node jq
-ensureline "allow ^10\.191\.255\.241$" /etc/munin/munin-node.conf
-ensureline "allow ^10\.191\.255\.242$" /etc/munin/munin-node.conf
-ensureline "allow ^10\.191\.255\.243$" /etc/munin/munin-node.conf
-cat <<'EOF' >/etc/munin/plugin-conf.d/freifunk
-[fastdall]
-user root
-EOF
-wget http://gw08.albi.info/dl/status.pl -O/usr/local/bin/status.pl; chmod +x /usr/local/bin/status.pl
-wget http://gw08.albi.info/dl/dhcp-clients -O/usr/share/munin/plugins/dhcp-clients; chmod +x /usr/share/munin/plugins/dhcp-clients
-wget http://gw08.albi.info/dl/fastdall -O/usr/share/munin/plugins/fastdall; chmod +x /usr/share/munin/plugins/fastdall
-[ ! -e /etc/munin/plugins/dhcp-clients ] && ln -s /usr/share/munin/plugins/dhcp-clients /etc/munin/plugins/dhcp-clients
-[ ! -e /usr/share/munin/plugins/fastdall ] && ln -s /usr/share/munin/plugins/fastdall /etc/munin/plugins/fastdall
-service munin-node restart
+}

@@ -46,6 +46,7 @@ SEGMENTLIST=""
 TINC_BB=0
 VPNKEY="Wird generiert"
 WWWPFAD="/var/www/html"
+FFSGIT=/var/lib/ffs/git
 error() {
   print_help
   echo "$*"
@@ -192,8 +193,8 @@ show_progress setup_fastd
 ensureline "source-directory interfaces.d" /etc/network/interfaces
 
 OLDDIR=$(pwd)
-mkdir -p /root/git
-cd /root/git
+mkdir -p $FFSGIT
+cd $FFSGIT
 # Patch and run FfsConfigGenerator
 setup_ffsconfiggenerator_config
 show_progress setup_ffsconfiggenerator_config
@@ -210,7 +211,7 @@ show_progress setup_interface_segxx
 
 cd "$OLDPWD"
 
-TINCBASE=/var/lib/ffs/git
+TINCBASE=$FFSGIT
 TINCNETS=ffsl3
 setup_tinc_base
 show_progress setup_tinc_base
@@ -226,11 +227,11 @@ show_progress setup_tinc_interface
 setup_tinc_update
 show_progress setup_tinc_update
 
-if [ ! -d /root/git/peers-ffs/.git ]; then
-  mkdir -p /root/git
-  git clone https://github.com/freifunk-stuttgart/peers-ffs /root/git/peers-ffs
+if [ ! -d $FFSGIT/peers-ffs/.git ]; then
+  mkdir -p $FFSGIT
+  git clone https://github.com/freifunk-stuttgart/peers-ffs $FFSGIT/peers-ffs
 else
-  ( cd /root/git/peers-ffs && git pull )
+  ( cd $FFSGIT/peers-ffs && git pull )
 fi
 setup_fastd_config
 show_progress setup_fastd_config
@@ -278,6 +279,16 @@ setup_bird
 show_progress setup_bird
 
 # Monitoring
+setup_monitoring_updateff
+show_progress setup_monitoring_updateff
+setup_monitoring_statuspl # setup_monitoring_ubuntu.sh
+show_progress setup_monitoring_statuspl
+setup_monitoring_munin    # setup_monitoring_ubuntu.sh
+show_progress setup_monitoring_munin
+service munin-node restart
+setup_monitoring_vnstat
+show_progress setup_monitoring_vnstat
+
 setup_monitoring
 setup_monitoring_collectd
 show_progress setup_monitoring
