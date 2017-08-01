@@ -29,8 +29,8 @@ group="peers"
 segext=""
 for ipv in ip4 ip6; do
   if [ x$FASTD_SPLIT == x1 ] || [ $ipv == ip4 ]; then
-    for i in $(seq 0 4); do
-      seg=$(printf "%02i" $i)
+    for seg in $SEGMENTLIST; do
+      i=${seg##0}
       if [ $i -eq 0 ]; then
         vpnport=10037
       else
@@ -56,7 +56,6 @@ for ipv in ip4 ip6; do
 	method "salsa2012+umac";  
 	mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
 	include "/etc/fastd/secret_vpn${segext}.key";
-	mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
 	on verify "/root/freifunk/unclaimed.py";
 	status socket "/var/run/fastd/fastd-vpn${seg}${segext}$(if [ x$FASTD_SPLIT != x ] && [ $ipv == ip6 ]; then echo -n ip6; fi).sock";
 	peer group "${group}" {

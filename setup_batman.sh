@@ -29,7 +29,8 @@ setup_batman_names() {
   for subgw in $(seq 0 9); do
     ensureline "$(printf '02:00:38:00:%02i:%02i mgw%02ii%02i\n' $gw $subgw $gw $subgw)" /etc/bat-hosts
     ensureline "$(printf '02:00:37:00:%02i:%02i vgw%02ii%02i\n' $gw $subgw $gw $subgw)" /etc/bat-hosts
-    for seg in $(seq 1 $SEGMENTS); do
+    for seg in $SEGMENTLIST; do
+      seg=${seg##0}
       ensureline "$(printf '02:00:38:%02i:%02i:%02i mgw%02ii%02i-%i' $seg $gw $subgw $gw $subgw $seg)" /etc/bat-hosts
       ensureline "$(printf '02:00:37:%02i:%02i:%02i vgw%02ii%02i-%i' $seg $gw $subgw $gw $subgw $seg)" /etc/bat-hosts
     done

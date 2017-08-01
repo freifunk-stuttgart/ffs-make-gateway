@@ -315,7 +315,8 @@ chmod +x /usr/local/bin/openvpn-freifunk
 if [ x"$OPT_FWLIHAS" == x1 ]; then
   echo systemctl start firewall-lihas
 fi
-for i in $(seq 0 4); do
+for i in $SEGMENTLIST; do
+  seg=${i##0}
   if [ x$FASTD_SPLIT == x1 ]; then
     echo -n systemctl start fastd@vpn$(printf "%02i" $seg)ip6.service"; "
   fi
