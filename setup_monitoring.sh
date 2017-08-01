@@ -1,3 +1,6 @@
+setup_monitoring_vnstat() {
+  replaceline "BandwidthDetection 1" "BandwidthDetection 0" /etc/vnstat.conf
+}
 setup_monitoring_updateff() {
   mkdir -p /var/www/html/data
   cat >/usr/local/bin/update-ff <<-EOF
