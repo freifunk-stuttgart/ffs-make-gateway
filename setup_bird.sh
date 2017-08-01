@@ -1,8 +1,4 @@
 setup_bird() {
-  /etc/bird/bird_routerid.conf
-  /etc/bird/bird_kernel_stuttgart.conf
-  /etc/bird/bird_device.conf
-  /etc/bird/bird_ospf_stuttgart.conf
   cat <<-EOF >/etc/bird/bird_routerid.conf
 	router id router id 10.191.255.$GWID;
 	EOF
