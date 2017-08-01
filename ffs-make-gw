@@ -220,8 +220,6 @@ setup_tinc_key
 show_progress setup_tinc_key
 setup_tinc_config
 show_progress setup_tinc_config
-setup_tinc_git_push
-show_progress setup_tinc_git_push
 setup_tinc_interface
 show_progress setup_tinc_interface
 setup_tinc_update

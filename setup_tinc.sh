@@ -22,10 +22,11 @@ setup_tinc_base() {
     ( cd /var/lib/ffs/git/tinc && git pull )
   fi
   for tinc in $TINCNETS; do
+    mkdir -p /etc/tinc/$tinc
     for ref_file in tinc.conf.sample subnet-up.sample subnet-down.sample conf.d hosts; do
       dst_file=${ref_file%.sample}
       if [ ! -e /etc/tinc/ffsl3/$dst_file ]; then
-        ln -s $TINCBASE/tinc/$tinc/tinc.conf.sample /etc/tinc/$tinc/tinc.conf
+        ln -s $TINCBASE/tinc/$tinc/$ref_file /etc/tinc/$tinc/$dst_file
       fi
     done
     if [ ! -e /etc/tinc/$tinc/rsa_key.priv ]; then
@@ -65,7 +66,7 @@ setup_tinc_config() {
 	Address = $HOSTNAME.gw.freifunk-stuttgart.de
 	Port = 110$GWID$GWSUBID
 	EOF
-    for $segment in $SEGMENTLIST; do
+    for segment in $SEGMENTLIST; do
       IPv4seg=$((${segment#0} * 8))
       if [ $IPv4seg -gt 255 ]; then
         IPv4seg=$(($IPv4seg-256))
@@ -83,10 +84,9 @@ setup_tinc_config() {
     cat <<-EOF >/etc/tinc/$tinc/conf.d/$HOSTNAME
 	ConnectTo = $HOSTNAME
 	EOF
-    cat 
   done
   (
-    cd $TINCNETS/tinc
+    cd $FFSGIT/tinc
     if LC_ALL=C git status | egrep -q "($HOSTNAME|ahead)"; then
       git add .
       git commit -m "add/update $HOSTNAME" -a
@@ -127,16 +127,9 @@ setup_tinc_key() {
       ln -s /etc/tinc/rsa_key.priv /etc/tinc/ffsbb/
     fi
     if ! grep -q "BEGIN RSA PUBLIC KEY" /etc/tinc/ffsbb/hosts/$HOSTNAME; then
-      cat /etc/tinc/rsa_key.pub >> /etc/tinc/ffsbb/hosts/$HOSTNAME
+      cat </etc/tinc/rsa_key.pub >> /etc/tinc/ffsbb/hosts/$HOSTNAME
     fi
   fi
-}
-setup_tinc_git_push() {
-if [ x$TINC_BB == x1 ]; then
-  git add hosts/$HOSTNAME
-  git commit -m "hosts/$HOSTNAME" -a || true
-  git push
-fi
 }
 setup_tinc_interface() {
   if [ x$TINC_FFSBB = x1 ]; then
