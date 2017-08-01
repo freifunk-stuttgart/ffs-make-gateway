@@ -45,53 +45,47 @@ setup_fastd_config() {
         fi
         mkdir -p $dir
         cat <<-EOF >$dir/fastd.conf
-  	log to syslog level warn;
-  	interface "$iface";
-  	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
-  	method "salsa2012+umac";  
-  	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip4 ]; then for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done; fi)
-  	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip6 ]; then for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done; fi)
-  	log to syslog level warn;
-  	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
-  	method "salsa2012+umac";  
-  	mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
-  	include "/etc/fastd/secret_vpn${segext}.key";
-  	on verify "/root/freifunk/unclaimed.py";
-  	status socket "/var/run/fastd/fastd-vpn${seg}${segext}$(if [ x$FASTD_SPLIT != x ] && [ $ipv == ip6 ]; then echo -n ip6; fi).sock";
-  	peer group "${group}" {
-  	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
-  	}
-  	EOF
+	log to syslog level warn;
+	interface "$iface";
+	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
+	method "salsa2012+umac";  
+	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip4 ]; then for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done; fi)
+	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip6 ]; then for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done; fi)
+	log to syslog level warn;
+	mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
+	include "/etc/fastd/secret_vpn${segext}.conf";
+	on verify "/root/freifunk/unclaimed.py";
+	status socket "/var/run/fastd/fastd-vpn${seg}${segext}$(if [ x$FASTD_SPLIT != x ] && [ $ipv == ip6 ]; then echo -n ip6; fi).sock";
+	peer group "${group}" {
+	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
+	}
+	EOF
       done
     fi
   done
   # Low MTU fastd
   for seg in $SEGMENTLIST; do
     i=${seg##0}
-    if [ $i -eq 0 ]; then
-      vpnport=10037
-    else
-      vpnport=$((10000+$i))
-    fi
+    vpnport=$((10000+$i))
+    dir=/etc/fastd/vpx$seg${segext}
+    iface="vpx${seg}${segext}"
     mkdir -p $dir
     cat <<-EOF >$dir/fastd.conf
-    log to syslog level warn;
-    interface "$iface";
-    method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
-    method "salsa2012+umac";  
-    $(for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done)
-    $(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
-    log to syslog level warn;
-    method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
-    method "salsa2012+umac";  
-    mtu 1312; # Lowest possible MTU
-    include "/etc/fastd/secret_vpn${segext}.key";
-    on verify "/root/freifunk/unclaimed.py";
-    status socket "/var/run/fastd/fastd-vpn${seg}${segext}$(if [ x$FASTD_SPLIT != x ] && [ $ipv == ip6 ]; then echo -n ip6; fi).sock";
-    peer group "${group}" {
-      include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
-    }
-    EOF
+	log to syslog level warn;
+	interface "$iface";
+	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
+	method "salsa2012+umac";  
+	$(for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done)
+	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
+	log to syslog level warn;
+	mtu 1312; # Lowest possible MTU
+	include "/etc/fastd/secret_vpn${segext}.conf";
+	on verify "/root/freifunk/unclaimed.py";
+	status socket "/var/run/fastd/fastd-vpx${seg}${segext}.sock";
+	peer group "${group}" {
+	  include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
+	}
+	EOF
   done
 }
 setup_fastd_bb() {
@@ -106,8 +100,9 @@ setup_fastd_bb() {
   fi
   for seg in $SEGMENTLIST; do
     segnum=$(sed 's/\b //' <<< $seg)
-    vpnport=$((9000+$seg))
-    mkdir -p /etc/fastd/vpn${seg}bb
+    segnum=${segnum##0}
+    vpnport=$((9000+$segnum))
+    mkdir -p /etc/fastd/vpn${seg}$segext
     cat <<-EOF >/etc/fastd/vpn${seg}${segext}/fastd.conf
 	log to syslog level warn;
 	interface "vpn${seg}${segext}";
@@ -143,7 +138,9 @@ EOF
   )
 }
 setup_fastd_key() {
-  mkdir -p /etc/fastd/peers-ffs
+  if [ ! -e /etc/fastd/peers-ffs ]; then
+    ln -s $FFSGIT/peers-ffs /etc/fastd/peers-ffs
+  fi
   if [ "$VPNKEY" == "Wird generiert" ] && [ ! -e /etc/fastd/secret_vpn.conf ]; then
     VPNKEY=$(fastd --generate-key --machine-readable)
     cat <<-EOF >/etc/fastd/secret_vpn.conf

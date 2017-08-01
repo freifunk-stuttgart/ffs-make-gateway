@@ -245,17 +245,13 @@ show_progress setup_batman_names
 
 systemctl daemon-reload
 update-rc.d fastd disable
-systemctl enable fastd@vpn00.service 
-systemctl enable fastd@vpn00bb.service 
-if [ x$FASTD_SPLIT == x1 ]; then
-  systemctl enable fastd@vpn00ip6.service 
-fi
-for seg in $(seq 1 $SEGMENTS); do
+for seg in $SEGMENTLIST; do
   if [ x$FASTD_SPLIT == x1 ]; then
-    systemctl enable fastd@vpn$(printf "%02i" $seg)ip6.service
+    systemctl enable fastd@vpn${seq}ip6.service
   fi
-  systemctl enable fastd@vpn$(printf "%02i" $seg).service 
-  systemctl enable fastd@vpn$(printf "%02i" $seg)bb.service 
+  systemctl enable fastd@vpn${seg}.service 
+  systemctl enable fastd@vpx${seg}.service 
+  systemctl enable fastd@vpn${seg}bb.service 
 done
 
 # fastd /usr/local/bin/fastd-update + cronjob
@@ -326,5 +322,5 @@ done
 echo
 echo systemctl start bird
 
-echo "fastd Public Key: $(fastd -c /etc/fastd/ffs-vpn/secret.conf --show-key --machine-readable)"
+echo "fastd Public Key: $(fastd -c /etc/fastd/secret_vpn.conf --show-key --machine-readable)"
 # vim: ts=2 sw=2 sts=2 sr noet
