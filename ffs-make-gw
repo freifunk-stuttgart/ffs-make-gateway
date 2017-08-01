@@ -160,7 +160,7 @@ fi
 . setup_fastd.sh
 . setup_ffsconfiggenerator.sh
 . setup_firewall.sh
-. setup_interface_ubuntu.sh
+. setup_interface.sh
 . setup_monitoring_ubuntu.sh
 . setup_monitoring.sh
 . setup_system.sh
@@ -250,7 +250,7 @@ for seg in $SEGMENTLIST; do
     systemctl enable fastd@vpn${seq}ip6.service
   fi
   systemctl enable fastd@vpn${seg}.service 
-  systemctl enable fastd@vpx${seg}.service 
+  systemctl enable fastd@vpn${seg}mtu.service 
   systemctl enable fastd@vpn${seg}bb.service 
 done
 

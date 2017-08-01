@@ -64,10 +64,11 @@ setup_fastd_config() {
     fi
   done
   # Low MTU fastd
+  segext=mtu
   for seg in $SEGMENTLIST; do
     i=${seg##0}
     vpnport=$((10000+$i))
-    dir=/etc/fastd/vpx$seg${segext}
+    dir=/etc/fastd/vpn$seg${segext}
     iface="vpx${seg}${segext}"
     mkdir -p $dir
     cat <<-EOF >$dir/fastd.conf
