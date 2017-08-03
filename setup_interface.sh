@@ -4,7 +4,7 @@ netz=$((${seg#0} - 1))
 netz=$(($netz * 8))
 cat <<-EOF >/etc/network/interfaces.d/br$seg
 	auto br$seg
-	iface br00 inet static
+	iface br$seg inet static
 	  bridge_hw 02:00:39:$seg:$GWLID:$GWLSUBID
 	  address 10.190.$netz.$GWID$GWSUBID
 	  netmask 255.255.248.0
@@ -21,12 +21,10 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  post-up         /sbin/ip route add unreachable default table nodefault || true
 	  post-down       /sbin/ip route del unreachable default table nodefault || true
 	  post-down       /sbin/ip route del 172.21.0.0/18 dev \$IFACE table stuttgart || true
-	  auto bat$seg
-	  allow-hotplug bat$seg
 	  post-up         /sbin/ip route add unreachable default table stuttgart metric 9999 || true
 	  post-down       /sbin/ip route del unreachable default table stuttgart metric 9999 || true
 
-	iface br00 inet6 static
+	iface br$seg inet6 static
 	  address fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID
 	  netmask 64
 	  # ULA route mz for rt_table stuttgart
@@ -38,6 +36,8 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  pre-up          /sbin/modprobe batman-adv || true
 	  post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
 	  post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
+          post-up         ifup br$seg || true
+          post-up         /sbin/brctl addif br$seg \$IFACE || true
 	  # be sure all incoming traffic is handled by the appropriate rt_table
 	  post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true

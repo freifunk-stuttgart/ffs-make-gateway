@@ -76,10 +76,16 @@ setup_tinc_config() {
       fi
       cat <<-EOF >>/etc/tinc/$tinc/hosts/$HOSTNAME
 	Subnet = 10.$IPv4segbase.$IPv4seg.$GWID$GWSUBID
+	Subnet = 10.$IPv4segbase.$IPv4seg.0/21
 	Subnet = fd21:b4dc:4b$segment::/64
 	Subnet = fd21:b4dc:4b$segment::a38:$(printf '%i%02i' $GWID $GWSUBID)
 	EOF
     done
+    cat <<-EOF >>/etc/tinc/$tinc/hosts/$HOSTNAME
+	Subnet = 10.191.254.$GWID$GWSUBID
+	Subnet = 10.191.255.$GWID$GWSUBID
+	Subnet = fd21:b4dc:4b00::a38:$(printf '%i%02i' $GWID $GWSUBID)
+	EOF
     cat /etc/tinc/rsa_key.pub >>/etc/tinc/$tinc/hosts/$HOSTNAME
     cat <<-EOF >/etc/tinc/$tinc/conf.d/$HOSTNAME
 	ConnectTo = $HOSTNAME

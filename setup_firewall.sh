@@ -37,14 +37,17 @@ setup_firewall() {
     if [ ! -e /etc/firewall.lihas.d/interface-ffsbb ]; then
       ln -s /etc/firewall.lihas.d/interface-br00 /etc/firewall.lihas.d/interface-ffsbb
     fi
+    if [ ! -e /etc/firewall.lihas.d/interface-ffsl3 ]; then
+      ln -s /etc/firewall.lihas.d/interface-br00 /etc/firewall.lihas.d/interface-ffsl3
+    fi
     ensureline 172.21.0.0/16 /etc/firewall.lihas.d/interface-br00/network
     ensureline 10.190.0.0/15 /etc/firewall.lihas.d/interface-br00/network
     ensureline dhcpd /etc/firewall.lihas.d/interface-br00/mark
     ensureline "0.0.0.0/0 hostgroup-gw$GWLID tcp 0" /etc/firewall.lihas.d/interface-br00/privclients
     ensureline "0.0.0.0/0 hostgroup-gw$GWLID udp 0" /etc/firewall.lihas.d/interface-br00/privclients
     ensureline "0.0.0.0/0 hostgroup-gw$GWLID icmp 0" /etc/firewall.lihas.d/interface-br00/privclients
-    ensureline "hostgroup-gw$GWLID 255.255.255.255 udp 68" /etc/firewall.lihas.d/interface-br00/privclients
-    for iface in tun9 br00 br01 br03 br04 ffsbb; do
+    ensureline "0.0.0.0/0 255.255.255.255 udp 68" /etc/firewall.lihas.d/interface-br00/privclients
+    for iface in tun9 br00; do
       ensureline "0.0.0.0/0 0.0.0.0/0 tcp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
       ensureline "0.0.0.0/0 0.0.0.0/0 udp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
       ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
@@ -54,19 +57,11 @@ setup_firewall() {
       ensureline "0.0.0.0/0 0.0.0.0/0 udp 0" /etc/firewall.lihas.d/interface-$iface/masquerade
       ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0" /etc/firewall.lihas.d/interface-$iface/masquerade
     done
-    for i in $SEGMENTLIST; do
+    for i in $SEGMENTLIST ffsl3 ffsbb; do
       for j in $SEGMENTLIST; do
         ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -i br$i -o br$j'" /etc/firewall.lihas.d/localhost
       done
-      ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -i br$i -o ffsl3'" /etc/firewall.lihas.d/localhost
-      ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -o br$i -i ffsl3'" /etc/firewall.lihas.d/localhost
-      ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -i br$i -o ffsbb'" /etc/firewall.lihas.d/localhost
-      ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -o br$i -i ffsbb'" /etc/firewall.lihas.d/localhost
     done
-    ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -i ffsbb -o ffsbb'" /etc/firewall.lihas.d/localhost
-    ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -i ffsbb -o ffsl3'" /etc/firewall.lihas.d/localhost
-    ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -i ffsl3 -o ffsbb'" /etc/firewall.lihas.d/localhost
-    ensureline "IPT_FILTER '-A FORWARD -j ACCEPT -i ffsl3 -o ffsl3'" /etc/firewall.lihas.d/localhost
     ensureline "IPT_FILTER '-A INPUT -j ACCEPT -i ffsbb -p 2'" /etc/firewall.lihas.d/localhost
     ensureline "IPT_FILTER '-A INPUT -j ACCEPT -i ffsbb -p 89'" /etc/firewall.lihas.d/localhost
     ensureline "IPT_FILTER '-A OUTPUT -j ACCEPT -o ffsbb -p 2'" /etc/firewall.lihas.d/localhost
@@ -114,7 +109,7 @@ setup_firewall() {
       echo $LEGIP >> /etc/firewall.lihas.d/groups/hostgroup-gw$GWLID
       b=190
       for seg in $(seq 0 63); do
-        c=$(($seg*64))
+        c=$(($seg*8))
         if [ $c -gt 255 ]; then
           b=191
           c=$((c-256))
