@@ -18,6 +18,7 @@ ExecStart=/usr/bin/fastd --syslog-level debug2 --syslog-ident fastd@%I -c /etc/f
 ExecStop=/bin/kill $(cat /var/run/fastd/fastd-%I.pid)
 ExecReload=/bin/kill -HUP $(cat /var/run/fastd/fastd-%I.pid)
 ExecStop=/bin/kill $(cat /var/run/fastd/fastd-%I.pid)
+Restart=always
 
 [Install]
 WantedBy=multi-user.target

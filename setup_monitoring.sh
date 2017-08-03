@@ -67,10 +67,10 @@ if ! host www.freifunk-stuttgart.de 127.0.0.1 > /dev/null 2>&1; then
 fi
 # check interfaces
 # 'auto'-interfaces must be present
-INTERFACES="$INTERFACES $(egrep -h '^(auto|allow-hotplug)' /etc/network/interfaces.d/* /etc/network/interfaces | sed 's/^\(auto\|allow-hotplug\)[ \t]*//')"
+INTERFACES="$INTERFACES $(egrep -h '^(auto)' /etc/network/interfaces.d/* /etc/network/interfaces | sed 's/^\(auto\|allow-hotplug\)[ \t]*//')"
 for iface in $INTERFACES; do
         case $iface in
-                vpn*|bb*)
+                vpn*)
                         # fastd muss laufen
                         if ! systemctl status fastd@$iface >/dev/null; then
                                 error "/sbin/ifdown --force $iface"
