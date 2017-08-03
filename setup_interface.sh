@@ -21,8 +21,6 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  post-up         /sbin/ip route add unreachable default table nodefault || true
 	  post-down       /sbin/ip route del unreachable default table nodefault || true
 	  post-down       /sbin/ip route del 172.21.0.0/18 dev \$IFACE table stuttgart || true
-	  post-up         /sbin/ip route add unreachable default table stuttgart metric 9999 || true
-	  post-down       /sbin/ip route del unreachable default table stuttgart metric 9999 || true
 
 	iface br$seg inet6 static
 	  address fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID
