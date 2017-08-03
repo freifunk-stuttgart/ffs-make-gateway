@@ -69,7 +69,7 @@ setup_fastd_config() {
     i=${seg##0}
     vpnport=$((10000+$i))
     dir=/etc/fastd/vpn$seg${segext}
-    iface="vpx${seg}${segext}"
+    iface="vpn${seg}${segext}"
     mkdir -p $dir
     cat <<-EOF >$dir/fastd.conf
 	log to syslog level warn;
@@ -80,9 +80,9 @@ setup_fastd_config() {
 	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
 	log to syslog level warn;
 	mtu 1312; # Lowest possible MTU
-	include "/etc/fastd/secret_vpn${segext}.conf";
+	include "/etc/fastd/secret_vpn.conf";
 	on verify "/root/freifunk/unclaimed.py";
-	status socket "/var/run/fastd/fastd-vpx${seg}${segext}.sock";
+	status socket "/var/run/fastd/fastd-vpn${seg}${segext}.sock";
 	peer group "${group}" {
 	  include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
 	}
