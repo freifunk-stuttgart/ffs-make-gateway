@@ -71,8 +71,8 @@ setup_firewall() {
         ensureline "0.0.0.0/0 0.0.0.0/0 tcp $port" /etc/firewall.lihas.d/interface-br00/privclients
       done
     fi
-    ensureline "0.0.0.0/0 0.0.0.0/0 icmp 3" /etc/firewall.lihas.d/interface-br00/privclients
-    ensureline "0.0.0.0/0 0.0.0.0/0 icmp 4" /etc/firewall.lihas.d/interface-br00/privclients
+    ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0" /etc/firewall.lihas.d/interface-br00/privclients
+    ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0" /etc/firewall.lihas.d/interface-br00/privclients
     # Loopback, was lokale ausgehend ist
     if [ "x$OTHERGW_IP" != "x" ]; then
       mkdir -p /etc/firewall.lihas.d/policy-routing-othergw
@@ -116,5 +116,7 @@ setup_firewall() {
         fi
         echo 10.$b.$c.$(($GWID*10+$GWSUBID))
       done >> /etc/firewall.lihas.d/groups/hostgroup-gw$GWLID
+      echo 10.191.254.$(($GWID*10+$GWSUBID)) >> /etc/firewall.lihas.d/groups/hostgroup-gw$GWLID
+      echo 10.191.255.$(($GWID*10+$GWSUBID)) >> /etc/firewall.lihas.d/groups/hostgroup-gw$GWLID
   fi
 }
