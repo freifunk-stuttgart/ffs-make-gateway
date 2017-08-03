@@ -126,6 +126,9 @@ EOF
 	remote "${HOSTNAME}.freifunk-stuttgart.de" port $(printf '9%03i' $segnum);
 EOF
     fi
+    if [ $NOPUBLICIP -eq 1 ]; then
+      sed -i '/^remote/d' $FFSGIT/peers-ffs/vpn$seg/$group/${HOSTNAME}s$seg
+    fi
   done
   (
     cd $FFSGIT/peers-ffs

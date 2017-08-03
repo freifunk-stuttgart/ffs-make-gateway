@@ -28,6 +28,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --with-lihas-firewall: Installiere LiHAS Firewall fuer policy routing
 --with-backbone-vpn: Nimm das backbone-tinc, github-Schreibzugriff auf git+ssh://git@github.com/freifunk-stuttgart/tinc-ffsbb wird benoetigt
 --www:           Webroot
+--no-public:     GW hat keine fixe offizielle IP (fastd --remote nicht nutzen)
 --no-log-call:   Aufruf nicht unter /var/log/$0 speichern
 EOF
 }
@@ -37,6 +38,7 @@ DIRECTTCP=""
 GWS=10
 GWSUBID="1"
 LOG_CALL=1
+NOPUBLICIP=0
 NEEDS_APTKEY=1
 NEEDS_APTUPDATE=1
 NEEDS_SYSTEMD=1
@@ -52,7 +54,7 @@ error() {
   echo "$*"
   exit 1
 }
-TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall -- "$@"`
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall -- "$@"`
 if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 while true ; do
@@ -68,7 +70,8 @@ while true ; do
     --no-apt-key)					NEEDS_APTKEY=0; shift 1;;
     --no-apt-update)			NEEDS_APTUPDATE=0; shift 1;;
     --no-confirm)					CONFIRM=0; shift 1;;
-    --no-log-call)				LOG_CALL=0; shift 1;;
+    --no-log-call)					LOG_CALL=0; shift 1;;
+    --no-public)					NOPUBLICIP=1; shift 1;;
     --no-systemd)					NEEDS_SYSTEMD=0; shift 1;;
     --othergw)						OTHERGW_IP=$2; shift 2;;
     --segmentlist)				SEGMENTLIST="$2"; shift 2;;
@@ -318,6 +321,7 @@ for i in $SEGMENTLIST; do
   fi
   echo -n systemctl start fastd@vpn$(printf "%02i" $seg).service"; "
   echo -n systemctl start fastd@vpn$(printf "%02i" $seg)bb.service"; "
+  echo -n systemctl start fastd@vpn$(printf "%02i" $seg)mtu.service"; "
 done
 echo
 echo systemctl start bird
