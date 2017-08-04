@@ -160,6 +160,7 @@ fi
 . add_repositories.sh
 . setup_batman.sh
 . setup_bird.sh
+. setup_radvd_ubuntu.sh
 . setup_fastd.sh
 . setup_ffsconfiggenerator.sh
 . setup_firewall.sh
@@ -274,6 +275,8 @@ systemctl restart isc-dhcp-relay
 # bird
 setup_bird
 show_progress setup_bird
+setup_radvd
+show_progress setup_radvd
 
 # Monitoring
 setup_monitoring_updateff
