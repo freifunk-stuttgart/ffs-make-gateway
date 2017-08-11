@@ -19,8 +19,10 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
 	  post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
-	  post-up         iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
-	  post-up         ip6tables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+	  post-up         iptables -t mangle -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+	  post-up         ip6tables -t mangle -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+	  post-down       iptables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+	  post-down       ip6tables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 	  # default route is unreachable
 	  post-up         /sbin/ip route add 172.21.0.0/18 dev \$IFACE table stuttgart || true
 	  post-up         /sbin/ip route add unreachable default table nodefault || true
