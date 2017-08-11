@@ -65,6 +65,7 @@ setup_system_routing() {
   ensureline "71  nodefault" /etc/iproute2/rt_tables
   ensureline "1000  othergw" /etc/iproute2/rt_tables
   ensureline "2000  direct" /etc/iproute2/rt_tables
+  ensureline "3000  ffsdefault" /etc/iproute2/rt_tables
 }
 system_setup_sysfs() {
   ensureline "class/net/br00/bridge/hash_max = 4096" /etc/sysfs.d/freifunk

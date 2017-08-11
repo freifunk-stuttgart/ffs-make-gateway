@@ -11,11 +11,16 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  bridge_ports bat$seg
 	  bridge_fd 0
 	  bridge_maxwait 0
+	  mtu 1280
 	  # be sure all incoming traffic is handled by the appropriate rt_table
-	  post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 10000 || true
-	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 10000 || true
+	  post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
+	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+	  post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
+	  pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
 	  post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
+	  post-up         iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
+	  post-up         ip6tables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 	  # default route is unreachable
 	  post-up         /sbin/ip route add 172.21.0.0/18 dev \$IFACE table stuttgart || true
 	  post-up         /sbin/ip route add unreachable default table nodefault || true
@@ -34,11 +39,9 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  pre-up          /sbin/modprobe batman-adv || true
 	  post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
 	  post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
+	  post-up         /usr/sbin/batctl -m \$IFACE fragmentation 0 || true
           post-up         ifup br$seg || true
           post-up         /sbin/brctl addif br$seg \$IFACE || true
-	  # be sure all incoming traffic is handled by the appropriate rt_table
-	  post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
-	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
 	
 	allow-hotplug vpn$seg
 	iface vpn$seg inet6 manual
@@ -80,8 +83,10 @@ iface br00 inet static
         bridge_maxwait 0
 	broadcast 172.21.63.255
         # be sure all incoming traffic is handled by the appropriate rt_table
-        post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 10000 || true
-        pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 10000 || true
+        post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
+        pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+        post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
+        pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
         post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
         pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
         # default route is unreachable
