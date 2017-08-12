@@ -66,6 +66,8 @@ setup_firewall() {
     ensureline "IPT_FILTER '-A INPUT -j ACCEPT -i ffsbb -p 89'" /etc/firewall.lihas.d/localhost
     ensureline "IPT_FILTER '-A OUTPUT -j ACCEPT -o ffsbb -p 2'" /etc/firewall.lihas.d/localhost
     ensureline "IPT_FILTER '-A OUTPUT -j ACCEPT -o ffsbb -p 89'" /etc/firewall.lihas.d/localhost
+    ensureline "IPT_MANGLE '-A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu'" /etc/firewall.lihas.d/localhost
+    ensureline "ip6tables -t mangle -I FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu" /etc/firewall.lihas.d/localhost
     if [ "x$DIRECTTCP" != "x" ]; then
       for port in $DIRECTTCP; do
         ensureline "0.0.0.0/0 0.0.0.0/0 tcp $port" /etc/firewall.lihas.d/interface-br00/privclients
