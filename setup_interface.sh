@@ -28,14 +28,11 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  post-up         /sbin/ip route add unreachable default table nodefault || true
 	  post-down       /sbin/ip route del unreachable default table nodefault || true
 	  post-down       /sbin/ip route del 172.21.0.0/18 dev \$IFACE table stuttgart || true
-
-	iface br$seg inet6 static
-	  address fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID
-	  netmask 64
-	  # ULA route mz for rt_table stuttgart
+	  post-up         /sbin/ip addr add fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
 	  post-up         /sbin/ip -6 route add fd21:b4dc:4b$seg::/64 proto static dev \$IFACE table stuttgart || true
 	  post-down       /sbin/ip -6 route del fd21:b4dc:4b$seg::/64 proto static dev \$IFACE table stuttgart || true
-	
+	  post-down       /sbin/ip addr del fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
+
 	allow-hotplug bat$seg
 	iface bat$seg inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true

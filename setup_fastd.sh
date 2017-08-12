@@ -172,7 +172,7 @@ setup_fastd_update() {
 	EOF
   chmod +x /usr/local/bin/fastd-status
   cat <<-EOF >/etc/cron.d/fastd_update_status 
-	*/5 * * * *	root /usr/local/bin/update_peers.py
+	*/5 * * * *	root /usr/local/bin/update_peers.py --repo /var/lib/ffs/git/peers-ffs
 	* * * * *	root /usr/local/bin/fastd-status
 	EOF
 }
