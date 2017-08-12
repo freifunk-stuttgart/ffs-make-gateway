@@ -23,7 +23,7 @@ setup_monitoring_updateff() {
 	  fi
 	  mkdir -p "\$FASTD_STATUS_OUTDIR"
 	fi
-	
+	/usr/local/bin/update_peers.py --repo /var/lib/ffs/git/peers-ffs
 	# find all active fastd status sockets
 	for fastdsocket in \$(find /etc/fastd/ -name fastd.conf |
 	xargs sed -n '/^status\s\+socket\s\+"/{s#^status\s\+socket\s\+"\([^"]\+\)";#\1#; p}'); do
