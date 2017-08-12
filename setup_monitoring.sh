@@ -7,7 +7,7 @@ setup_monitoring_updateff() {
 	#!/bin/bash
 	export LC_ALL=C
 	WWWPFAD="$WWWPFAD"
-	git -C $FFSGIT/tinc-ffsbb pull > /dev/null
+	git -C $FFSGIT/peers-ffs pull > /dev/null
 	git -C $FFSGIT/tinc pull > /dev/null
 	killall -HUP tincd
 	
@@ -16,22 +16,22 @@ setup_monitoring_updateff() {
 	if [ -e /etc/default/freifunk ]; then
 	        . /etc/default/freifunk
 	fi
-	if [ ! -d "$FASTD_STATUS_OUTDIR" ]; then
-	  if [ -e "$FASTD_STATUS_OUTDIR" ]; then
-	    echo "'$FASTD_STATUS_OUTDIR' exists and is no directory" >&2
+	if [ ! -d "\$FASTD_STATUS_OUTDIR" ]; then
+	  if [ -e "\$FASTD_STATUS_OUTDIR" ]; then
+	    echo "'\$FASTD_STATUS_OUTDIR' exists and is no directory" >&2
 	    exit 1
 	  fi
-	  mkdir -p "$FASTD_STATUS_OUTDIR"
+	  mkdir -p "\$FASTD_STATUS_OUTDIR"
 	fi
 	
 	# find all active fastd status sockets
 	for fastdsocket in \$(find /etc/fastd/ -name fastd.conf |
 	xargs sed -n '/^status\s\+socket\s\+"/{s#^status\s\+socket\s\+"\([^"]\+\)";#\1#; p}'); do
-	  if fuser -s $fastdsocket 2>/dev/null; then
+	  if fuser -s \$fastdsocket 2>/dev/null; then
 	    # active fastd
-	    fastdname=\$(sed 's#^.*/##; s#^fastd-##; s#\.sock$##' <<<$fastdsocket)
-	    /usr/local/bin/fastd-clean.py -i <(socat "$fastdsocket" -) -o "$FASTD_STATUS_OUTDIR"/"$fastdname".json.new
-	    mv "$FASTD_STATUS_OUTDIR"/"$fastdname".json.new "$FASTD_STATUS_OUTDIR"/"$fastdname".json
+	    fastdname=\$(sed 's#^.*/##; s#^fastd-##; s#\.sock\$##' <<<\$fastdsocket)
+	    /usr/local/bin/fastd-clean.py -i <(socat "\$fastdsocket" -) -o "\$FASTD_STATUS_OUTDIR"/"\$fastdname".json.new
+	    mv "\$FASTD_STATUS_OUTDIR"/"\$fastdname".json.new "\$FASTD_STATUS_OUTDIR"/"\$fastdname".json
 	  fi
 	done
 	rm -rf \$TEMPDIR
