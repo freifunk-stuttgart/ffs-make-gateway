@@ -168,15 +168,14 @@ setup_fastd_update() {
     wget https://raw.githubusercontent.com/poldy79/FfsScripts/master/fastd-clean.py -nd -P /usr/local/bin/
     chmod +x /usr/local/bin/fastd-clean.py
   fi
-  cat <<-'EOF' >/usr/local/bin/fastd-status
-	VPNS=\$(ls /var/run/fastd/fastd-*sock | sed 's/^.*\///; s/\.sock\$//')
-	for i in \$VPNS; do
-	  status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
-	done
-	EOF
+#  cat <<-'EOF' >/usr/local/bin/fastd-status
+#	VPNS=\$(ls /var/run/fastd/fastd-*sock | sed 's/^.*\///; s/\.sock\$//')
+#	for i in \$VPNS; do
+#	  status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
+#	done
+#	EOF
   chmod +x /usr/local/bin/fastd-status
   cat <<-EOF >/etc/cron.d/fastd_update_status 
-	*/5 * * * *	root /usr/local/bin/update_peers.py --repo /var/lib/ffs/git/peers-ffs
-	* * * * *	root /usr/local/bin/fastd-status
+	*/5 * * * *	root /usr/local/bin/update-ff
 	EOF
 }
