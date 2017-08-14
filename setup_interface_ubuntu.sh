@@ -55,7 +55,7 @@ iface bb${seg} inet6 manual
 allow-hotplug bat$seg
 iface bat$seg inet6 manual
   pre-up          /sbin/modprobe batman-adv || true
-  up              /usr/sbin/batctl -m $IFACE fragmentation 0
+  up              /usr/sbin/batctl -m \$IFACE fragmentation 0
   post-up         /sbin/brctl addif br$seg \$IFACE || true
   post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
   #post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
