@@ -10,6 +10,7 @@ iface br$seg inet static
   address 10.190.$netz.$GWID$GWSUBID
   netmask 255.255.248.0
   bridge_ports bat$seg
+  mtu 1280
 #  pre-up          /sbin/brctl addbr \$IFACE || true
 #  up              /sbin/ip address add fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
 #  post-down       /sbin/brctl delbr \$IFACE || true
@@ -54,6 +55,7 @@ iface bb${seg} inet6 manual
 allow-hotplug bat$seg
 iface bat$seg inet6 manual
   pre-up          /sbin/modprobe batman-adv || true
+  up              /usr/sbin/batctl -m $IFACE fragmentation 0
   post-up         /sbin/brctl addif br$seg \$IFACE || true
   post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
   #post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true

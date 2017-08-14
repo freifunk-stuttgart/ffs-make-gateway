@@ -17,8 +17,9 @@ chmod +x /usr/local/bin/switch-vpn
 cat <<-EOF >/etc/openvpn/openvpn-up
 #!/bin/sh
 ip rule add from \$ifconfig_local table stuttgart priority 9970
-ip route add 0.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
-ip route add 128.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
+ip route add default via \$route_vpn_gateway dev \$dev table stuttgart metric 2000
+#ip route add 0.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
+#ip route add 128.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
 # NAT aktivieren und NAT Tabelle vergroessern, wird benötigt wenn NICHT Berlin
 iptables -t nat -A POSTROUTING -o \$dev -j MASQUERADE
 sysctl -w net.netfilter.nf_conntrack_max=500000

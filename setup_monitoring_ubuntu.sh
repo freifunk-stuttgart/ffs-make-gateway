@@ -125,7 +125,8 @@ while : ; do
 done
 EOF
 chmod +x /usr/local/bin/update-ff
-ensureline_insert "/usr/local/bin/update-ff &" /etc/rc.local
+#ensureline_insert "/usr/local/bin/update-ff &" /etc/rc.local
+ensureline_insert "nohup /usr/local/bin/update-ff 2>&1 | logger -t "check-tasks: " &" /etc/rc.local
 }
 
 setup_monitoring_checktasks() {
@@ -383,7 +384,8 @@ cat <<EOF >/usr/local/bin/check-tasks
 
 EOF
 chmod +x /usr/local/bin/check-tasks
-ensureline_insert "/usr/local/bin/check-tasks &" /etc/rc.local
+#ensureline_insert "/usr/local/bin/check-tasks &" /etc/rc.local
+ensureline_insert "nohup /usr/local/bin/check-tasks 2>&1 | logger -t "check-tasks: " &" /etc/rc.local
 }
 
 setup_monitoring_collectd() {
