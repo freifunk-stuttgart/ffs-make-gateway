@@ -264,10 +264,6 @@ show_progress setup_fastd_update
 setup_fastd_bb
 show_progress setup_fastd_bb
 
-# sysfs
-system_setup_sysfs
-show_progress system_setup_sysfs
-
 # DHCP Relay
 ensureline "SERVERS=\"$DHCPRELAYSERVERS\"" /etc/default/isc-dhcp-relay
 systemctl restart isc-dhcp-relay
