@@ -9,7 +9,7 @@ iface br$seg inet static
   hwaddress 02:00:39:$seg:$GWLID:$GWLSUBID
   address 10.190.$netz.$GWID$GWSUBID
   netmask 255.255.248.0
-  mtu 1280
+#  mtu 1280
   bridge_ports bat$seg
 #  pre-up          /sbin/brctl addbr \$IFACE || true
 #  up              /sbin/ip address add fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
@@ -57,7 +57,7 @@ iface bat$seg inet6 manual
   pre-up          /sbin/modprobe batman-adv || true
   up              /usr/sbin/batctl -m \$IFACE fragmentation 0
   post-up         /sbin/brctl addif br$seg \$IFACE || true
-  post-up         /sbin/ip link set dev br$seg mtu 1280 || true
+#  post-up         /sbin/ip link set dev br$seg mtu 1280 || true
   post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
   #post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
   pre-down        /sbin/brctl delif br$seg \$IFACE || true
