@@ -148,6 +148,10 @@ setup_tinc_interface() {
 	    mtu 1280
 	    post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
 	    pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+	    post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
+	    post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	    post-up         /sbin/ip route add 10.191.255.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.255.0/24 dev \$IFACE table stuttgart || true
 	
@@ -167,6 +171,10 @@ setup_tinc_interface() {
 	    mtu 1280
 	    post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
 	    pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+	    post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
+	    post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	
@@ -182,6 +190,10 @@ setup_tinc_interface() {
 	    post-up         /sbin/ip addr add 10.191.255.$(($GWID*10+$GWSUBID)) dev \$IFACE || true
 	    post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
 	    pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+	    post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
+	    post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
+	    pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	
