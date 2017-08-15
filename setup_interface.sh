@@ -35,6 +35,7 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 
 	allow-hotplug bat$seg
 	iface bat$seg inet6 manual
+	  mtu 1280
 	  pre-up          /sbin/modprobe batman-adv || true
 	  post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
 	  post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
