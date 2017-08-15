@@ -33,12 +33,12 @@ setup_bird() {
 	    preference 100;
 	    import filter {
 	        # Wir lennen alles was eine Netzmaske /8 oder schlechter hat:
-		if net ~ [ 0.0.0.0/0{0,7} ] then reject;
+	        if net ~ [ 0.0.0.0/0{0,7} ] then reject;
 	        accept;     
 	    };
 	    export filter {
 	        # Wir lennen alles was eine Netzmaske /8 oder schlechter hat:
-		if net ~ [ 0.0.0.0/0{0,7} ] then reject;
+	        if net ~ [ 0.0.0.0/0{0,7} ] then reject;
 	        accept;     
 	        ospf_metric1 = 100;
 	    };
