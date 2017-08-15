@@ -32,16 +32,14 @@ setup_bird() {
 	    table tk_stuttgart;
 	    preference 100;
 	    import filter {
-	        #Nur Freifunk-Netze lernen - keine FFRL IPs und keine default-Route
-	        if net ~ [ 172.21.0.0/16+ ] then accept;
-	        if net ~ [ 10.190.0.0/15+ ] then accept;
-	        reject;     
+	        # Wir lennen alles was eine Netzmaske /8 oder schlechter hat:
+		if net ~ [ 0.0.0.0/0{0,7} ] then reject;
+	        accept;     
 	    };
 	    export filter {
-	        #Nur Freifunk-Netze an andere weiter propagieren - keine FFRL IPs und keine default-Route
-	        if net ~ [ 172.21.0.0/16+ ] then accept;
-	        if net ~ [ 10.190.0.0/15+ ] then accept;
-	        reject; 
+	        # Wir lennen alles was eine Netzmaske /8 oder schlechter hat:
+		if net ~ [ 0.0.0.0/0{0,7} ] then reject;
+	        accept;     
 	        ospf_metric1 = 100;
 	    };
 	    rfc1583compat no;    # Metrik gem. OSPFv2, RFC 2328
@@ -54,7 +52,7 @@ setup_bird() {
 	            0.0.0.0/0;
 	        };
 	        
-	        interface "ffsbb" {
+	        interface "ffsl3" {
 	            cost        100;
 	            hello        10;
 	            poll        20;
