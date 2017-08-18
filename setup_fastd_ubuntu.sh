@@ -28,10 +28,11 @@ EOF
 fi
 
 # alte Verzeichnisse und Dateien löschen
-rm -rf /etc/fastd/bb[0-6][0-9]
-rm -rf /etc/fastd/vpn[0-6][0-9]
-rm -rf /etc/fastd/vpn[0-6][0-9]bb
-rm -f  /etc/fastd/${HOSTNAME}s[0-6][0-9]
+rm -rf /etc/fastd/bb[0-9][0-9]
+rm -rf /etc/fastd/vpn[0-9][0-9]
+rm -rf /etc/fastd/vpx[0-9][0-9]
+rm -rf /etc/fastd/vpy[0-9][0-9]
+rm -f  /etc/fastd/${HOSTNAME}s[0-9][0-9]
 
 # fastd Verzeichnisse anlegen
 for seg in $SEGMENTLIST; do
