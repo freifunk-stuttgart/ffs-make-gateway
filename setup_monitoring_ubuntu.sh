@@ -217,7 +217,7 @@ cat <<EOF >/usr/local/bin/check-tasks
              \$3 ~ /67\$/ && \$5 ~ /68:\$/ {answer++}
              END {print "Request:" req "  Reply:" rep "  Answer:" answer; exit rep}'
         if [ \$? == 0 ]; then
-          ANTWORT+="Fehler: \$PRG leitet keine Daten durch\n\n"
+#          ANTWORT+="Fehler: \$PRG leitet keine Daten durch\n\n"
           service \$PRG restart
           sleep 5
           dhcppause=10
