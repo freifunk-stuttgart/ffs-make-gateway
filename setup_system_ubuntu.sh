@@ -48,4 +48,16 @@ setup_system_routing() {
   ensureline "2000  direct" /etc/iproute2/rt_tables
 }
 
-
+setup_system_autostart() {
+  ensureline "/usr/local/bin/autostart &" /etc/rc.local
+cat <<EOF >/usr/local/bin/autostart
+#!/bin/bash
+# wird beim booten einmal gestartet
+# MTU Fixes
+/sbin/iptables -t mangle -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1240
+/sbin/iptables -t mangle -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+/sbin/ip6tables -t mangle -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1220
+/sbin/ip6tables -t mangle -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+EOF
+chmod +x /usr/local/bin/autostart
+}

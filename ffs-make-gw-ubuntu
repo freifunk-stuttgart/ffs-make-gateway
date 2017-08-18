@@ -143,6 +143,8 @@ setup_system_sysfs
 show_progress setup_system_sysfs
 setup_system_routing
 show_progress setup_system_routing
+setup_system_autostart
+show_progress setup_system_autostart
 
 # Networking
 ensureline "source-directory interfaces.d" /etc/network/interfaces

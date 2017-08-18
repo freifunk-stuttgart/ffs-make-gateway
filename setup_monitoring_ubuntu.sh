@@ -126,7 +126,11 @@ done
 EOF
 chmod +x /usr/local/bin/update-ff
 #ensureline_insert "/usr/local/bin/update-ff &" /etc/rc.local
-ensureline_insert "nohup /usr/local/bin/update-ff 2>&1 | logger -t "check-tasks: " &" /etc/rc.local
+#ensureline_insert "nohup /usr/local/bin/update-ff 2>&1 | logger -t "check-tasks: " &" /etc/rc.local
+cat <<EOF >>/usr/local/bin/autostart
+# Updatescript (Git) starten
+nohup /usr/local/bin/update-ff 2>&1 | logger -t "check-tasks: " &
+EOF
 }
 
 setup_monitoring_checktasks() {
@@ -385,7 +389,11 @@ cat <<EOF >/usr/local/bin/check-tasks
 EOF
 chmod +x /usr/local/bin/check-tasks
 #ensureline_insert "/usr/local/bin/check-tasks &" /etc/rc.local
-ensureline_insert "nohup /usr/local/bin/check-tasks 2>&1 | logger -t "check-tasks: " &" /etc/rc.local
+#ensureline_insert "nohup /usr/local/bin/check-tasks 2>&1 | logger -t "check-tasks: " &" /etc/rc.local
+cat <<EOF >>/usr/local/bin/autostart
+# Ueberwachungsscript starten
+nohup /usr/local/bin/check-tasks 2>&1 | logger -t "check-tasks: " &
+EOF
 }
 
 setup_monitoring_collectd() {
