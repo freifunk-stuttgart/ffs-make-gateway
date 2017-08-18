@@ -126,10 +126,10 @@ done
 EOF
 chmod +x /usr/local/bin/update-ff
 #ensureline_insert "/usr/local/bin/update-ff &" /etc/rc.local
-#ensureline_insert "nohup /usr/local/bin/update-ff 2>&1 | logger -t "check-tasks: " &" /etc/rc.local
+#ensureline_insert "nohup /usr/local/bin/update-ff 2>&1 | logger -t "update-ff: " &" /etc/rc.local
 cat <<EOF >>/usr/local/bin/autostart
 # Updatescript (Git) starten
-nohup /usr/local/bin/update-ff 2>&1 | logger -t "check-tasks: " &
+nohup /usr/local/bin/update-ff 2>&1 | logger -t "update-ff: " &
 EOF
 }
 
