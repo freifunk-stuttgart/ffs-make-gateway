@@ -45,7 +45,7 @@ iface vpx$seg inet6 manual
   post-up         /sbin/ip link set dev bat$seg up || true
 
 allow-hotplug vpy$seg
-iface vpx$seg inet6 manual
+iface vpy$seg inet6 manual
   hwaddress 02:00:33:$seg:$GWLID:$GWLSUBID
   pre-up          /sbin/modprobe batman-adv || true
   pre-up          /sbin/ip link set \$IFACE address 02:00:33:$seg:$GWLID:$GWLSUBID up || true
