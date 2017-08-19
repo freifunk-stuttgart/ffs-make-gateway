@@ -11,33 +11,14 @@ sysctl -p /etc/sysctl.d/999-freifunk.conf || true
 setup_system_sysfs() {
 cat <<EOF >/etc/sysfs.d/99-freifunk.conf
 # increase batman-adv hop penalty (default=15)
-class/net/bat01/mesh/hop_penalty = 60
-class/net/bat02/mesh/hop_penalty = 60
-class/net/bat03/mesh/hop_penalty = 60
-class/net/bat04/mesh/hop_penalty = 60
-
 # increase multicast hash table of freifunk bridges (default=512)
-class/net/br01/bridge/hash_max = 2048
-class/net/br02/bridge/hash_max = 2048
-class/net/br03/bridge/hash_max = 2048
-class/net/br04/bridge/hash_max = 2048
 EOF
-}
-
-setup_system_sysfs() {
-cat <<EOF >/etc/sysfs.d/99-freifunk.conf
-# increase batman-adv hop penalty (default=15)
-class/net/bat01/mesh/hop_penalty = 60
-class/net/bat02/mesh/hop_penalty = 60
-class/net/bat03/mesh/hop_penalty = 60
-class/net/bat04/mesh/hop_penalty = 60
-
-# increase multicast hash table of freifunk bridges (default=512)
-class/net/br01/bridge/hash_max = 2048
-class/net/br02/bridge/hash_max = 2048
-class/net/br03/bridge/hash_max = 2048
-class/net/br04/bridge/hash_max = 2048
+for seg in $SEGMENTLIST ; do
+cat <<EOF >>/etc/sysfs.d/99-freifunk.conf
+class/net/bat$seg/mesh/hop_penalty = 60
+class/net/br$seg/bridge/hash_max = 2048
 EOF
+done
 }
 
 setup_system_routing() {
