@@ -38,7 +38,7 @@ rm -f  /etc/fastd/${HOSTNAME}s[0-9][0-9]
 for seg in $SEGMENTLIST; do
     portvpn=$((10040 + ${seg#0}))
     portvpx=$((10000 + ${seg#0}))
-    portvpy=$((10100 + ${seg#0}))
+    portvpy=$((10200 + ${seg#0}))
     portbb=$((9040 + ${seg#0}))
     dirvpn=/etc/fastd/vpn$seg
     dirvpx=/etc/fastd/vpx$seg
