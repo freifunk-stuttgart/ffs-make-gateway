@@ -64,7 +64,7 @@ setup_fastd_config() {
       done
     fi
   done
-  # Low MTU fastd
+  # Low MTU fastd, 1312
   segext=mtu
   for seg in $SEGMENTLIST; do
     i=${seg##0}
@@ -81,6 +81,31 @@ setup_fastd_config() {
 	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
 	log to syslog level warn;
 	mtu 1312; # Lowest possible MTU
+	include "/etc/fastd/secret_vpn.conf";
+	on verify "/root/freifunk/unclaimed.py";
+	status socket "/var/run/fastd/fastd-vpn${seg}${segext}.sock";
+	peer group "${group}" {
+	  include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
+	}
+	EOF
+  done
+  # Low MTU fastd, 1340
+  segext=mtv
+  for seg in $SEGMENTLIST; do
+    i=${seg##0}
+    vpnport=$((10200+$i))
+    dir=/etc/fastd/vpn$seg${segext}
+    iface="vpn${seg}${segext}"
+    mkdir -p $dir
+    cat <<-EOF >$dir/fastd.conf
+	log to syslog level warn;
+	interface "$iface";
+	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
+	method "salsa2012+umac";  
+	$(for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done)
+	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
+	log to syslog level warn;
+	mtu 1340; # Lowest possible MTU
 	include "/etc/fastd/secret_vpn.conf";
 	on verify "/root/freifunk/unclaimed.py";
 	status socket "/var/run/fastd/fastd-vpn${seg}${segext}.sock";
