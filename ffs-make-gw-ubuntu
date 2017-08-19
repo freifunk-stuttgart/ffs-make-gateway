@@ -134,7 +134,7 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
 #apt -y install postfix collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
 apt -y install postfix collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay radvd dnsutils tcpdump
 # ubuntu
-if [ $(cat /etc/apt/sources.list | grep jessie | wc -l) -le 1 ]; then
+if [ $(cat /etc/apt/sources.list | grep -e "xenial" | wc -l) -gt 0 ]; then
   apt -y install linux-image-generic
 fi
 setup_system_sysctl
