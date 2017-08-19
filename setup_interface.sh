@@ -60,7 +60,7 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  post-up         /sbin/ip link set dev bat$seg up || true
 	
 	allow-hotplug vpn${seg}mtv
-	iface vpn${seg}mtu inet6 manual
+	iface vpn${seg}mtv inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
 	  pre-up          /sbin/ip link set \$IFACE address 02:00:33:$seg:$GWLID:$GWLSUBID up || true
 	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
