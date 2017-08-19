@@ -27,7 +27,7 @@ Example:
 
 # ffs-make-gateway-ubuntu
 
-Setzt auf einem leeren Ubuntu 16.04 Server ein Freifunk-Gateway auf.
+Setzt auf einem leeren Ubuntu 16.04 oder Debian 8 Server ein Freifunk-Gateway auf.
 
 #### Beispiele:
 git clone https://github.com/freifunk-stuttgart/ffs-make-gateway.git  
