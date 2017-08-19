@@ -30,14 +30,14 @@ Example:
 Setzt auf einem leeren Ubuntu 16.04 Server ein Freifunk-Gateway auf.
 
 #### Beispiele:
-git clone https://github.com/freifunk-stuttgart/ffs-make-gateway.git
-cd ffs-make-gateway
+git clone https://github.com/freifunk-stuttgart/ffs-make-gateway.git  
+cd ffs-make-gateway  
 
-Erstellen eine Gateways gw06n02.freifunk-stuttgart.de der in Segment 3 arbeitet:
-./ffs-make-gw-ubuntu --email fehler@ffs.ovh --gwid 6 --gwsubid 2 --segmentlist "03"
+Erstellen eine Gateways gw06n02.freifunk-stuttgart.de der in Segment 3 arbeitet:  
+./ffs-make-gw-ubuntu --email fehler@ffs.ovh --gwid 6 --gwsubid 2 --segmentlist "03"  
 
-Erstellen eine Gateways gw08n06.freifunk-stuttgart.de der in den Segmenten 1 2 3 4 5 6 7 8 9 10 arbeitet:
-./ffs-make-gw-ubuntu --gwid 8 --gwsubid 6 --segmentlist "01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16"
+Erstellen eine Gateways gw08n06 in Segment 1-16:  
+./ffs-make-gw-ubuntu --gwid 8 --gwsubid 6 --segmentlist "01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16"  
 
 Nachdem das Script ohne Fehler gelaufen ist, ist ein reboot nötig.
 
