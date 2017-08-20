@@ -139,7 +139,7 @@ include "../secret-bb.conf";
 include peers from "bb";
 # error|warn|info|verbose|debug|debug2
 log level info;
-hide ip addresses yes;
+#hide ip addresses yes;
 hide mac addresses yes;
 method "salsa2012+umac";    # new method (faster)
 method "salsa2012+gmac";
