@@ -138,7 +138,7 @@ setup_fastd_bb() {
 	$(for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done)
 	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
 	include "/etc/fastd/secret_vpn${segext}.key";
-	mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
+	mtu 1340;
 	on verify "/root/freifunk/unclaimed.py";
 	status socket "/var/run/fastd/fastd-vpn${seg}${segext}.sock";
 	peer group "${group}" {
