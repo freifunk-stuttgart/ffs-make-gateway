@@ -7,11 +7,10 @@ setup_firewall() {
     mkdir -p /etc/firewall.lihas.d/interface-$EXT_IF_V4
     ensureline 0.0.0.0/0 /etc/firewall.lihas.d/interface-$EXT_IF_V4/network
     ensureline 0.0.0.0/0 /etc/firewall.lihas.d/interface-lo/network
-    ensureline "0.0.0.0/0 0.0.0.0/0 udp 9000:13000" /etc/firewall.lihas.d/interface-$EXT_IF_V4/privclients
-    ensureline "0.0.0.0/0 0.0.0.0/0 udp 9000:13000" /etc/firewall.lihas.d/interface-lo/privclients
     ensureline "0.0.0.0/0 0.0.0.0/0 tcp 9000:13000" /etc/firewall.lihas.d/interface-$EXT_IF_V4/privclients
     ensureline "0.0.0.0/0 0.0.0.0/0 tcp 9000:13000" /etc/firewall.lihas.d/interface-lo/privclients
-    ensureline "0.0.0.0/0 0.0.0.0/0 tcp 9000:13000" /etc/firewall.lihas.d/interface-$EXT_IF_V4/privclients
+    ensureline "0.0.0.0/0 0.0.0.0/0 udp 9000:13000" /etc/firewall.lihas.d/interface-$EXT_IF_V4/privclients
+    ensureline "0.0.0.0/0 0.0.0.0/0 udp 9000:13000" /etc/firewall.lihas.d/interface-lo/privclients
     ensureline "0.0.0.0/0 0.0.0.0/0 tcp 80" /etc/firewall.lihas.d/interface-$EXT_IF_V4/privclients
     # monitoring from lenny.ua25.de
     ensureline "88.198.194.43 0.0.0.0/0 tcp 6556" /etc/firewall.lihas.d/interface-$EXT_IF_V4/privclients
@@ -43,14 +42,23 @@ setup_firewall() {
     ensureline 172.21.0.0/16 /etc/firewall.lihas.d/interface-br00/network
     ensureline 10.190.0.0/15 /etc/firewall.lihas.d/interface-br00/network
     ensureline dhcpd /etc/firewall.lihas.d/interface-br00/mark
-    ensureline "0.0.0.0/0 hostgroup-gw$GWLID tcp 0" /etc/firewall.lihas.d/interface-br00/privclients
-    ensureline "0.0.0.0/0 hostgroup-gw$GWLID udp 0" /etc/firewall.lihas.d/interface-br00/privclients
-    ensureline "0.0.0.0/0 hostgroup-gw$GWLID icmp 0" /etc/firewall.lihas.d/interface-br00/privclients
+    ensureline "0.0.0.0/0 0.0.0.0/0 tcp 0 lo" /etc/firewall.lihas.d/interface-br00/privclients
+    ensureline "0.0.0.0/0 0.0.0.0/0 udp 0 lo" /etc/firewall.lihas.d/interface-br00/privclients
+    ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0 lo" /etc/firewall.lihas.d/interface-br00/privclients
     ensureline "0.0.0.0/0 255.255.255.255 udp 68" /etc/firewall.lihas.d/interface-br00/privclients
-    for iface in tun9 br00; do
+    for iface in tun9; do
       ensureline "0.0.0.0/0 0.0.0.0/0 tcp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
       ensureline "0.0.0.0/0 0.0.0.0/0 udp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
       ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
+    done
+    for iface in br00; do
+      for net1 in 10.190.0.0/15 172.21.0.0/16; do
+        for net2 in 10.190.0.0/15 172.21.0.0/16; do
+          ensureline "$net1 $net2 tcp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
+          ensureline "$net1 $net2 udp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
+          ensureline "$net1 $net2 icmp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
+        done
+      done
     done
     for iface in tun9 $EXT_IF_V4; do
       ensureline "0.0.0.0/0 0.0.0.0/0 tcp 0" /etc/firewall.lihas.d/interface-$iface/masquerade
@@ -73,7 +81,6 @@ setup_firewall() {
         ensureline "0.0.0.0/0 0.0.0.0/0 tcp $port" /etc/firewall.lihas.d/interface-br00/privclients
       done
     fi
-    ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0" /etc/firewall.lihas.d/interface-br00/privclients
     ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0" /etc/firewall.lihas.d/interface-br00/privclients
     # Loopback, was lokale ausgehend ist
     if [ "x$OTHERGW_IP" != "x" ]; then
@@ -103,7 +110,7 @@ setup_firewall() {
       done
     fi
     if [ ! -e /etc/firewall.lihas.d/interface-br00/policy-routing ]; then
-      ln -s /etc/firewall.lihas.d/policy-routing /etc/firewall.lihas.d/interface-br00/policy-routing
+      ln -s /etc/firewall.lihas.d/policy-routing /etc/firewall.lihas.d/interface-lo/policy-routing
     fi
     mkdir -p /etc/firewall.lihas.d/groups
       # Eigene IP Adressen
