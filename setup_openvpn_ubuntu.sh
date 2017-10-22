@@ -36,7 +36,7 @@ iptables -t mangle -A PREROUTING -j MARK --set-xmark 0x0/0xffffffff
 iptables -t mangle -A FORWARD -j MARK --set-xmark 0x0/0xffffffff
 for port in $DIRECTTCP; do
   iptables -t mangle -A PREROUTING -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
-  iptables -t mangle -A FORWARD -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
+  iptables -t mangle -A FORWARD    -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
   iptables -t nat -A POSTROUTING -o $EXT_IF_V4 -p tcp --dport \$port -j SNAT --to-source $EXT_IP_V4
 done
 ip route show table main | while read ROUTE ; do ip route add table direct \$ROUTE ; done
@@ -55,6 +55,7 @@ iptables -t nat -D POSTROUTING -o \$dev -j MASQUERADE
 ip rule del fwmark 0x2000 lookup direct priority 6000
 for port in $DIRECTTCP; do
   iptables -t mangle -D PREROUTING -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
+  iptables -t mangle -D FORWARD    -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
   iptables -t nat -D POSTROUTING -o $EXT_IF_V4 -p tcp --dport \$port -j SNAT --to-source $EXT_IP_V4
 done
 iptables -t mangle -D PREROUTING -j MARK --set-xmark 0x0/0xffffffff
