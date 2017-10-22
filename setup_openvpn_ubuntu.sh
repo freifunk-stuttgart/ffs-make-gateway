@@ -33,7 +33,7 @@ cat <<-EOF >>/etc/openvpn/openvpn-up
 # https+Mailports direkt ausleiten
 ip rule add fwmark 0x2000 lookup direct priority 6000
 iptables -t mangle -A PREROUTING -j MARK --set-xmark 0x0/0xffffffff
-iptables -t mangle -A FORWARD -j MARK --set-xmark 0x0/0xffffffff
+iptables -t mangle -A FORWARD    -j MARK --set-xmark 0x0/0xffffffff
 for port in $DIRECTTCP; do
   iptables -t mangle -A PREROUTING -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
   iptables -t mangle -A FORWARD    -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
@@ -53,6 +53,8 @@ iptables -t nat -D POSTROUTING -o \$dev -j MASQUERADE
 
 # https+Mailports direkt ausleiten
 ip rule del fwmark 0x2000 lookup direct priority 6000
+iptables -t mangle -D PREROUTING -j MARK --set-xmark 0x0/0xffffffff
+iptables -t mangle -D FORWARD    -j MARK --set-xmark 0x0/0xffffffff
 for port in $DIRECTTCP; do
   iptables -t mangle -D PREROUTING -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
   iptables -t mangle -D FORWARD    -s 10.190.0.0/15 -p tcp -m tcp --dport \$port -j MARK --set-xmark 0x2000/0xffffffff
