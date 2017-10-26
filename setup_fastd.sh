@@ -50,6 +50,7 @@ setup_fastd_config() {
 	interface "$iface";
 	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
 	method "salsa2012+umac";  
+	method "null+salsa2012+umac";
 	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip4 ]; then for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done; fi)
 	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip6 ]; then for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done; fi)
 	log to syslog level warn;
@@ -77,6 +78,7 @@ setup_fastd_config() {
 	interface "$iface";
 	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
 	method "salsa2012+umac";  
+	method "null+salsa2012+umac";
 	$(for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done)
 	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
 	log to syslog level warn;
@@ -110,6 +112,7 @@ setup_fastd_bb() {
 	interface "vpn${seg}${segext}";
 	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
 	method "salsa2012+umac";  
+	method "null+salsa2012+umac";
 	$(for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done)
 	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
 	include "/etc/fastd/secret_vpn${segext}.key";
