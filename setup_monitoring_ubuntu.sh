@@ -394,6 +394,8 @@ chmod +x /usr/local/bin/check-tasks
 cat <<EOF >>/usr/local/bin/autostart
 # Ueberwachungsscript starten
 nohup /usr/local/bin/check-tasks 2>&1 | logger -t "check-tasks" &
+# br Interfaces auf up
+/sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
 EOF
 }
 
