@@ -91,6 +91,7 @@ cat <<EOF >/usr/local/bin/update-ff
 WWWPFAD="/var/www/html"
 FASTD=/etc/fastd/peers
 VPNS="$(echo " $SEGMENTLIST" | sed 's/ / vpn/g')"
+VPXS="$(echo " $SEGMENTLIST" | sed 's/ / vpx/g')"
 #       Endlosschleife
 while : ; do
    ## ffs Peers aktualisieren
@@ -112,6 +113,9 @@ while : ; do
 #   tincd -n ffsl3 -k WINCH
    # Status veroeffentlichen
    for i in \$VPNS; do
+     status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
+   done
+   for i in \$VPXS; do
      status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
    done
    # Segmentinfo generieren
