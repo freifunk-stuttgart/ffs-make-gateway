@@ -5,6 +5,12 @@ net.ipv6.conf.all.forwarding=1
 net.ipv4.conf.default.rp_filter=0
 net.ipv4.conf.all.rp_filter=0
 net.core.netdev_budget=1000
+net.ipv4.neigh.default.gc_thresh1 = 1280
+net.ipv4.neigh.default.gc_thresh2 = 5120
+net.ipv4.neigh.default.gc_thresh3 = 10240
+net.ipv6.neigh.default.gc_thresh1 = 1280
+net.ipv6.neigh.default.gc_thresh2 = 5120
+net.ipv6.neigh.default.gc_thresh3 = 10240
 EOF
 sysctl -p /etc/sysctl.d/999-freifunk.conf || true
 }
