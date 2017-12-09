@@ -94,38 +94,44 @@ VPNS="$(echo " $SEGMENTLIST" | sed 's/ / vpn/g')"
 VPYS="$(echo " $SEGMENTLIST" | sed 's/ / vpy/g')"
 #       Endlosschleife
 while : ; do
-   ## ffs Peers aktualisieren
-   cd /etc/fastd/peers
-   back=\$( git pull )
-   echo "fastd-peers: \$back"
-   /usr/local/bin/update_peers.py --repo /etc/fastd/peers
+  ## ffs Peers aktualisieren
+  cd /etc/fastd/peers
+  back=\$( git pull )
+  echo "fastd-peers: \$back"
+  /usr/local/bin/update_peers.py --repo /etc/fastd/peers
 #   ## ffsbb aktualisieren
 #   cd /root/tinc-ffsbb/
 #   back=\$( git pull )
 #   echo "tinc-ffsbb: \$back"
 #   tincd -n ffsbb -k HUP
 #   tincd -n ffsbb -k WINCH
-   ## ffsl3 aktualisieren
-   cd /root/tinc-ffsl3/
-   back=\$( git pull )
-   echo "tinc-ffsl3: \$back"
-   tincd -n ffsl3 -k HUP
-#   tincd -n ffsl3 -k WINCH
-   # Status veroeffentlichen
-   for i in \$VPNS; do
+  ## ffsl3 aktualisieren
+  cd /root/tinc-ffsl3/
+  back=\$( git pull )
+  echo "tinc-ffsl3: \$back"
+  tincd -n ffsl3 -k HUP
+#  tincd -n ffsl3 -k WINCH
+  # Status veroeffentlichen
+  for i in \$VPNS; do
+    status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
+  done
+  for i in \$VPYS; do
      status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
-   done
-   for i in \$VPYS; do
-     status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
-   done
-   # Segmentinfo generieren
-#   rm \$WWWPFAD/seg/*
-#   for seg in $SEGMENTLIST; do
-#     echo "\$seg" >\$WWWPFAD/seg/s\${seg}
-#     find \$FASTD/vpn\${seg}/peers/ -type f | xargs -i basename {} | xargs -i ln -s \$WWWPFAD/seg/s\${seg} \$WWWPFAD/seg/{}
-#   done
-   echo "*** fertig ***"
-   sleep 120
+  done
+  # tinc Grafik aktualisieren
+  if [ -x /usr/bin/circo ]; then
+    if [ -f /tmp/ffsl3.gv ]; then
+      circo -Tpng /tmp/ffsl3.gv -o /var/www/html/ffsl3.png
+    fi
+  fi
+  # Segmentinfo generieren
+#  rm \$WWWPFAD/seg/*
+#  for seg in $SEGMENTLIST; do
+#    echo "\$seg" >\$WWWPFAD/seg/s\${seg}
+#    find \$FASTD/vpn\${seg}/peers/ -type f | xargs -i basename {} | xargs -i ln -s \$WWWPFAD/seg/s\${seg} \$WWWPFAD/seg/{}
+#  done
+  echo "*** fertig ***"
+  sleep 120
 done
 EOF
 chmod +x /usr/local/bin/update-ff
