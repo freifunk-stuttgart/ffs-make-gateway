@@ -199,7 +199,11 @@ cat <<EOF >/usr/local/bin/check-tasks
       if [ -z "\$BACK" ] ; then
           echo "Error"
           ANTWORT+="Fehler: \$PRG nicht gestartet\nFehler: \$BACK\n\n"
-          service \$PRG restart
+          if [ -d /etc/systemd/system/tinc.service.wants ]; then
+            systemctl restart \$PRG@ffsl3
+          else
+            service \$PRG restart
+          fi
           sleep 5
       else
           echo "OK"
