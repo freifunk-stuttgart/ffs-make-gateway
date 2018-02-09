@@ -18,7 +18,7 @@ keybbpublic=$(cat /etc/fastd/gateway-bb.key | grep "Public" | cut -d" " -f2)
 cat <<-EOF >/etc/fastd/$HOSTNAME
 #MAC: 02:00:38:$SEGMENT1:$GWLID:$GWLSUBID
 key "$(cat /etc/fastd/gateway-bb.key | grep "Public" | cut -d" " -f2)";
-remote "$HOSTNAME.freifunk-stuttgart.de" port $((9040 + $SEGMENT1));
+remote "$HOSTNAME.gw.freifunk-stuttgart.de" port $((9040 + $SEGMENT1));
 EOF
 # gatewaykey
 if [ "$VPNKEY" != "Wird generiert" ]; then
@@ -67,7 +67,7 @@ for seg in $SEGMENTLIST; do
 cat <<-EOF >/etc/fastd/${HOSTNAME}s$seg
 #MAC: 02:00:38:$seg:$GWLID:$GWLSUBID
 key "$keybbpublic";
-remote "$HOSTNAME.freifunk-stuttgart.de" port $portbb;
+remote "$HOSTNAME.gw.freifunk-stuttgart.de" port $portbb;
 EOF
 cat <<-EOF >$dirvpn/fastd.conf
 interface "$ifacevpn";
