@@ -127,7 +127,7 @@ EOF
     if [ ! -e $FFSGIT/peers-ffs/vpn$seg/$group/$HOSTNAME ] || ! grep $VPNBBPUB $FFSGIT/peers-ffs/vpn$seg/$group/$HOSTNAME; then
       cat <<-EOF >$FFSGIT/peers-ffs/vpn$seg/$group/${HOSTNAME}s$seg
 	key "$VPNBBPUB";
-	remote "${HOSTNAME}.freifunk-stuttgart.de" port $(printf '9%03i' $segnum);
+	remote "${HOSTNAME}.gw.freifunk-stuttgart.de" port $(printf '9%03i' $segnum);
 EOF
     fi
     if [ $NOPUBLICIP -eq 1 ]; then

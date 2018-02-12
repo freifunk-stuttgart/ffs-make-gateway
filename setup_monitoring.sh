@@ -51,15 +51,6 @@ error () {
 
 [ -e /etc/default/freifunk ] && . /etc/default/freifunk
 
-# check ffsbb-tinc
-# pid of tinc
-TINC_PID=$(ps x | awk '$5 ~ /tincd$/ && /-n ffsbb/ {print $1}')
-if [ 'x'"$TINC_PID" == 'x' ]; then
-        # no tinc, restart
-        error "tinc ffsbb down, restart"
-        /sbin/ifdown --force ffsbb
-        /sbin/ifup ffsbb
-fi
 if ! host www.freifunk-stuttgart.de 127.0.0.1 > /dev/null 2>&1; then
 	killall rndc
 	killall -9 named

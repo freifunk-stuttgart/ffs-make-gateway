@@ -40,6 +40,12 @@ net.ipv6.conf.default.accept_ra=0
 vm.panic_on_oom=1
 
 net.core.netdev_budget=3000
+net.ipv4.neigh.default.gc_thresh1 = 1280
+net.ipv4.neigh.default.gc_thresh2 = 5120
+net.ipv4.neigh.default.gc_thresh3 = 10240
+net.ipv6.neigh.default.gc_thresh1 = 1280
+net.ipv6.neigh.default.gc_thresh2 = 5120
+net.ipv6.neigh.default.gc_thresh3 = 10240
 EOF
 sysctl -p /etc/sysctl.d/999-freifunk.conf || true
 }
