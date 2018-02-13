@@ -257,6 +257,12 @@ for seg in $SEGMENTLIST; do
   systemctl enable fastd@vpn${seg}mtv.service 
   systemctl enable fastd@vpn${seg}bb.service 
 done
+# remove obsolete fastd
+ls /etc/systemd/system/multi-user.target.wants/fastd@* 2>/dev/null | sed 's/.*@//; s/.service$//' | while read fastdinstance; do
+  if [ ! -e /etc/fastd/$fastdinstance ]; then
+		systemctl disable  fastd@$fastdinstance.service
+  fi
+done
 
 # fastd /usr/local/bin/fastd-update + cronjob
 setup_fastd_update
