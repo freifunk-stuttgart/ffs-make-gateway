@@ -254,7 +254,6 @@ for seg in $SEGMENTLIST; do
     systemctl enable fastd@vpn${seq}ip6.service
   fi
   systemctl enable fastd@vpn${seg}.service 
-  systemctl enable fastd@vpn${seg}mtu.service 
   systemctl enable fastd@vpn${seg}mtv.service 
   systemctl enable fastd@vpn${seg}bb.service 
 done
@@ -321,7 +320,6 @@ for i in $SEGMENTLIST; do
   fi
   echo -n systemctl start fastd@vpn$(printf "%02i" $seg).service"; "
   echo -n systemctl start fastd@vpn$(printf "%02i" $seg)bb.service"; "
-  echo -n systemctl start fastd@vpn$(printf "%02i" $seg)mtu.service"; "
   echo -n systemctl start fastd@vpn$(printf "%02i" $seg)mtv.service"; "
 done
 echo
