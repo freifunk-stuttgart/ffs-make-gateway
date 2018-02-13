@@ -3,7 +3,7 @@ for seg in $SEGMENTLIST ; do
 netz=$((${seg#0} - 1))
 netz=$(($netz * 8))
 cat <<-EOF >/etc/network/interfaces.d/br$seg
-	auto br$seg
+	allow-hotplug br$seg
 	iface br$seg inet static
 	  bridge_hw 02:00:39:$seg:$GWLID:$GWLSUBID
 	  address 10.190.$netz.$GWID$GWSUBID
@@ -41,7 +41,6 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
 	  post-up         /usr/sbin/batctl -m \$IFACE fragmentation 0 || true
 	  post-up         ifup br$seg || true
-	  post-up         /sbin/brctl addif br$seg \$IFACE || true
 	  post-up         /sbin/brctl addif br$seg \$IFACE || true
 	  post-up         /sbin/ip link set dev br$seg mtu 1280 || true
 	
