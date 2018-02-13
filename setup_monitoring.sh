@@ -38,6 +38,10 @@ setup_monitoring_updateff() {
 EOF
   chmod +x /usr/local/bin/update-ff
   ensureline_insert "/usr/local/bin/update-ff &" /etc/rc.local
+  [ -e /etc/cron.d/fastd_update_status ] && rm /etc/cron.d/fastd_update_status
+  cat <<-EOF >/etc/cron.d/update-ff
+	*/5 * * * *     root /usr/local/bin/update-ff
+	EOF
 }
 setup_monitoring() {
 cat <<'EOF' >/usr/local/bin/gw-watchdog

@@ -177,8 +177,5 @@ setup_fastd_update() {
 #	  status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
 #	done
 #	EOF
-  chmod +x /usr/local/bin/fastd-status
-  cat <<-EOF >/etc/cron.d/fastd_update_status 
-	*/5 * * * *	root /usr/local/bin/update-ff
-	EOF
+#  chmod +x /usr/local/bin/fastd-status
 }
