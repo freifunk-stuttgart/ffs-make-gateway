@@ -109,7 +109,7 @@ setup_firewall() {
         ensureline "$ip 0.0.0.0/0 icmp 0 direct" /etc/firewall.lihas.d/policy-routing
       done
     fi
-    if [ ! -e /etc/firewall.lihas.d/interface-br00/policy-routing ]; then
+    if [ ! -e /etc/firewall.lihas.d/interface-lo/policy-routing ]; then
       ln -s /etc/firewall.lihas.d/policy-routing /etc/firewall.lihas.d/interface-lo/policy-routing
     fi
     mkdir -p /etc/firewall.lihas.d/groups
