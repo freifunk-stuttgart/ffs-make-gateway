@@ -70,7 +70,7 @@ setup_fastd_config() {
   for seg in $SEGMENTLIST; do
     i=${seg##0}
     vpnport=$((10200+$i))
-    dir=/etc/fastd/vpx$seg${segext}
+    dir=/etc/fastd/vpn$seg${segext}
     iface="vpn${seg}${segext}"
     mkdir -p $dir
     cat <<-EOF >$dir/fastd.conf
