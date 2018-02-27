@@ -19,12 +19,12 @@ for seg in $SEGMENTLIST ; do
 	  pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
 	EOF
   if [ $PROVIDERMODE -eq 0 ]; then
-    cat <<-EOF >/etc/network/interfaces.d/br$seg
+    cat <<-EOF >>/etc/network/interfaces.d/br$seg
 	  post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	EOF
   fi
-  cat <<-EOF >/etc/network/interfaces.d/br$seg
+  cat <<-EOF >>/etc/network/interfaces.d/br$seg
 	  post-up         iptables -t mangle -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 	  post-up         ip6tables -t mangle -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 	  post-down       iptables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
@@ -91,12 +91,12 @@ iface br00 inet static
         pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
 EOF
 if [ $PROVIDERMODE -eq 0 ]; then
-  cat <<-EOF >/etc/network/interfaces.d/ffs-seg00
+  cat <<-EOF >>/etc/network/interfaces.d/ffs-seg00
         post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
         pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
 EOF
 fi
-cat <<-EOF >/etc/network/interfaces.d/ffs-seg00
+cat <<-EOF >>/etc/network/interfaces.d/ffs-seg00
         post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
         pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
         # default route is unreachable
