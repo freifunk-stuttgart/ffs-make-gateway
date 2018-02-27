@@ -2,7 +2,7 @@ setup_firewall() {
   if [ "x$OPT_FWLIHAS" == "x1" ]; then
     mkdir -p /etc/firewall.lihas.d/interface-lo
     # Uplink VPN Interface
-    mkdir -p /etc/firewall.lihas.d/interface-tun9
+    if [ $PROVIDERMODE -eq 0 ]; then mkdir -p /etc/firewall.lihas.d/interface-tun9; fi
     # Externes Interface
     mkdir -p /etc/firewall.lihas.d/interface-$EXT_IF_V4
     ensureline 0.0.0.0/0 /etc/firewall.lihas.d/interface-$EXT_IF_V4/network
@@ -46,11 +46,17 @@ setup_firewall() {
     ensureline "0.0.0.0/0 0.0.0.0/0 udp 0 lo" /etc/firewall.lihas.d/interface-br00/privclients
     ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0 lo" /etc/firewall.lihas.d/interface-br00/privclients
     ensureline "0.0.0.0/0 255.255.255.255 udp 68" /etc/firewall.lihas.d/interface-br00/privclients
-    for iface in tun9; do
-      ensureline "0.0.0.0/0 0.0.0.0/0 tcp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
-      ensureline "0.0.0.0/0 0.0.0.0/0 udp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
-      ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
-    done
+    if [ $PROVIDERMODE -eq 0 ]; then
+      for iface in tun9; do
+        ensureline "0.0.0.0/0 0.0.0.0/0 tcp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
+        ensureline "0.0.0.0/0 0.0.0.0/0 udp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
+        ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0 $iface" /etc/firewall.lihas.d/interface-br00/privclients
+      done
+    else
+      ensureline "0.0.0.0/0 0.0.0.0/0 tcp 0" /etc/firewall.lihas.d/interface-br00/privclients
+      ensureline "0.0.0.0/0 0.0.0.0/0 udp 0" /etc/firewall.lihas.d/interface-br00/privclients
+      ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0" /etc/firewall.lihas.d/interface-br00/privclients
+    fi
     for iface in br00; do
       for net1 in 10.190.0.0/15 172.21.0.0/16; do
         for net2 in 10.190.0.0/15 172.21.0.0/16; do
@@ -60,7 +66,7 @@ setup_firewall() {
         done
       done
     done
-    for iface in tun9 $EXT_IF_V4; do
+    for iface in $(if [ $PROVIDERMODE -eq 0 ]; then echo tun9; fi) $EXT_IF_V4; do
       ensureline "0.0.0.0/0 0.0.0.0/0 tcp 0" /etc/firewall.lihas.d/interface-$iface/masquerade
       ensureline "0.0.0.0/0 0.0.0.0/0 udp 0" /etc/firewall.lihas.d/interface-$iface/masquerade
       ensureline "0.0.0.0/0 0.0.0.0/0 icmp 0" /etc/firewall.lihas.d/interface-$iface/masquerade

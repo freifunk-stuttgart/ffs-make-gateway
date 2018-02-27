@@ -29,6 +29,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --with-backbone-vpn: Nimm das backbone-tinc, github-Schreibzugriff auf git+ssh://git@github.com/freifunk-stuttgart/tinc-ffsbb wird benoetigt
 --www:           Webroot
 --no-public:     GW hat keine fixe offizielle IP (fastd --remote nicht nutzen)
+--provider-mode: Alles direkt ausleiten
 --no-log-call:   Aufruf nicht unter /var/log/$0 speichern
 EOF
 }
@@ -46,6 +47,7 @@ OPT_FWLIHAS=0
 SEGMENTS=4
 SEGMENTLIST=""
 TINC_BB=0
+PROVIDERMODE=0
 VPNKEY="Wird generiert"
 WWWPFAD="/var/www/html"
 FFSGIT=/var/lib/ffs/git
@@ -54,7 +56,7 @@ error() {
   echo "$*"
   exit 1
 }
-TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall -- "$@"`
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode -- "$@"`
 if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 while true ; do
@@ -74,6 +76,7 @@ while true ; do
     --no-public)					NOPUBLICIP=1; shift 1;;
     --no-systemd)					NEEDS_SYSTEMD=0; shift 1;;
     --othergw)						OTHERGW_IP=$2; shift 2;;
+    --provider-mode)      PROVIDERMODE=1; shift 1;;
     --segmentlist)				SEGMENTLIST="$2"; shift 2;;
     --segments)						SEGMENTS="$2"; shift 2;;
     --vpnkey)             VPNKEY=$2; shift 2;;
@@ -260,7 +263,8 @@ done
 # remove obsolete fastd
 ls /etc/systemd/system/multi-user.target.wants/fastd@* 2>/dev/null | sed 's/.*@//; s/.service$//' | while read fastdinstance; do
   if [ ! -e /etc/fastd/$fastdinstance ]; then
-		systemctl disable  fastd@$fastdinstance.service
+		systemctl stop fastd@$fastdinstance.service || true
+		systemctl disable fastd@$fastdinstance.service
   fi
 done
 

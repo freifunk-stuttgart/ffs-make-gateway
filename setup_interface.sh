@@ -1,8 +1,8 @@
 setup_interface_segxx() {
 for seg in $SEGMENTLIST ; do
-netz=$((${seg#0} - 1))
-netz=$(($netz * 8))
-cat <<-EOF >/etc/network/interfaces.d/br$seg
+  netz=$((${seg#0} - 1))
+  netz=$(($netz * 8))
+  cat <<-EOF >/etc/network/interfaces.d/br$seg
 	allow-hotplug br$seg
 	iface br$seg inet static
 	  bridge_hw 02:00:39:$seg:$GWLID:$GWLSUBID
@@ -17,8 +17,14 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
 	  post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
+	EOF
+  if [ $PROVIDERMODE -eq 0 ]; then
+    cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
+	EOF
+  fi
+  cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  post-up         iptables -t mangle -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 	  post-up         ip6tables -t mangle -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 	  post-down       iptables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
@@ -66,11 +72,11 @@ cat <<-EOF >/etc/network/interfaces.d/br$seg
 	  post-up         /sbin/ip link set dev bat$seg up || true
 	
 	EOF
-done
+  done
 }
 
 setup_interface_seg00() {
-cat <<EOF >/etc/network/interfaces.d/ffs-seg00
+  cat <<EOF >/etc/network/interfaces.d/ffs-seg00
 auto br00
 iface br00 inet static
 	bridge_hw 02:00:39:00:$GWLID:$GWLSUBID
@@ -83,8 +89,14 @@ iface br00 inet static
         # be sure all incoming traffic is handled by the appropriate rt_table
         post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
         pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+EOF
+if [ $PROVIDERMODE -eq 0 ]; then
+  cat <<-EOF >/etc/network/interfaces.d/ffs-seg00
         post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
         pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
+EOF
+fi
+cat <<-EOF >/etc/network/interfaces.d/ffs-seg00
         post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
         pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
         # default route is unreachable
