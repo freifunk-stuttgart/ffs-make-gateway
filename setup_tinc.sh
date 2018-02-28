@@ -67,7 +67,7 @@ setup_tinc_config() {
 	Port = 110$GWID$GWSUBID
 	EOF
     for segment in $SEGMENTLIST; do
-      IPv4seg=$((${segment#0} * 8))
+      IPv4seg=$((${segment#0} * 8 - 8))
       if [ $IPv4seg -gt 255 ]; then
         IPv4seg=$(($IPv4seg-256))
         IPv4segbase=191
