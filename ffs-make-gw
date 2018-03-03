@@ -283,6 +283,7 @@ setup_bird
 show_progress setup_bird
 setup_radvd
 show_progress setup_radvd
+systemctl enable radvd
 
 # Monitoring
 setup_monitoring_updateff
@@ -334,6 +335,7 @@ for i in $SEGMENTLIST; do
 done
 echo
 echo systemctl start bird
+echo systemctl start radvd
 
 echo "fastd Public Key: $(fastd -c /etc/fastd/secret_vpn.conf --show-key --machine-readable)"
 # vim: ts=2 sw=2 sts=2 sr noet
