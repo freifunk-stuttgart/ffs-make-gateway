@@ -65,7 +65,7 @@ fi
 INTERFACES="$INTERFACES $(egrep -h '^(auto)' /etc/network/interfaces.d/* /etc/network/interfaces | sed 's/^\(auto\|allow-hotplug\)[ \t]*//')"
 for iface in $INTERFACES; do
         case $iface in
-                vpn*)
+                vpn*|bb*|vpy*)
                         # fastd muss laufen
                         if ! systemctl status fastd@$iface >/dev/null; then
                                 error "/sbin/ifdown --force $iface"
@@ -74,7 +74,7 @@ for iface in $INTERFACES; do
                                 systemctl start fastd@$iface
                         fi
                         # batman muss das Interface haben
-                        BATIF=bat$(sed 's/\(vpn\|bb\|ip6\)//g' <<<$iface)
+                        BATIF=bat$(sed 's/\(vpn\|vpy\|bb\|ip6\)//g' <<<$iface)
                         if ! /usr/sbin/batctl -m $BATIF if | grep -q "$iface:"; then
                                 error "/usr/sbin/batctl -m $BATIF if add $iface"
                                 /usr/sbin/batctl -m $BATIF if add $iface

@@ -257,8 +257,8 @@ for seg in $SEGMENTLIST; do
     systemctl enable fastd@vpn${seq}ip6.service
   fi
   systemctl enable fastd@vpn${seg}.service 
-  systemctl enable fastd@vpn${seg}mtv.service 
-  systemctl enable fastd@vpn${seg}bb.service 
+  systemctl enable fastd@vpy${seg}.service 
+  systemctl enable fastd@bb${seg}.service 
 done
 # remove obsolete fastd
 ls /etc/systemd/system/multi-user.target.wants/fastd@* 2>/dev/null | sed 's/.*@//; s/.service$//' | while read fastdinstance; do
@@ -329,8 +329,8 @@ for i in $SEGMENTLIST; do
     echo -n systemctl start fastd@vpn$(printf "%02i" $seg)ip6.service"; "
   fi
   echo -n systemctl start fastd@vpn$(printf "%02i" $seg).service"; "
-  echo -n systemctl start fastd@vpn$(printf "%02i" $seg)bb.service"; "
-  echo -n systemctl start fastd@vpn$(printf "%02i" $seg)mtv.service"; "
+  echo -n systemctl start fastd@bb$(printf "%02i" $seg).service"; "
+  echo -n systemctl start fastd@vpy$(printf "%02i" $seg).service"; "
 done
 echo
 echo systemctl start bird

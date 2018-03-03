@@ -27,7 +27,6 @@ EOF
 setup_fastd_config() {
   # Might do separate fastd for ipv4 and ipv6
   group="peers"
-  segext=""
   for ipv in ip4 ip6; do
     if [ x$FASTD_SPLIT == x1 ] || [ $ipv == ip4 ]; then
       for seg in $SEGMENTLIST; do
@@ -38,11 +37,11 @@ setup_fastd_config() {
           vpnport=$((10040+$i))
         fi
         if [ $ipv == ip6 ]; then
-          dir=/etc/fastd/vpn${seg}${segext}ip6
-          iface="vpn${seg}${segext}ip6"
+          dir=/etc/fastd/vpn${seg}ip6
+          iface="vpn${seg}ip6"
         else
-          dir=/etc/fastd/vpn$seg${segext}
-          iface="vpn${seg}${segext}"
+          dir=/etc/fastd/vpn$seg
+          iface="vpn${seg}"
         fi
         mkdir -p $dir
         cat <<-EOF >$dir/fastd.conf
@@ -55,9 +54,9 @@ setup_fastd_config() {
 	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip6 ]; then for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done; fi)
 	log to syslog level warn;
 	mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
-	include "/etc/fastd/secret_vpn${segext}.conf";
+	include "/etc/fastd/secret_vpn.conf";
 	on verify "/root/freifunk/unclaimed.py";
-	status socket "/var/run/fastd/fastd-vpn${seg}${segext}$(if [ x$FASTD_SPLIT != x ] && [ $ipv == ip6 ]; then echo -n ip6; fi).sock";
+	status socket "/var/run/fastd/fastd-vpn${seg}$(if [ x$FASTD_SPLIT != x ] && [ $ipv == ip6 ]; then echo -n ip6; fi).sock";
 	peer group "${group}" {
 	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
 	}
@@ -66,12 +65,11 @@ setup_fastd_config() {
     fi
   done
   # Low MTU fastd, 1340
-  segext=mtv
   for seg in $SEGMENTLIST; do
     i=${seg##0}
     vpnport=$((10200+$i))
-    dir=/etc/fastd/vpn$seg${segext}
-    iface="vpn${seg}${segext}"
+    dir=/etc/fastd/vpy$seg
+    iface="vpy${seg}"
     mkdir -p $dir
     cat <<-EOF >$dir/fastd.conf
 	log to syslog level warn;
@@ -85,7 +83,7 @@ setup_fastd_config() {
 	mtu 1340; # Lowest possible MTU
 	include "/etc/fastd/secret_vpn.conf";
 	on verify "/root/freifunk/unclaimed.py";
-	status socket "/var/run/fastd/fastd-vpn${seg}${segext}.sock";
+	status socket "/var/run/fastd/fastd-vpy${seg}.sock";
 	peer group "${group}" {
 	  include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
 	}
@@ -95,35 +93,34 @@ setup_fastd_config() {
 setup_fastd_bb() {
   mkdir -p /etc/fastd
   group=bb
-  segext=bb
-  if [ ! -e /etc/fastd/secret_vpn${segext}.key ]; then
+  if [ ! -e /etc/fastd/secret_vpnbb.key ]; then
     VPNBBKEY=$(fastd --generate-key --machine-readable)
-    printf 'secret "%s";' $VPNBBKEY > /etc/fastd/secret_vpn${segext}.key
+    printf 'secret "%s";' $VPNBBKEY > /etc/fastd/secret_vpnbb.key
   else
-    VPNBBKEY=$(sed -n '/secret/{ s/.* "//; s/".*//; p}' /etc/fastd/secret_vpn${segext}.key)
+    VPNBBKEY=$(sed -n '/secret/{ s/.* "//; s/".*//; p}' /etc/fastd/secret_vpnbb.key)
   fi
   for seg in $SEGMENTLIST; do
     segnum=$(sed 's/\b //' <<< $seg)
     segnum=${segnum##0}
     vpnport=$((9000+$segnum))
-    mkdir -p /etc/fastd/vpn${seg}$segext
-    cat <<-EOF >/etc/fastd/vpn${seg}${segext}/fastd.conf
+    mkdir -p /etc/fastd/bb${seg}
+    cat <<-EOF >/etc/fastd/bb${seg}/fastd.conf
 	log to syslog level warn;
-	interface "vpn${seg}${segext}";
+	interface "bb${seg}";
 	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
 	method "salsa2012+umac";  
 	method "null+salsa2012+umac";
 	$(for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done)
 	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
-	include "/etc/fastd/secret_vpn${segext}.key";
+	include "/etc/fastd/secret_vpnbb.key";
 	mtu 1340;
 	on verify "/root/freifunk/unclaimed.py";
-	status socket "/var/run/fastd/fastd-vpn${seg}${segext}.sock";
+	status socket "/var/run/fastd/fastd-bb${seg}.sock";
 	peer group "${group}" {
 	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
 	}
 EOF
-    VPNBBPUB=$(fastd -c /etc/fastd/vpn${seg}${segext}/fastd.conf --show-key --machine-readable)
+    VPNBBPUB=$(fastd -c /etc/fastd/bb${seg}/fastd.conf --show-key --machine-readable)
     if [ ! -e $FFSGIT/peers-ffs/vpn$seg/$group/$HOSTNAME ] || ! grep $VPNBBPUB $FFSGIT/peers-ffs/vpn$seg/$group/$HOSTNAME; then
       cat <<-EOF >$FFSGIT/peers-ffs/vpn$seg/$group/${HOSTNAME}s$seg
 	key "$VPNBBPUB";
