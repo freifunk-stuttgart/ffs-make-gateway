@@ -86,6 +86,19 @@ for iface in $INTERFACES; do
                 /sbin/ifup $iface
         fi
 done
+# fastd-Interfaces muessen auch im batman-Interface sein
+ip l l |
+awk -F: '$2 ~ /^\s*bat/ {gsub("^ *bat","", $2); print $2}' |
+while read batif; do
+    diff \
+	<((echo vpn$batif; echo vpn${batif}mtv; echo vpn${batif}bb)| sort) \
+	<(batctl -m bat$batif if | sed 's/:.*//' | sort)
+done |
+sed -n 's/< //p' |
+while read fastdif; do
+    systemctl restart fastd@$fastdif
+done
+
 if ! pgrep named > /dev/null; then
 	service bind9 restart
 fi
