@@ -91,7 +91,7 @@ ip l l |
 awk -F: '$2 ~ /^\s*bat/ {gsub("^ *bat","", $2); print $2}' |
 while read batif; do
     diff \
-	<((echo vpn$batif; echo vpn${batif}mtv; echo vpn${batif}bb)| sort) \
+	<((echo vpn$batif; echo vpy${batif}; echo bb${batif})| sort) \
 	<(batctl -m bat$batif if | sed 's/:.*//' | sort)
 done |
 sed -n 's/< //p' |
