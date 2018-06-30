@@ -11,17 +11,14 @@ After=network.target
 
 [Service]
 Type=notify
-ExecStartPre=/bin/mkdir -p /var/run/fastd
-ExecStartPre=/bin/chown fastd /var/run/fastd
-ExecStartPre=/bin/rm -f /var/run/fastd/fastd-%I.sock
-ExecStart=/usr/bin/fastd --syslog-level debug2 --syslog-ident fastd@%I -c /etc/fastd/%I/fastd.conf --pid-file /var/run/fastd/fastd-%I.pid --status-socket /var/run/fastd/fastd-%I.sock --user fastd
-ExecStop=/bin/kill $(cat /var/run/fastd/fastd-%I.pid)
-ExecReload=/bin/kill -HUP $(cat /var/run/fastd/fastd-%I.pid)
-ExecStop=/bin/kill $(cat /var/run/fastd/fastd-%I.pid)
+ExecStartPre=/bin/rm -f /var/run/fastd-%I.sock
+ExecStart=/usr/bin/fastd --syslog-level verbose --syslog-ident fastd@%I -c /etc/fastd/%I/fastd.conf
+ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
+
 EOF
 }
 setup_fastd_config() {
