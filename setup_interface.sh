@@ -30,10 +30,10 @@ for seg in $SEGMENTLIST ; do
 	  post-down       iptables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 	  post-down       ip6tables -t mangle -D FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 	  # default route is unreachable
-	  post-up         /sbin/ip route add 172.21.0.0/18 dev \$IFACE table stuttgart || true
+	  post-up         /sbin/ip route add 10.190.$netz.0/21 dev \$IFACE table stuttgart || true
 	  post-up         /sbin/ip route add unreachable default table nodefault || true
 	  post-down       /sbin/ip route del unreachable default table nodefault || true
-	  post-down       /sbin/ip route del 172.21.0.0/18 dev \$IFACE table stuttgart || true
+	  post-down       /sbin/ip route del 10.190.$netz.0/21 dev \$IFACE table stuttgart || true
 	  post-up         /sbin/ip addr add fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
 	  post-up         /sbin/ip -6 route add fd21:b4dc:4b$seg::/64 proto static dev \$IFACE table stuttgart || true
 	  post-down       /sbin/ip -6 route del fd21:b4dc:4b$seg::/64 proto static dev \$IFACE table stuttgart || true
