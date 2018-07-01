@@ -92,7 +92,7 @@ awk -F: '$2 ~ /^\s*bat/ {gsub("^ *bat","", $2); print $2}' |
 while read batif; do
     diff \
 	<((echo vpn$batif; echo vpy${batif}; echo bb${batif})| sort) \
-	<(batctl -m bat$batif if | sed 's/:.*//' | sort)
+	<(/usr/sbin/batctl -m bat$batif if | sed 's/:.*//' | sort)
 done |
 sed -n 's/< //p' |
 while read fastdif; do
@@ -107,7 +107,7 @@ if ! host www.freifunk-stuttgart.de 127.0.0.1 > /dev/null 2>&1; then
 	killall -9 named
 	/usr/sbin/service bind9 restart
 fi
-tcpdump -n -i any port 67 or port 68 -c 20 2>/dev/null |
+tcpdump -n -i any port 67 or port 68 -c 50 2>/dev/null |
 awk 'BEGIN {req=0; rep=0; answer=0} 
      $7 ~ /^Request$/ {req++} 
      $7 ~ /^Reply$/ {rep++} 
