@@ -168,8 +168,8 @@ fi
 . setup_firewall.sh
 . setup_interface.sh
 . setup_logging.sh
-. setup_monitoring.sh
 . setup_monitoring_ubuntu.sh
+. setup_monitoring.sh
 . setup_radvd_ubuntu.sh
 . setup_system.sh
 . setup_tinc.sh
