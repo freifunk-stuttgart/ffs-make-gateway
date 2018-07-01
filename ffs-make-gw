@@ -163,13 +163,14 @@ fi
 . add_repositories.sh
 . setup_batman.sh
 . setup_bird.sh
-. setup_radvd_ubuntu.sh
 . setup_fastd.sh
 . setup_ffsconfiggenerator.sh
 . setup_firewall.sh
 . setup_interface.sh
-. setup_monitoring_ubuntu.sh
+. setup_logging.sh
 . setup_monitoring.sh
+. setup_monitoring_ubuntu.sh
+. setup_radvd_ubuntu.sh
 . setup_system.sh
 . setup_tinc.sh
 
@@ -299,6 +300,9 @@ show_progress setup_monitoring_vnstat
 setup_monitoring
 setup_monitoring_collectd
 show_progress setup_monitoring
+
+setup_logrotate
+show_progress setup_logging
 
 # Uplink VPN
 cat <<'EOF' >/usr/local/bin/openvpn-freifunk
