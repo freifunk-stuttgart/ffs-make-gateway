@@ -340,7 +340,7 @@ cat <<EOF >/usr/local/bin/check-tasks
       else
           echo "OK"
           echo -n "check masquerate: "
-          nat=\$(iptables -vL -t nat | grep "MASQUERADE  all  --  0.0.0.0/0" | wc -l)
+          nat=\$(iptables -nL -t nat | grep "MASQUERADE  all  --  0.0.0.0/0" | wc -l)
           if [ "\$nat" -ne 1 ] ; then
               echo "Error"
               ZAHL=99
