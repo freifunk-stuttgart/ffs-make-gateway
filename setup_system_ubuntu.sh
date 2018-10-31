@@ -41,6 +41,12 @@ setup_system_autostart() {
 cat <<EOF >/usr/local/bin/autostart
 #!/bin/bash
 # wird beim booten einmal gestartet
+# flush all chains
+#iptables -F
+#iptables -t nat -F
+iptables -t mangle -F
+# delete all chains
+#iptables -X
 # MTU Fixes
 /sbin/iptables -t mangle -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1240
 /sbin/iptables -t mangle -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
