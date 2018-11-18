@@ -32,6 +32,7 @@ HE_IPS_V6_PRE=$HE_IPS_V6_PRE
 # alte tunnel loeschen
 for seg in $SEGMENTLIST ; do
   ip route del \${HE_IPS_V6_PRE}:4b\${seg}::/64 dev br\$seg
+  ip route del \${HE_IPS_V6_PRE}:4b\${seg}::/64 dev br\$seg table stuttgart
 done
 ip addr del $HE_IP_V6 dev $HE_IF_V6
 ip tunnel del $HE_IF_V6 mode sit remote $HE_GW_V4 local $EXT_IP_V4 ttl 255
@@ -48,6 +49,7 @@ ip -f inet6 addr dev $HE_IF_V6
 # zusatzrouten
 for seg in $SEGMENTLIST ; do
   ip route add \${HE_IPS_V6_PRE}:4b\${seg}::/64 dev br\$seg
+  ip route add \${HE_IPS_V6_PRE}:4b\${seg}::/64 dev br\$seg table stuttgart
 done
 EOF
 chmod +x $DATEIHE
