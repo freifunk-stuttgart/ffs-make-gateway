@@ -124,6 +124,7 @@ fi
 . setup_dnsmasq_ubuntu.sh
 . setup_dhcp_ubuntu.sh
 . setup_openvpn_ubuntu.sh
+. setup_heipv6_ubuntu.sh
 . setup_monitoring_ubuntu.sh
 
 if [ x"$NEEDS_APTKEY" == x1 ]; then add_apt_keys; fi
@@ -175,6 +176,8 @@ setup_iscdhcprelay_config
 show_progress setup_iscdhcprelay_config
 setup_openvpn
 show_progress setup_openvpn
+setup_heipv6_config
+show_progress setup_heipv6_config
 
 # Monitoring
 setup_monitoring_updateff
