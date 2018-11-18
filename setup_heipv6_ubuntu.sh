@@ -44,7 +44,7 @@ ip tunnel add $HE_IF_V6 mode sit remote $HE_GW_V4 local $EXT_IP_V4 ttl 255
 ip link set $HE_IF_V6 up
 ip addr add $HE_IP_V6 dev $HE_IF_V6
 ip route add ::/0 dev $HE_IF_V6
-ip -f inet6 addr dev $HE_IF_V6
+ip -f inet6 addr show dev $HE_IF_V6
 
 # zusatzrouten
 for seg in $SEGMENTLIST ; do
