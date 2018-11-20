@@ -37,7 +37,7 @@ done
 ip addr del $HE_IP_V6 dev $HE_IF_V6
 ip tunnel del $HE_IF_V6 mode sit remote $HE_GW_V4 local $EXT_IP_V4 ttl 255
 
-sleep 10
+sleep 5
 
 # neuer tunnel aufbauen
 ip tunnel add $HE_IF_V6 mode sit remote $HE_GW_V4 local $EXT_IP_V4 ttl 255
@@ -50,6 +50,9 @@ ip addr show dev $HE_IF_V6
 for seg in $SEGMENTLIST ; do
   ip route add \${HE_IPS_V6_PRE}:4b\${seg}::/64 dev br\$seg
   ip route add \${HE_IPS_V6_PRE}:4b\${seg}::/64 dev br\$seg table stuttgart
+  # lokale Mac anpassen
+  ip addr del dev br\$seg \$(ip addr show dev br\$seg | grep fe80: | tail -1 | awk '{print \$2}')
+  ip addr add dev br\$seg scope link fe80::4b\${seg}:a38:$GWLID$GWLSUBID/64
 done
 EOF
 chmod +x $DATEIHE
