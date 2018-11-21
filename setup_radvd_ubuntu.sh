@@ -13,7 +13,6 @@ interface br$seg
   prefix fd21:b4dc:4b$seg::/64 {};
   RDNSS fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID {};
   route fd21:b4dc:4b00::/40 {};
-#    route ::/0 {};
 #    prefix ${HE_IPS_V6_PRE}:4b${seg}::/64
 #    {
 #    AdvOnLink on;
