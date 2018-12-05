@@ -9,6 +9,9 @@ rm -f /etc/dnsmasq.d/dns
 #done
 cat <<EOF >>/etc/dnsmasq.d/dns
 except-interface=$EXT_IF_V4
+except-interface=lo
+interface=br*
+interface=ffsl3
 bind-interfaces
 log-facility=/var/log/dnsmasq.log
 
