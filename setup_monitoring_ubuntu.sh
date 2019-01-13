@@ -85,6 +85,10 @@ if [ ! -e /usr/local/bin/update_peers.py ]; then
   chmod +x /usr/local/bin/update_peers.py
 fi
 
+# generiere Testdownloadfiles
+dd if=/dev/zero of=/var/www/html/10M  bs=1M  count=10
+dd if=/dev/zero of=/var/www/html/100M  bs=1M  count=100
+
 mkdir -p /var/www/html/data
 cat <<EOF >/usr/local/bin/update-ff
 #!/bin/sh
