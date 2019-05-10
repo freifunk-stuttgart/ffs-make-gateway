@@ -318,7 +318,7 @@ cat <<EOF >/usr/local/bin/check-tasks
 #      BACK=\$(nslookup \$DNSANFRAGE \$DNSIP)
 #      ZAHL=\$(echo \$BACK | grep -c \$DNSBACK)
       echo -n "check DNS-Anfrage: "
-      if [ "\$ZAHL" -lt 1 ] ; then
+      if [ "\$BACK" -lt 1 ] ; then
           echo "Error"
           ANTWORT+="Fehler: \$PRG ANTWORTet nicht auf DNS-Anfragen\nFehler: \$BACK\n\n"
           service \$PRG restart
