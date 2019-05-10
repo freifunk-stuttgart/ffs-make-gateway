@@ -314,11 +314,12 @@ cat <<EOF >/usr/local/bin/check-tasks
 
       ####    dnsmasq dns Anfragen pruefen
       PRG="dnsmasq"
-      BACK=\$(dig +short @\$DNSIP \$DNSANFRAGE | wc -l)
+      BACK=\$(dig +short @\$DNSIP \$DNSANFRAGE)
+      ZAHL=$?
 #      BACK=\$(nslookup \$DNSANFRAGE \$DNSIP)
 #      ZAHL=\$(echo \$BACK | grep -c \$DNSBACK)
       echo -n "check DNS-Anfrage: "
-      if [ "\$BACK" -lt 1 ] ; then
+      if [ "\$ZAHL" -gt 0 ] ; then
           echo "Error"
           ANTWORT+="Fehler: \$PRG ANTWORTet nicht auf DNS-Anfragen\nFehler: \$BACK\n\n"
           service \$PRG restart
