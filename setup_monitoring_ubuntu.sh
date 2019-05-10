@@ -315,7 +315,7 @@ cat <<EOF >/usr/local/bin/check-tasks
       ####    dnsmasq dns Anfragen pruefen
       PRG="dnsmasq"
       BACK=\$(dig +short @\$DNSIP \$DNSANFRAGE)
-      ZAHL=$?
+      ZAHL=\$?
 #      BACK=\$(nslookup \$DNSANFRAGE \$DNSIP)
 #      ZAHL=\$(echo \$BACK | grep -c \$DNSBACK)
       echo -n "check DNS-Anfrage: "
