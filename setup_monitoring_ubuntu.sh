@@ -154,18 +154,21 @@ cat <<EOF >/usr/local/bin/check-tasks
 
   ####       Variablen anpassen!
   EMAIL=$EMAIL              # an wen die Antwortmails gehen sollen
-  DNSIP=\$(ifconfig br$(echo "$SEGMENTLIST" | cut -d " " -f 1) | grep 'inet [Aa]d' | cut -d: -f2 | awk '{print \$1}')  # IP Adresse des DNS Servern
+#  DNSIP=\$(ifconfig br$(echo "$SEGMENTLIST" | cut -d " " -f 1) | grep 'inet [Aa]d' | cut -d: -f2 | awk '{print \$1}')  # IP Adresse des DNS Servern
+  DNSIP=\$(ifconfig br$(echo "$SEGMENTLIST" | cut -d " " -f 1) | grep 'inet ' | awk '{print \$2}' | tr -d "Adresse:")   # IP Adresse des DNS Servern
   DNSANFRAGE=web.de                 # Domainname Anfrage
   DNSBACK=212.227                   # IP die als Antwort auf DNSANFRAGE zurück kommen muss
   IFBAT="$(echo " $SEGMENTLIST" | sed 's/ / bat/g')"   # Alle Fastd Interfaces
   FASTDANZAHL=$(($(echo $SEGMENTLIST | wc -w) * 2 ))                # Anzahl der Fastd Instanzen die laufen
   OVPN=/etc/openvpn                 # Pfad zu Openvpn Konfigs
+  DIRECTOUT=$DIRECTOUT              # Direct Out Internet aktivieren
 
   ####        auf standard setzen
   VPNERROR=0
   VPNDOWN=1
   EMAILZAHL=0
   dhcppause=10
+  gwoff=0
 
   if [ -n "\$1" ]; then
       TESTMODE=\$1
@@ -328,66 +331,97 @@ cat <<EOF >/usr/local/bin/check-tasks
           echo "OK"
       fi
 
-      ####    openvpn pruefen
-      PRG="openvpn"
-      ip=\$(ip -o -4 addr list tun0 | awk '{print \$4}' | cut -d/ -f1)
-      #ip=\$(ip -o -4 addr list tun0 | awk '{gsub("/.*","",\$4); print \$4}')
-      echo -n "check ping web.de: "
-      BACK=\$(ping -c2 -I \$ip web.de 2>&1)
-      ZAHL=\$?
-      if [ "\$ZAHL" -gt 0 ] ; then
-          echo "Error"
-          echo -n "check ping 8.8.8.8: "
-          BACK=\$(ping -c2 -I \$ip 8.8.8.8 2>&1)
+      if [ "\$DIRECTOUT" -eq 1 ]; then
+          #### Kein Openvpn verwenden, Direkt ausleiten
+          PRG="directout"
+          echo -n "check \$PRG: "
+          DR=\$(ip route show table stuttgart | grep "default via" | wc -l )
+          if [ "\$gwoff" -eq 0 ]; then
+            if [ "\$DR" -eq 0 ]; then
+              # Default Route fehlt, gw server off
+              for ZAHL in \$IFBAT ; do
+                batctl -m \$ZAHL gw off
+                ANTWORT+="\$ZAHL: gw off\n\n"
+              done
+              gwoff=1
+              echo "Error: setze gw off"
+            else
+              echo "OK"
+            fi
+          else
+            if [ "\$DR" -gt 0 ]; then
+              # Default Route ok, gw server on
+              for ZAHL in \$IFBAT ; do
+                batctl -m \$ZAHL gw server
+                ANTWORT+="\$ZAHL: gw server\n\n"
+              done
+              gwoff=0
+              echo "OK: setze gw server on"
+            else
+              echo "Error: gw off"
+            fi
+          fi
+      else
+          ####    openvpn pruefen
+          PRG="openvpn"
+          ip=\$(ip -o -4 addr list tun0 | awk '{print \$4}' | cut -d/ -f1)
+          #ip=\$(ip -o -4 addr list tun0 | awk '{gsub("/.*","",\$4); print \$4}')
+          echo -n "check ping web.de: "
+          BACK=\$(ping -c2 -I \$ip web.de 2>&1)
           ZAHL=\$?
-      fi
-      if [ "\$ZAHL" -gt 0 ] ; then
-          echo "Error"
-      else
-          echo "OK"
-          echo -n "check masquerate: "
-          nat=\$(iptables -nL -t nat | grep "MASQUERADE  all  --  0.0.0.0/0" | wc -l)
-          if [ "\$nat" -ne 1 ] ; then
+          if [ "\$ZAHL" -gt 0 ] ; then
               echo "Error"
-              ZAHL=99
-              BACK=\$(iptables -vnt nat -L)
+              echo -n "check ping 8.8.8.8: "
+              BACK=\$(ping -c2 -I \$ip 8.8.8.8 2>&1)
+              ZAHL=\$?
           fi
-      fi
-      if [ "\$ZAHL" -gt 0 ] ; then
-          ANTWORT+="Fehler: \$PRG funktioniert nicht korrekt\nFehler: \$BACK\n\n"
-          service \$PRG restart
-          ((VPNERROR++))
-          if [ \$VPNERROR -gt 1 ] ; then
-              # Config wechseln wenn vpn erneut down
-              mv \$OVPN/00.conf \$OVPN/00.ovpn
-              mv \$OVPN/01.ovpn \$OVPN/00.conf
-              mv \$OVPN/02.ovpn \$OVPN/01.ovpn
-              mv \$OVPN/00.ovpn \$OVPN/02.ovpn
+          if [ "\$ZAHL" -gt 0 ] ; then
+              echo "Error"
+          else
+              echo "OK"
+              echo -n "check masquerate: "
+              nat=\$(iptables -nL -t nat | grep "MASQUERADE  all  --  0.0.0.0/0" | wc -l)
+              if [ "\$nat" -ne 1 ] ; then
+                  echo "Error"
+                  ZAHL=99
+                  BACK=\$(iptables -vnt nat -L)
+              fi
+          fi
+          if [ "\$ZAHL" -gt 0 ] ; then
+              ANTWORT+="Fehler: \$PRG funktioniert nicht korrekt\nFehler: \$BACK\n\n"
               service \$PRG restart
-              ANTWORT+="\$PRG Config gewechselt nach \$(cat \$OVPN/00.conf | grep remote)\n\n"
-          fi
-          if [ \$VPNERROR -gt 3 ] ; then
-              # Gateway deaktivieren wenn zu viele Fehler
-              for ZAHL in \$IFBAT ; do
-                  batctl -m \$ZAHL gw off
-                  ANTWORT+="\$ZAHL: gw off\n\n"
-              done
+              ((VPNERROR++))
+              if [ \$VPNERROR -gt 1 ] ; then
+                  # Config wechseln wenn vpn erneut down
+                  mv \$OVPN/00.conf \$OVPN/00.ovpn
+                  mv \$OVPN/01.ovpn \$OVPN/00.conf
+                  mv \$OVPN/02.ovpn \$OVPN/01.ovpn
+                  mv \$OVPN/00.ovpn \$OVPN/02.ovpn
+                  service \$PRG restart
+                  ANTWORT+="\$PRG Config gewechselt nach \$(cat \$OVPN/00.conf | grep remote)\n\n"
+              fi
+              if [ \$VPNERROR -gt 3 ] ; then
+                  # Gateway deaktivieren wenn zu viele Fehler
+                  for ZAHL in \$IFBAT ; do
+                      batctl -m \$ZAHL gw off
+                      ANTWORT+="\$ZAHL: gw off\n\n"
+                  done
+                  VPNERROR=0
+                  VPNDOWN=1
+              fi
+          else
+              echo "OK"
               VPNERROR=0
-              VPNDOWN=1
-          fi
-      else
-          echo "OK"
-          VPNERROR=0
-          if [ \$VPNDOWN -gt 0 ] ; then
-              # Gateway aktivieren
-              for ZAHL in \$IFBAT ; do
-                  batctl -m \$ZAHL gw server 64mbit/64mbit
-                  ANTWORT+="\$ZAHL: gw server 64mbit/64mbit\n\n"
-              done
-              VPNDOWN=0
+              if [ \$VPNDOWN -gt 0 ] ; then
+                  # Gateway aktivieren
+                  for ZAHL in \$IFBAT ; do
+                      batctl -m \$ZAHL gw server 64mbit/64mbit
+                      ANTWORT+="\$ZAHL: gw server 64mbit/64mbit\n\n"
+                  done
+                  VPNDOWN=0
+              fi
           fi
       fi
-
 
       #       Email senden wenn Fehler auftrat
       if [ -n "\$ANTWORT" ]; then
