@@ -341,8 +341,9 @@ cat <<EOF >/usr/local/bin/check-tasks
               # Default Route fehlt, gw server off
               for ZAHL in \$IFBAT ; do
                 batctl -m \$ZAHL gw off
-                ANTWORT+="\$ZAHL: gw off\n\n"
+                ANTWORT+="\$ZAHL: gw off\n"
               done
+              ANTWORT+=\n"
               gwoff=1
               echo "Error: setze gw off"
             else
@@ -353,8 +354,9 @@ cat <<EOF >/usr/local/bin/check-tasks
               # Default Route ok, gw server on
               for ZAHL in \$IFBAT ; do
                 batctl -m \$ZAHL gw server
-                ANTWORT+="\$ZAHL: gw server\n\n"
+                ANTWORT+="\$ZAHL: gw server\n"
               done
+              ANTWORT+=\n"
               gwoff=0
               echo "OK: setze gw server on"
             else
@@ -404,8 +406,9 @@ cat <<EOF >/usr/local/bin/check-tasks
                   # Gateway deaktivieren wenn zu viele Fehler
                   for ZAHL in \$IFBAT ; do
                       batctl -m \$ZAHL gw off
-                      ANTWORT+="\$ZAHL: gw off\n\n"
+                      ANTWORT+="\$ZAHL: gw off\n"
                   done
+                  ANTWORT+=\n"
                   VPNERROR=0
                   VPNDOWN=1
               fi
@@ -416,8 +419,9 @@ cat <<EOF >/usr/local/bin/check-tasks
                   # Gateway aktivieren
                   for ZAHL in \$IFBAT ; do
                       batctl -m \$ZAHL gw server 64mbit/64mbit
-                      ANTWORT+="\$ZAHL: gw server 64mbit/64mbit\n\n"
+                      ANTWORT+="\$ZAHL: gw server 64mbit/64mbit\n"
                   done
+                  ANTWORT+=\n"
                   VPNDOWN=0
               fi
           fi
