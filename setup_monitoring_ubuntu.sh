@@ -161,7 +161,7 @@ cat <<EOF >/usr/local/bin/check-tasks
   IFBAT="$(echo " $SEGMENTLIST" | sed 's/ / bat/g')"   # Alle Fastd Interfaces
   FASTDANZAHL=$(($(echo $SEGMENTLIST | wc -w) * 2 ))                # Anzahl der Fastd Instanzen die laufen
   OVPN=/etc/openvpn                 # Pfad zu Openvpn Konfigs
-  DIRECTOUT=$DIRECTOUT              # Direct Out Internet aktivieren
+  PROVIDERMODE=$PROVIDERMODE        # Direct Out Internet aktivieren
 
   ####        auf standard setzen
   VPNERROR=0
@@ -331,11 +331,11 @@ cat <<EOF >/usr/local/bin/check-tasks
           echo "OK"
       fi
 
-      if [ "\$DIRECTOUT" -eq 1 ]; then
+      if [ "\$PROVIDERMODE" -eq 1 ]; then
           #### Kein Openvpn verwenden, Direkt ausleiten
-          PRG="directout"
+          PRG="Providermode"
           echo -n "check \$PRG: "
-          DR=\$(ip route show table stuttgart | grep "default via" | wc -l )
+          DR=\$(ip route show table ffsdefault | grep "default via" | wc -l )
           if [ "\$gwoff" -eq 0 ]; then
             if [ "\$DR" -eq 0 ]; then
               # Default Route fehlt, gw server off
@@ -343,7 +343,7 @@ cat <<EOF >/usr/local/bin/check-tasks
                 batctl -m \$ZAHL gw off
                 ANTWORT+="\$ZAHL: gw off\n"
               done
-              ANTWORT+=\n"
+              ANTWORT+="\n"
               gwoff=1
               echo "Error: setze gw off"
             else
@@ -356,7 +356,7 @@ cat <<EOF >/usr/local/bin/check-tasks
                 batctl -m \$ZAHL gw server
                 ANTWORT+="\$ZAHL: gw server\n"
               done
-              ANTWORT+=\n"
+              ANTWORT+="\n"
               gwoff=0
               echo "OK: setze gw server on"
             else
@@ -408,7 +408,7 @@ cat <<EOF >/usr/local/bin/check-tasks
                       batctl -m \$ZAHL gw off
                       ANTWORT+="\$ZAHL: gw off\n"
                   done
-                  ANTWORT+=\n"
+                  ANTWORT+="\n"
                   VPNERROR=0
                   VPNDOWN=1
               fi
@@ -421,7 +421,7 @@ cat <<EOF >/usr/local/bin/check-tasks
                       batctl -m \$ZAHL gw server 64mbit/64mbit
                       ANTWORT+="\$ZAHL: gw server 64mbit/64mbit\n"
                   done
-                  ANTWORT+=\n"
+                  ANTWORT+="\n"
                   VPNDOWN=0
               fi
           fi

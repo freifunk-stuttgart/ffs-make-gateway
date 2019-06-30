@@ -11,15 +11,15 @@ iface br$seg inet static
   netmask 255.255.248.0
 #  mtu 1280
   bridge_ports bat$seg
-#  pre-up          /sbin/brctl addbr \$IFACE || true
-#  up              /sbin/ip address add fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
-#  post-down       /sbin/brctl delbr \$IFACE || true
+  # default route is unreachable. Nur einmal
+  post-up         /sbin/ip route add unreachable default table nodefault || true
   # be sure all incoming traffic is handled by the appropriate rt_table
   post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
   pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
-  # default route is unreachable. Nur einmal
-  post-up         /sbin/ip route add unreachable default table stuttgart metric 9999 || true
-  post-down       /sbin/ip route del unreachable default table stuttgart metric 9999 || true
+  post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
+  pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
+  post-up         /sbin/ip rule add iif \$IFACE table nodefault priority 10001 || true
+  pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 
 iface br$seg inet6 static
   address fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID

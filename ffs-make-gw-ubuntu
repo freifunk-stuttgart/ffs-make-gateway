@@ -15,7 +15,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --gwsubid:       Gateway Sub-ID
 --vpnkey:        use this fastd private key (string)
 --directtcp:     Liste der TCP-Ports die direkt ausgeleitet werden, durch Leerzeichen getrennt (Quoting nicht vergessen)
---directout:     Ausleitung direkt, nicht über Openvpn
+--provider-mode: Alles direkt ausleiten
 --dhcp-relay-servers: DHCP Relay Server die dieses GW benutzt, Default "10.190.128.251 10.191.255.252 10.191.255.253"
 --no-apt-update: apt-get update nicht ausfuehren
 --othergw:       IP eines anderen GWs fuer ausgehenden Traffic, z.B. 172.21.16.1 (gw04)
@@ -27,7 +27,6 @@ EOF
 CONFIRM=1
 DHCPRELAYSERVERS="10.190.128.251 10.191.255.252 10.191.255.253"
 DIRECTTCP="22 587 993 995 443 80"
-DIRECTOUT=0
 GWSUBID="1"
 LOG_CALL=1
 NEEDS_APTKEY=0
@@ -36,6 +35,7 @@ NEEDS_SYSTEMD=1
 OPT_FWLIHAS=0
 SEGMENTLIST="01 02 03 04"
 TINC_BB=0
+PROVIDERMODE=0
 VPNKEY="Wird generiert"
 EMAIL=albi@albi.info
 error() {
@@ -43,14 +43,13 @@ error() {
   echo "$*"
   exit 1
 }
-TEMP=`getopt -o h --long help,dhcp-relay-servers:,name:,ip:,gwid:,gwsubid:,vpnkey:,directtcp:,directout,no-apt-update,no-log-call,segmentlist:,email: -- "$@"`
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,name:,ip:,gwid:,gwsubid:,vpnkey:,directtcp:,no-apt-update,no-log-call,segmentlist:,email:,provider-mode -- "$@"`
 if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 while true ; do
   case "$1" in
     --dhcp-relay-servers) DHCPRELAYSERVERS="$2"; shift 2;;
     --directtcp)	DIRECTTCP="$2"; shift 2;;
-    --directout)	DIRECTOUT=1; shift 1;;
     --email)		EMAIL="$2"; shift 2;;
     --gwid)             GWID=$2; shift 2;;
     --gwsubid)          GWSUBID=$2; shift 2;;
@@ -59,6 +58,7 @@ while true ; do
     --no-confirm)	CONFIRM=0; shift 1;;
     --no-log-call)	LOG_CALL=0; shift 1;;
     --othergw)		OTHERGW_IP=$2; shift 2;;
+    --provider-mode)    PROVIDERMODE=1; shift 1;;
     --segmentlist)	SEGMENTLIST="$2"; shift 2;;
     --vpnkey)           VPNKEY=$2; shift 2;;
     --help|-h) print_help; exit 1;;
@@ -200,9 +200,17 @@ cat <<EOF
    Folgendes ist nun noch zu tun:
    ==============================
 EOF
-if [ "$DIRECTOUT" -eq 1 ] && [ $(cat /etc/openvpn/00.conf | wc -l) -le 5 ] ; then
+if [ "$PROVIDERMODE" -eq 0 ]; then
+  if [ $(cat /etc/openvpn/00.conf | wc -l) -le 10 ] ; then
 cat <<EOF
 *  Openvpn Config /etc/openvpn/00.conf bis 03.ovpn anpassen
+
+EOF
+  fi
+else
+cat <<EOF
+*  /etc/network/interfaces bei eth0 hinzufügen
+   post-up /sbin/ip route add default via \$IF_GATEWAY dev \$IFACE table ffsdefault
 
 EOF
 fi
