@@ -25,9 +25,9 @@ Example:
 * eigenes Ausleitungs VPN
 
 
-# ffs-make-gateway-ubuntu
+# ffs-make-gateway-buster
 
-Setzt auf einem leeren Ubuntu 16.04 oder Debian 8 (mit Backports) ein Freifunk-Gateway auf.
+Setzt auf einem leeren Debian 10 ein Freifunk-Gateway auf.
 
 #### Beispiele:
 git clone https://github.com/freifunk-stuttgart/ffs-make-gateway.git
