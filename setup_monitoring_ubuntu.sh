@@ -168,7 +168,7 @@ cat <<EOF >/usr/local/bin/check-tasks
   VPNDOWN=1
   EMAILZAHL=0
   dhcppause=10
-  gwoff=0
+  gwoff=1
 
   if [ -n "\$1" ]; then
       TESTMODE=\$1
