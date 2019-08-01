@@ -1,27 +1,29 @@
 setup_batman_dkms() {
-  apt-get -y install linux-headers-$(uname -r)
-  # batman-adv-dkms haengt von linux-headers-generic ab, das gibt es auf Debian nicht
-  if ! dpkg -l equivs >/dev/null 2>&1; then
-    apt-get install equivs
-  fi
-  if ! dpkg -l linux-headers-generic | grep -qw $(uname -r); then
-    TMPDIR=$(mktemp -d)
-    equivs-control $TMPDIR/linux-headers-generic
-    sed -i '
-      s/^Package:.*/Package: linux-headers-generic/
-      s/^# Version:.*/Version: '"$(uname -r)"'/
-      s/^# Maintainer:.*/Maintainer: ffs-make-gateway <freifunk@lihas.de>/
-      /^Description/,$d
-    ' $TMPDIR/linux-headers-generic
-    cat <<EOF >>$TMPDIR/linux-headers-generic
+  if [ $(uname -r | awk '$1 > "4.19"' | wc -l ) -lt 1 ]; then
+    apt-get -y install linux-headers-$(uname -r)
+    # batman-adv-dkms haengt von linux-headers-generic ab, das gibt es auf Debian nicht
+    if ! dpkg -l equivs >/dev/null 2>&1; then
+      apt-get install equivs
+    fi
+    if ! dpkg -l linux-headers-generic | grep -qw $(uname -r); then
+      TMPDIR=$(mktemp -d)
+      equivs-control $TMPDIR/linux-headers-generic
+      sed -i '
+        s/^Package:.*/Package: linux-headers-generic/
+        s/^# Version:.*/Version: '"$(uname -r)"'/
+        s/^# Maintainer:.*/Maintainer: ffs-make-gateway <freifunk@lihas.de>/
+        /^Description/,$d
+      ' $TMPDIR/linux-headers-generic
+      cat <<EOF >>$TMPDIR/linux-headers-generic
 Description: linux-headers-generic translation package
  linux-headers-generic translation package for batman-adv-dkms
 EOF
-    equivs-build $TMPDIR/linux-headers-generic
-    dpkg -i linux-headers-generic_$(uname -r)_all.deb
-    rm -rf "$TMPDIR"
+      equivs-build $TMPDIR/linux-headers-generic
+      dpkg -i linux-headers-generic_$(uname -r)_all.deb
+      rm -rf "$TMPDIR"
+    fi
+    apt-get -y install batman-adv-dkms
   fi
-  apt-get -y install batman-adv-dkms
 }
 
 setup_batman_names() {
