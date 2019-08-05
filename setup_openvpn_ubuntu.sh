@@ -17,6 +17,7 @@ chmod +x /usr/local/bin/switch-vpn
 cat <<-EOF >/etc/openvpn/openvpn-up
 #!/bin/sh
 ip rule add from \$ifconfig_local table stuttgart priority 7000
+ip rule add from \$ifconfig_local table ffsdefault priority 10000
 ip route add default via \$route_vpn_gateway dev \$dev table ffsdefault metric 2000
 #ip route add 0.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
 #ip route add 128.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
@@ -52,6 +53,7 @@ chmod +x /etc/openvpn/openvpn-up
 cat <<-EOF >/etc/openvpn/openvpn-down
 #!/bin/sh
 ip rule del from \$ifconfig_local table stuttgart priority 7000
+ip rule del from \$ifconfig_local table ffsdefault priority 10000
 # NAT deaktivieren, wird benötigt wenn NICHT Berlin
 iptables -t nat -D POSTROUTING -o \$dev -j MASQUERADE
 #exit 0
