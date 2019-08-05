@@ -72,6 +72,19 @@ for seg in $SEGMENTLIST ; do
 	  post-up         /sbin/ip link set dev bat$seg up || true
 	
 	EOF
+	set -x
+	if [ "$LOCAL_SEGMENT" == "$seg" ]; then
+	  for iface in $LOCAL_SEGMENT_INTERFACES; do
+            cat <<-EOF >>/etc/network/interfaces.d/br$seg
+	allow-hotplug $iface
+	iface $iface inet6 manual
+	  pre-up          /sbin/modprobe batman-adv || true
+	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
+	  post-up         /sbin/ip link set dev bat$seg up || true
+	EOF
+	  done
+	fi
+	set +x
   done
 }
 

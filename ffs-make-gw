@@ -31,6 +31,8 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --no-public:     GW hat keine fixe offizielle IP (fastd --remote nicht nutzen)
 --provider-mode: Alles direkt ausleiten
 --no-log-call:   Aufruf nicht unter /var/log/$0 speichern
+--local-segment: Segment das lokal verwendet wird
+--local-segment-interfaces: Interfaces die lokal Mesh haben
 EOF
 }
 CONFIRM=1
@@ -51,23 +53,27 @@ PROVIDERMODE=0
 VPNKEY="Wird generiert"
 WWWPFAD="/var/www/html"
 FFSGIT=/var/lib/ffs/git
+LOCAL_SEGMENT=""
+LOCAL_SEGMENT_INTERFACES=""
 error() {
   print_help
   echo "$*"
   exit 1
 }
-TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode -- "$@"`
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode,local-segment:,local-segment-interfaces: -- "$@"`
 if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 while true ; do
   case "$1" in
     --dhcp-relay-servers)	DHCPRELAYSERVERS="$2"; shift 2;;
-    --directtcp)					DIRECTTCP="$2"; shift 2;;
-    --email)							EMAIL="$2"; shift 2;;
-    --fastdsplit)					FASTD_SPLIT="1"; shift 1;;
-    --gwid)								GWID=$2; shift 2;;
-    --gws)								GWS=$2; shift 2;;
-    --gwsubid)						GWSUBID=$2; shift 2;;
+    --directtcp)		DIRECTTCP="$2"; shift 2;;
+    --email)			EMAIL="$2"; shift 2;;
+    --fastdsplit)		FASTD_SPLIT="1"; shift 1;;
+    --gwid)			GWID=$2; shift 2;;
+    --gws)			GWS=$2; shift 2;;
+    --gwsubid)			GWSUBID=$2; shift 2;;
+    --local-segment)		LOCAL_SEGMENT=$(printf "%02i" $2); shift 2;;
+    --local-segment-interfaces)	LOCAL_SEGMENT_INTERFACES=$2; shift 2;;
     --name)								GWNAME=$2; shift 2;;
     --no-apt-key)					NEEDS_APTKEY=0; shift 1;;
     --no-apt-update)			NEEDS_APTUPDATE=0; shift 1;;
