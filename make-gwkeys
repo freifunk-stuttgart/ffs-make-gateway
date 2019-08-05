@@ -10,7 +10,7 @@ if [ -z ${vpns:0:1} ]; then
     echo "VPNs fehlen!"
     exit 1
 fi
-GWS="gw07n01"
+GWS="gw04n04"
 
 PFAD=~/peers-ffs
 PFADGW=~/peers-gw
