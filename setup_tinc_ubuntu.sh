@@ -112,6 +112,8 @@ if [ ! -d /etc/tinc/ffsl3/conf.d ]; then
 fi
 # tinc aktivieren
 ensureline "ffsl3" /etc/tinc/nets.boot
+# tinc systemd aktivieren
+systemctl enable tinc@ffsl3
 }
 
 setup_tincl3_key() {

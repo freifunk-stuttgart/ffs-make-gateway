@@ -1,0 +1,37 @@
+#! /bin/bash
+# Macht vpn Keys
+# Musterkeys müssen in PFADGW liegen
+# Beispiel für Musterkey
+# key "1024867fc96beb7407544b6ff6984e8bfca156fefff0c8829754c76a45cb6de5";
+# remote "gw07n01.gw.freifunk-stuttgart.de"
+
+vpns=$*
+if [ -z ${vpns:0:1} ]; then
+    echo "VPNs fehlen!"
+    exit 1
+fi
+GWS="gw04n04"
+
+PFAD=~/peers-ffs
+PFADGW=~/peers-gw
+
+for vpn in $vpns; do
+  for gw in $GWS; do
+    if [ ! -d $PFAD/vpn$vpn/bb/ ]; then
+      mkdir -p $PFAD/vpn$vpn/bb/
+    fi
+    if [ ! -d $PFAD/vpn$vpn/peers/ ]; then
+      mkdir -p $PFAD/vpn$vpn/peers/
+      touch $PFAD/vpn$vpn/peers/.dummy
+    fi
+    if [ ! -e $PFAD/vpn$vpn/bb/${gw}s$vpn ]; then
+      echo "$PFAD/vpn$vpn/bb/${gw}s$vpn"
+cat <<-EOF >$PFAD/vpn$vpn/bb/${gw}s$vpn
+#MAC: 02:00:38:$vpn:${gw:2:2}:${gw:5:2}
+$(cat $PFADGW/$gw) port $((9040 + ${vpn#0}));
+EOF
+    fi
+  done
+done
+
+
