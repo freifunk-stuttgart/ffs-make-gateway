@@ -1,0 +1,20 @@
+
+fastd:
+/etc/default/fastd anpassen
+AUTOSTART="all"
+
+
+tinc:
+systemctl enable tinc@ffsl3
+
+
+autostart:
+rc.local generieren wenn nicht existiert
+!/bin/sh -e
+/usr/local/bin/autostart &
+exit 0
+
+chmod +x rc.local
+
+systemctl enable rc-local
+
