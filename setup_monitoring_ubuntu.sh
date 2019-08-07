@@ -459,6 +459,7 @@ if [ "\$(brctl show | grep bat | wc -l)" = "0" ] ; then
   # br Interfaces up
   /sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
 fi
+systemctl restart isc-dhcp-relay
 EOF
 }
 
