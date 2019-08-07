@@ -452,9 +452,13 @@ chmod +x /usr/local/bin/check-tasks
 cat <<EOF >>/usr/local/bin/autostart
 # Ueberwachungsscript starten
 nohup /usr/local/bin/check-tasks 2>&1 | logger -t "check-tasks" &
-sleep 20
-# br Interfaces auf up
-/sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
+sleep 10
+if [ "\$(brctl show | grep bat | wc -l)" = "0" ] ; then
+  # br Interfaces down
+  /sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
+  # br Interfaces up
+  /sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
+fi
 EOF
 }
 
