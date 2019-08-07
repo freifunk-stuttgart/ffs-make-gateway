@@ -455,7 +455,7 @@ nohup /usr/local/bin/check-tasks 2>&1 | logger -t "check-tasks" &
 sleep 10
 if [ "\$(brctl show | grep bat | wc -l)" = "0" ] ; then
   # br Interfaces down
-  /sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
+  /sbin/ifdown \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
   # br Interfaces up
   /sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
 fi
