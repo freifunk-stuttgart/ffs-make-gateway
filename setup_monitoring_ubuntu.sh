@@ -351,14 +351,14 @@ cat <<EOF >/usr/local/bin/check-tasks
             fi
           else
             if [ "\$DR" -gt 0 ]; then
-              # Default Route ok, gw server on
+              # Default Route ok, gw server 64mbit/64mbit
               for ZAHL in \$IFBAT ; do
-                batctl -m \$ZAHL gw server
-                ANTWORT+="\$ZAHL: gw server\n"
+                batctl -m \$ZAHL gw server 64mbit/64mbit
+                ANTWORT+="\$ZAHL: gw server 64mbit/64mbit\n"
               done
               ANTWORT+="\n"
               gwoff=0
-              echo "OK: setze gw server on"
+              echo "OK: setze gw server 64mbit/64mbit"
             else
               echo "Error: gw off"
             fi

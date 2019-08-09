@@ -38,7 +38,16 @@ setup_system_routing() {
 }
 
 setup_system_autostart() {
+if [ -f /etc/rc.local ]; then
   ensureline "/usr/local/bin/autostart &" /etc/rc.local
+else
+  cat <<EOF >/etc/rc.local
+#!/bin/sh -e
+/usr/local/bin/autostart &
+exit 0
+EOF
+  chmod +x /etc/rc.local
+fi
 cat <<EOF >/usr/local/bin/autostart
 #!/bin/bash
 # wird beim booten einmal gestartet
