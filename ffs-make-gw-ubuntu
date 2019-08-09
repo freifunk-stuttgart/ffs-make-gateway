@@ -136,6 +136,7 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt update; fi
 # batadv-vis ist nicht in backports
 
 #apt -y install postfix collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay bird radvd dnsutils
+apt -y remove bind9
 apt -y install postfix collectd-core munin-node mutt apache2 ntp python-psutil jq sysfsutils dnsmasq bridge-utils git batctl fastd alfred openvpn tinc vnstat isc-dhcp-relay radvd dnsutils tcpdump net-tools
 # ubuntu
 if [ $(cat /etc/apt/sources.list | grep -e "xenial" | wc -l) -gt 0 ]; then
