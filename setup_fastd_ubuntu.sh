@@ -27,6 +27,14 @@ secret "$VPNKEY";
 EOF
 fi
 
+# alle Interfaces aktivieren
+cat <<EOF >/etc/default/fastd
+# Allowed values are "all", "none" or space separated list of
+# names of the VPNs. If empty, "all" is assumed.
+#
+AUTOSTART="all"
+EOF
+
 # alte Verzeichnisse und Dateien löschen
 rm -rf /etc/fastd/bb[0-9][0-9]
 rm -rf /etc/fastd/vpn[0-9][0-9]

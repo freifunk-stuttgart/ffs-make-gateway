@@ -351,14 +351,14 @@ cat <<EOF >/usr/local/bin/check-tasks
             fi
           else
             if [ "\$DR" -gt 0 ]; then
-              # Default Route ok, gw server on
+              # Default Route ok, gw server 64mbit/64mbit
               for ZAHL in \$IFBAT ; do
-                batctl -m \$ZAHL gw server
-                ANTWORT+="\$ZAHL: gw server\n"
+                batctl -m \$ZAHL gw server 64mbit/64mbit
+                ANTWORT+="\$ZAHL: gw server 64mbit/64mbit\n"
               done
               ANTWORT+="\n"
               gwoff=0
-              echo "OK: setze gw server on"
+              echo "OK: setze gw server 64mbit/64mbit"
             else
               echo "Error: gw off"
             fi
@@ -452,9 +452,15 @@ chmod +x /usr/local/bin/check-tasks
 cat <<EOF >>/usr/local/bin/autostart
 # Ueberwachungsscript starten
 nohup /usr/local/bin/check-tasks 2>&1 | logger -t "check-tasks" &
-sleep 20
-# br Interfaces auf up
-/sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
+sleep 10
+if [ "\$(brctl show | grep bat | wc -l)" = "0" ] ; then
+  # br Interfaces down
+  /sbin/ifdown \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
+  # br Interfaces up
+  /sbin/ifup \$(echo " $SEGMENTLIST" | sed 's/ / br/g')
+  # dhcrelay neu starten
+  systemctl restart isc-dhcp-relay
+fi
 EOF
 }
 
