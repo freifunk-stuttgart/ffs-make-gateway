@@ -51,6 +51,9 @@ fi
 cat <<EOF >/usr/local/bin/autostart
 #!/bin/bash
 # wird beim booten einmal gestartet
+# default Route in direct Tabelle hinzufügen
+back=\$(ip r | grep default)
+/sbin/ip route add \$back table direct
 # flush all chains
 #iptables -F
 #iptables -t nat -F
