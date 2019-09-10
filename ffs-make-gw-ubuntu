@@ -58,7 +58,7 @@ while true ; do
     --no-confirm)	CONFIRM=0; shift 1;;
     --no-log-call)	LOG_CALL=0; shift 1;;
     --othergw)		OTHERGW_IP=$2; shift 2;;
-    --providermode)    PROVIDERMODE=1; shift 1;;
+    --providermode)     PROVIDERMODE=1; shift 1;;
     --segmentlist)	SEGMENTLIST="$2"; shift 2;;
     --vpnkey)           VPNKEY=$2; shift 2;;
     --help|-h) print_help; exit 1;;
@@ -91,6 +91,7 @@ Gateway Sub ID (GWLSUBID): $GWLSUBID
 Hostname: $HOSTNAME
 Externes Interface v4 (EXT_IF_V4): $EXT_IF_V4
 Externe IP v4 (EXT_IP_V4): $EXT_IP_V4
+Externe GW v4 (EXT_GW_V4): $EXT_GW_V4
 Externes Interface v6 (EXT_IF_V6): $EXT_IF_V6
 Externe IPs v6 (EXT_IP_V6): $EXT_IPS_V6
 Segmente: $SEGMENTLIST

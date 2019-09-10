@@ -54,6 +54,17 @@ cat <<EOF >/usr/local/bin/autostart
 # default Route in direct Tabelle hinzufügen
 back=\$(ip r | grep default)
 /sbin/ip route add \$back table direct
+# sinkhole shadowserver
+for ship in 178.162.203.211 178.162.203.226 ;do
+  /sbin/ip route add \$ship dev lo table ffsdefault
+done
+EOF
+if [ "$PROVIDERMODE" -ne 0 ]; then
+cat <<EOF >>/usr/local/bin/autostart
+/sbin/ip route add default via $EXT_GW_V4 dev $EXT_IF_V4 table ffsdefault
+EOF
+fi
+cat <<EOF >>/usr/local/bin/autostart
 # flush all chains
 #iptables -F
 #iptables -t nat -F
