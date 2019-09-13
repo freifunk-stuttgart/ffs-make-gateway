@@ -91,11 +91,12 @@ dd if=/dev/zero of=/var/www/html/100M  bs=1M  count=100
 
 mkdir -p /var/www/html/data
 cat <<EOF >/usr/local/bin/update-ff
-#!/bin/sh
+#!/bin/bash
 WWWPFAD="/var/www/html"
 FASTD=/etc/fastd/peers
 VPNS="$(echo " $SEGMENTLIST" | sed 's/ / vpn/g')"
 VPYS="$(echo " $SEGMENTLIST" | sed 's/ / vpy/g')"
+TINCWINCH=0
 #       Endlosschleife
 while : ; do
   ## ffs Peers aktualisieren
@@ -115,6 +116,12 @@ while : ; do
   echo "tinc-ffsl3: \$back"
   tincd -n ffsl3 -k HUP
 #  tincd -n ffsl3 -k WINCH
+  ((TINCWINCH++))
+  if [ \$TINCWINCH -gt 1000 ] ; then
+    # alles 2000 Minuten
+    TINCWINCH=0
+    tincd -n ffsl3 -k winch
+  fi
   # Status veroeffentlichen
   for i in \$VPNS; do
     status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
