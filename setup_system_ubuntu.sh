@@ -55,7 +55,7 @@ cat <<EOF >/usr/local/bin/autostart
 back=\$(ip r | grep default)
 /sbin/ip route add \$back table direct
 # sinkhole shadowserver
-for ship in 178.162.203.211 178.162.203.226 ;do
+for ship in 184.105.192.2 178.162.203.211 178.162.203.226 ;do
   /sbin/ip route add \$ship dev lo table ffsdefault
 done
 EOF
