@@ -2,9 +2,44 @@ setup_system_sysctl() {
 cat <<EOF >/etc/sysctl.d/999-freifunk.conf
 net.ipv4.ip_forward=1
 net.ipv6.conf.all.forwarding=1
-net.ipv4.conf.default.rp_filter=0
-net.ipv4.conf.all.rp_filter=0
-net.core.netdev_budget=1000
+net.ipv4.conf.default.rp_filter = 0
+net.ipv4.conf.all.rp_filter = 0
+
+kernel.panic=3
+net.ipv4.conf.default.send_redirects=0
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.arp_ignore=1
+net.ipv4.conf.all.arp_ignore=1
+net.ipv4.ip_forward=1
+net.ipv4.icmp_echo_ignore_broadcasts=1
+net.ipv4.igmp_max_memberships=100
+net.ipv4.tcp_ecn=0
+net.ipv4.tcp_fin_timeout=30
+net.ipv4.tcp_keepalive_time=120
+net.ipv4.tcp_syncookies=1
+net.ipv4.tcp_timestamps=1
+net.ipv4.tcp_sack=1
+net.ipv4.tcp_dsack=1
+
+net.ipv6.conf.default.forwarding=1
+net.ipv6.conf.all.forwarding=1
+
+net.netfilter.nf_conntrack_acct=1
+net.netfilter.nf_conntrack_checksum=0
+net.netfilter.nf_conntrack_max=1000000
+net.netfilter.nf_conntrack_tcp_timeout_established=7440
+net.netfilter.nf_conntrack_udp_timeout=60
+net.netfilter.nf_conntrack_udp_timeout_stream=180
+
+# disable bridge firewalling by default
+net.bridge.bridge-nf-call-arptables=0
+net.bridge.bridge-nf-call-ip6tables=0
+net.bridge.bridge-nf-call-iptables=0
+net.ipv6.conf.all.accept_ra=0
+net.ipv6.conf.default.accept_ra=0
+vm.panic_on_oom=1
+
+net.core.netdev_budget=3000
 net.ipv4.neigh.default.gc_thresh1 = 1280
 net.ipv4.neigh.default.gc_thresh2 = 5120
 net.ipv4.neigh.default.gc_thresh3 = 10240
@@ -24,8 +59,10 @@ for seg in $SEGMENTLIST ; do
 cat <<EOF >>/etc/sysfs.d/99-freifunk.conf
 class/net/bat$seg/mesh/hop_penalty = 60
 class/net/br$seg/bridge/hash_max = 2048
+class/net/br$seg/brport/multicast_router = 2
 EOF
 done
+service sysfsutils restart || true
 }
 
 setup_system_routing() {
