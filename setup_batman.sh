@@ -1,6 +1,6 @@
 setup_batman_dkms() {
   if [ $(uname -r | awk '$1 > "4.19"' | wc -l ) -lt 1 ]; then
-    apt-get -y install linux-headers-$(uname -r)
+    apt-get -y install linux-headers
     # batman-adv-dkms haengt von linux-headers-generic ab, das gibt es auf Debian nicht
     if ! dpkg -l equivs >/dev/null 2>&1; then
       apt-get install equivs

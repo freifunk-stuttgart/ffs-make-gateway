@@ -50,10 +50,8 @@ setup_fastd_config() {
 	method "null+salsa2012+umac";
 	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip4 ]; then for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done; fi)
 	$(if [ x$FASTD_SPLIT == x ] || [ $ipv == ip6 ]; then for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done; fi)
-	log to syslog level warn;
-	mtu 1406; # 1492 - IPv4/IPv6 Header - fastd Header...
+	mtu 1340;
 	include "/etc/fastd/secret_vpn.conf";
-	on verify "/root/freifunk/unclaimed.py";
 	status socket "/var/run/fastd/fastd-vpn${seg}$(if [ x$FASTD_SPLIT != x ] && [ $ipv == ip6 ]; then echo -n ip6; fi).sock";
 	peer group "${group}" {
 	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
@@ -77,10 +75,8 @@ setup_fastd_config() {
 	method "null+salsa2012+umac";
 	$(for a in $EXT_IP_V4; do echo bind $a:$vpnport\;; done)
 	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
-	log to syslog level warn;
 	mtu 1340; # Lowest possible MTU
 	include "/etc/fastd/secret_vpn.conf";
-	on verify "/root/freifunk/unclaimed.py";
 	status socket "/var/run/fastd/fastd-vpy${seg}.sock";
 	peer group "${group}" {
 	  include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
@@ -112,7 +108,6 @@ setup_fastd_bb() {
 	$(for a in $EXT_IPS_V6; do echo bind [$a]:$vpnport\;; done)
 	include "/etc/fastd/secret_vpnbb.key";
 	mtu 1340;
-	on verify "/root/freifunk/unclaimed.py";
 	status socket "/var/run/fastd/fastd-bb${seg}.sock";
 	peer group "${group}" {
 	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
