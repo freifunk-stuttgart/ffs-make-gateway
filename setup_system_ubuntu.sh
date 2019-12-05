@@ -95,6 +95,10 @@ back=\$(ip r | grep default)
 for ship in 184.105.192.2 178.162.203.211 178.162.203.226 ;do
   /sbin/ip route add \$ship dev lo table ffsdefault
 done
+# IPs not allowed in internet
+for ship in 0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/3 ;do
+  /sbin/ip route add \$ship dev lo table ffsdefault
+done
 EOF
 if [ "$PROVIDERMODE" -ne 0 ]; then
 cat <<EOF >>/usr/local/bin/autostart
