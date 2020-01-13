@@ -90,6 +90,8 @@ ip rule add iif \$INTERFACE table stuttgart priority 7000
 ip route add 10.191.255.0/24 proto kernel scope link src 10.191.255.$GWID$GWSUBID dev \$INTERFACE table stuttgart
 ip route add 10.0.0.0/8 dev \$INTERFACE metric 512
 ip route add 10.0.0.0/8 dev \$INTERFACE metric 512 table stuttgart
+ip route add 100.100.0.0/16 dev \$INTERFACE metric 512
+ip route add 100.100.0.0/16 dev \$INTERFACE metric 512 table stuttgart
 ip addr add fd21:b4dc:4b00::a38:$GWLID$GWLSUBID/128 dev \$INTERFACE
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE metric 512
 ip route add fd21:b4dc:4b00::/40 dev \$INTERFACE metric 512 table stuttgart
