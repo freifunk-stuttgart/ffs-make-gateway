@@ -22,7 +22,7 @@ ip route add default via \$route_vpn_gateway dev \$dev table ffsdefault metric 2
 #ip route add 0.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
 #ip route add 128.0.0.0/1 via \$route_vpn_gateway dev \$dev table stuttgart
 # NAT aktivieren und NAT Tabelle vergroessern, wird benötigt wenn NICHT Berlin
-iptables -t nat -A POSTROUTING -o \$dev -j MASQUERADE
+#iptables -t nat -A POSTROUTING -o \$dev -j MASQUERADE
 sysctl -w net.netfilter.nf_conntrack_max=500000
 sysctl -w net.netfilter.nf_conntrack_buckets=65536
 #sysctl -w net.netfilter.nf_conntrack_tcp_timeout_established=86400
@@ -44,6 +44,8 @@ iptables -t mangle -A FORWARD    -j MARK --set-xmark 0x0/0xffffffff
 iptables -t mangle -A PREROUTING -s 10.190.0.0/15 -p tcp -m tcp -m multiport --dports $PORTS -j MARK --set-xmark 0x2000/0xffffffff
 iptables -t mangle -A FORWARD    -s 10.190.0.0/15 -p tcp -m tcp -m multiport --dports $PORTS -j MARK --set-xmark 0x2000/0xffffffff
 iptables -t nat -A POSTROUTING -o $EXT_IF_V4 -p tcp -m multiport --dports $PORTS -j SNAT --to-source $EXT_IP_V4
+
+iptables -t nat -A POSTROUTING -o \$dev -j MASQUERADE
 
 #ip route show table main | while read ROUTE ; do ip route add table direct \$ROUTE ; done
 exit 0
