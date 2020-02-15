@@ -2,9 +2,17 @@ setup_system_sysctl() {
 cat <<EOF >/etc/sysctl.d/999-freifunk.conf
 net.ipv4.ip_forward=1
 net.ipv6.conf.all.forwarding=1
-net.ipv4.conf.default.rp_filter = 0
-net.ipv4.conf.all.rp_filter = 0
+net.ipv4.conf.default.rp_filter=0
+net.ipv4.conf.all.rp_filter=0
+net.core.netdev_budget=1000
+net.ipv4.neigh.default.gc_thresh1 = 1280
+net.ipv4.neigh.default.gc_thresh2 = 5120
+net.ipv4.neigh.default.gc_thresh3 = 10240
+net.ipv6.neigh.default.gc_thresh1 = 1280
+net.ipv6.neigh.default.gc_thresh2 = 5120
+net.ipv6.neigh.default.gc_thresh3 = 10240
 
+# neu von are
 kernel.panic=3
 net.ipv4.conf.default.send_redirects=0
 net.ipv4.conf.all.send_redirects=0
@@ -22,7 +30,6 @@ net.ipv4.tcp_sack=1
 net.ipv4.tcp_dsack=1
 
 net.ipv6.conf.default.forwarding=1
-net.ipv6.conf.all.forwarding=1
 
 net.netfilter.nf_conntrack_acct=1
 net.netfilter.nf_conntrack_checksum=0
@@ -39,13 +46,6 @@ net.ipv6.conf.all.accept_ra=0
 net.ipv6.conf.default.accept_ra=0
 vm.panic_on_oom=1
 
-net.core.netdev_budget=3000
-net.ipv4.neigh.default.gc_thresh1 = 1280
-net.ipv4.neigh.default.gc_thresh2 = 5120
-net.ipv4.neigh.default.gc_thresh3 = 10240
-net.ipv6.neigh.default.gc_thresh1 = 1280
-net.ipv6.neigh.default.gc_thresh2 = 5120
-net.ipv6.neigh.default.gc_thresh3 = 10240
 EOF
 sysctl -p /etc/sysctl.d/999-freifunk.conf || true
 }
