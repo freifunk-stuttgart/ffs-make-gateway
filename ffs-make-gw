@@ -104,7 +104,7 @@ if [ x"$GWID" == "x" ]; then
 fi
 if [ x"$SEGMENTLIST" == x ]; then
 	SEGMENTLIST=$(
-    for segment in $(seq 0 $SEGMENTS); do
+    for segment in $(seq 1 $SEGMENTS); do
       printf '%02i ' $segment
     done
   )
