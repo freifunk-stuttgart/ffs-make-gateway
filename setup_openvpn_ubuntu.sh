@@ -33,7 +33,7 @@ if [ "x$DIRECTTCP" != "x" ]; then
 PORTS=$(echo "$DIRECTTCP" | tr " " ",")
 cat <<-EOF >>/etc/openvpn/openvpn-up
 # https+Mailports direkt ausleiten
-ip rule add fwmark 0x2000 lookup direct priority 9000
+ip rule add fwmark 0x2000 lookup ffsdefault priority 9000
 iptables -t mangle -A PREROUTING -j MARK --set-xmark 0x0/0xffffffff
 iptables -t mangle -A FORWARD    -j MARK --set-xmark 0x0/0xffffffff
 #for port in $DIRECTTCP; do
@@ -47,7 +47,7 @@ iptables -t nat -A POSTROUTING -o $EXT_IF_V4 -p tcp -m multiport --dports $PORTS
 
 iptables -t nat -A POSTROUTING -o \$dev -j MASQUERADE
 
-#ip route show table main | while read ROUTE ; do ip route add table direct \$ROUTE ; done
+#ip route show table main | while read ROUTE ; do ip route add table ffsdefault \$ROUTE ; done
 exit 0
 EOF
 fi
