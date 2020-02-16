@@ -72,7 +72,7 @@ iptables -t mangle -D FORWARD    -s 10.190.0.0/15 -p tcp -m tcp -m multiport --d
 iptables -t nat -D POSTROUTING -o $EXT_IF_V4 -p tcp -m multiport --dports $PORTS -j SNAT --to-source $EXT_IP_V4
 
 iptables -t mangle -D PREROUTING -j MARK --set-xmark 0x0/0xffffffff
-ip route flush table ffsdefault
+#ip route flush table ffsdefault
 exit 0
 EOF
 chmod +x /etc/openvpn/openvpn-down
