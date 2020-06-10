@@ -5,12 +5,12 @@ setup_tinc_base() {
 	[Unit]
 	Description=tincd (connection %I)
 	After=network.target
-	
+
 	[Service]
 	Type=simple
 	ExecStart=/usr/sbin/tincd -n %I -D
 	Restart=always
-	
+
 	[Install]
 	WantedBy=multi-user.target
 	EOF
@@ -154,13 +154,13 @@ setup_tinc_interface() {
 	    pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	    post-up         /sbin/ip route add 10.191.255.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.255.0/24 dev \$IFACE table stuttgart || true
-	
+
 	iface ffsbb inet6 static
-	    address fd21:b4dc:4b00::a38:$(($GWID*10+$GWSUBID))
+	    address fd21:b4dc:4b00::a38:$(printf '%i%02i' $GWID $GWSUBID)
 	    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
 	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
 	    netmask 64
-	
+
 	EOF
     cat <<-EOF >/etc/network/interfaces.d/ffsl3
 	allow-hotplug ffsl3
@@ -177,7 +177,7 @@ setup_tinc_interface() {
 	    pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
-	
+
 	EOF
   else
     cat <<-EOF >/etc/network/interfaces.d/ffsl3
@@ -196,13 +196,13 @@ setup_tinc_interface() {
 	    pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
-	
+
 	iface ffsl3 inet6 static
-	    address fd21:b4dc:4b00::a38:$(($GWID*10+$GWSUBID))
+	    address fd21:b4dc:4b00::a38:$(printf '%i%02i' $GWID $GWSUBID)
 	    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
 	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
 	    netmask 64
-	
+
 	EOF
   fi
 }
