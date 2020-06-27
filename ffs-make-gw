@@ -26,6 +26,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --segmentlist:   Liste der Segmente, bitte in " angeben, Default "00 01 02 03 04"
 --email:         Mailadresse an die Meldungen geschickt werden sollen
 --with-lihas-firewall: Installiere LiHAS Firewall fuer policy routing
+--with-checkmk:  Installiere checkmk agent aus LiHAS Repos
 --with-backbone-vpn: Nimm das backbone-tinc, github-Schreibzugriff auf git+ssh://git@github.com/freifunk-stuttgart/tinc-ffsbb wird benoetigt
 --www:           Webroot
 --no-public:     GW hat keine fixe offizielle IP (fastd --remote nicht nutzen)
@@ -46,6 +47,7 @@ NEEDS_APTKEY=1
 NEEDS_APTUPDATE=1
 NEEDS_SYSTEMD=1
 OPT_FWLIHAS=0
+OPT_CHECKMK=0
 SEGMENTS=4
 SEGMENTLIST=""
 TINC_BB=0
@@ -88,6 +90,7 @@ while true ; do
     --vpnkey)             VPNKEY=$2; shift 2;;
     --with-backbone-vpn)  TINC_BB=1; shift 1;;
     --with-lihas-firewall) OPT_FWLIHAS=1; shift 1;;
+    --with-checkmk) OPT_CHECKMK=1; shift 1;;
     --www)                WWWPFAD=$2; shift 2;;
     --help|-h) print_help; exit 1;;
     --) shift ; break ;;
@@ -190,7 +193,7 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt-get update; fi
 printf 'isc-dhcp-relay\tisc-dhcp-relay/servers\tstring\t%s\n' "$DHCPRELAYSERVERS" | debconf-set-selections
 printf 'isc-dhcp-relay\tisc-dhcp-relay/interfaces\tstring\t\n' | debconf-set-selections
 printf 'isc-dhcp-relay\tisc-dhcp-relay/options\tstring\t-q -a\n' | debconf-set-selections
-apt-get -y install resolvconf bind9 build-essential bridge-utils git batctl fastd openvpn tinc vnstat vnstati python-pip bind9 radvd conntrack $([ "x$OPT_FWLIHAS" == "x1" ] && echo firewall-lihas) isc-dhcp-relay apt-transport-https libjson-xs-perl libdata-dump-perl sysfsutils check-mk-agent jq xinetd bird equivs socat apache2 collectd-core munin-node python-psutil
+apt-get -y install resolvconf bind9 build-essential bridge-utils git batctl fastd openvpn tinc vnstat vnstati python-pip bind9 radvd conntrack $([ "x$OPT_FWLIHAS" == "x1" ] && echo firewall-lihas) isc-dhcp-relay apt-transport-https libjson-xs-perl libdata-dump-perl sysfsutils $([ "x$OPT_CHECKMK" == "x1" ] && echo check-mk-agent) jq xinetd bird equivs socat apache2 collectd-core munin-node python-psutil
 
 show_progress setup_batman_dkms
 setup_batman_dkms

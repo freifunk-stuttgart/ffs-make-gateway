@@ -8,7 +8,7 @@ add_apt_repositories() {
     ensureline "deb http://repo.universe-factory.net/debian/ sid main" /etc/apt/sources.list.d/freifunk.list
     ensureline "deb http://debian.mirrors.ovh.net/debian/ jessie-backports main" /etc/apt/sources.list.d/jessie-backports.list
   fi
-  if [ "x$OPT_FWLIHAS" == "x1" ]; then
+  if [ "x$OPT_FWLIHAS" == "x1" ] || [ "x$OPT_CHECKMK" == "x1" ] ; then
     apt update
     apt install extrepo
     extrepo enable lihas
