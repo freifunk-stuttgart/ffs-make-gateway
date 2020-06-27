@@ -1,5 +1,6 @@
 add_apt_repositories() {
   apt-get install apt-transport-https
+  ensureline "deb http://deb.debian.org/debian buster-backports main" /etc/apt/sources.list.d/buster-backports.list
   # no need with buster
   if [ $(uname -r | awk '$1 > "4.19"' | wc -l ) -lt 1 ]; then
     ensureline "deb http://ppa.launchpad.net/freifunk-mwu/freifunk-ppa/ubuntu trusty main" /etc/apt/sources.list.d/freifunk.list
@@ -8,7 +9,9 @@ add_apt_repositories() {
     ensureline "deb http://debian.mirrors.ovh.net/debian/ jessie-backports main" /etc/apt/sources.list.d/jessie-backports.list
   fi
   if [ "x$OPT_FWLIHAS" == "x1" ]; then
-    ensureline "deb http://ftp.lihas.de/debian/ buster main" /etc/apt/sources.list.d/lihas.list
+    apt update
+    apt install extrepo
+    extrepo enable lihas
   fi
 }
 add_apt_preference() {
@@ -20,9 +23,7 @@ add_apt_preference() {
 #EOF
 }
 add_apt_keys() {
+	echo
 #  apt-key adv --keyserver keyserver.ubuntu.com --recv 16EF3F64CB201D9C
 #  apt-key adv --keyserver keyserver.ubuntu.com --recv B976BD29286CC7A4
-  if [ "x$OPT_FWLIHAS" == "x1" ]; then
-    wget -O - http://ftp.lihas.de/debian/apt-key-lihas.gpg | apt-key add -
-  fi
 }
