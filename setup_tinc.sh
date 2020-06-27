@@ -94,8 +94,8 @@ setup_tinc_config() {
   (
     cd $FFSGIT/tinc
     if LC_ALL=C git status | egrep -q "($HOSTNAME|ahead)"; then
-      git add .
-      git commit -m "add/update $HOSTNAME" -a
+      git add . || true
+      git commit -m "add/update $HOSTNAME" -a || true
       git remote set-url origin git@github.com:freifunk-stuttgart/tinc.git
       git push
       git remote set-url origin https://github.com/freifunk-stuttgart/tinc
@@ -115,8 +115,8 @@ setup_tinc_config() {
     (
       cd $TINCNETS/tinc-ffsbb
       if LC_ALL=C git status | egrep -q "($HOSTNAME|ahead)"; then
-        git add .
-        git commit -m "add/update $HOSTNAME" -a
+        git add . || true
+        git commit -m "add/update $HOSTNAME" -a || true
         git remote set-url origin git@github.com:freifunk-stuttgart/tinc-ffsbb.git
         git push
         git remote set-url origin https://github.com/freifunk-stuttgart/tinc-ffsbb
