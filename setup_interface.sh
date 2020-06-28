@@ -39,37 +39,32 @@ for seg in $SEGMENTLIST ; do
 	  post-down       /sbin/ip -6 route del fd21:b4dc:4b$seg::/64 proto static dev \$IFACE table stuttgart || true
 	  post-down       /sbin/ip addr del fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
 
-	allow-hotplug bat$seg
+	auto bat$seg
 	iface bat$seg inet6 manual
 	  mtu 1280
+          up              /usr/sbin/batctl meshif \$IFACE if create
 	  pre-up          /sbin/modprobe batman-adv || true
 	  post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
 	  post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
 	  post-up         /usr/sbin/batctl -m \$IFACE fragmentation 0 || true
-	  post-up         ifup br$seg || true
-	  post-up         /sbin/brctl addif br$seg \$IFACE || true
-	  post-up         /sbin/ip link set dev br$seg mtu 1280 || true
 	
-	allow-hotplug vpn$seg
 	iface vpn$seg inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
 	  pre-up          /sbin/ip link set \$IFACE address 02:00:38:$seg:$GWLID:$GWLSUBID up || true
 	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
-	  post-up         /sbin/ip link set dev bat$seg up || true
+	  post-up         ifup br$seg || true
 	
-	allow-hotplug vpy${seg}
 	iface vpy${seg} inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
 	  pre-up          /sbin/ip link set \$IFACE address 02:00:33:$seg:$GWLID:$GWLSUBID up || true
 	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
-	  post-up         /sbin/ip link set dev bat$seg up || true
+	  post-up         ifup br$seg || true
 	
-	allow-hotplug bb${seg}
 	iface bb${seg} inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
 	  pre-up          /sbin/ip link set \$IFACE address 02:00:35:$seg:$GWLID:$GWLSUBID up || true
 	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
-	  post-up         /sbin/ip link set dev bat$seg up || true
+	  post-up         ifup br$seg || true
 	
 	EOF
 	if [ "$LOCAL_SEGMENT" == "$seg" ]; then
@@ -79,7 +74,7 @@ for seg in $SEGMENTLIST ; do
 	iface $iface inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
 	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
-	  post-up         /sbin/ip link set dev bat$seg up || true
+	  post-up         ifup br$seg || true
 	EOF
 	  done
 	fi
