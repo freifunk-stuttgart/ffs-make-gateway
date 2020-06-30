@@ -8,6 +8,7 @@ setup_tinc_base() {
 	[Service]
 	Type=simple
 	ExecStart=/usr/sbin/tincd -n %I -D
+	ExecStopPost=/sbin/ifdown %I
 	Restart=always
 
 	[Install]
@@ -27,6 +28,16 @@ setup_tinc_base() {
         ln -s $TINCBASE/tinc/$tinc/$ref_file /etc/tinc/$tinc/$dst_file
       fi
     done
+    cat <<-'EOF' >/etc/tinc/$tinc/tinc-up
+#!/bin/sh
+ifup $INTERFACE
+EOF
+    chmod +x /etc/tinc/$tinc/tinc-up
+    cat <<-'EOF' >/etc/tinc/$tinc/tinc-down
+#!/bin/sh
+ifdown $INTERFACE
+EOF
+    chmod +x /etc/tinc/$tinc/tinc-down
     if [ ! -e /etc/tinc/$tinc/rsa_key.priv ]; then
       ln -s /etc/tinc/rsa_key.priv /etc/tinc/$tinc/
     fi
