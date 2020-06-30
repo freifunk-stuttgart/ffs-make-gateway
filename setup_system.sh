@@ -46,6 +46,7 @@ net.ipv6.neigh.default.gc_thresh2 = 5120
 net.ipv6.neigh.default.gc_thresh3 = 10240
 EOF
 sysctl -p /etc/sysctl.d/999-freifunk.conf || true
+ensureline "nf_conntrack" /etc/modules
 }
 setup_system_sysfs() {
 	for seg in $SEGMENTLIST; do
