@@ -1,7 +1,6 @@
 setup_tinc_base() {
   mkdir -p /var/lib/ffs/git
-  if [ ! -e /etc/systemd/system/tincd\@.service ]; then
-    cat <<-'EOF' >/etc/systemd/system/tincd\@.service
+  cat <<-'EOF' >/etc/systemd/system/tincd\@.service
 	[Unit]
 	Description=tincd (connection %I)
 	After=network.target
@@ -14,8 +13,7 @@ setup_tinc_base() {
 	[Install]
 	WantedBy=multi-user.target
 	EOF
-    systemctl daemon-reload
-  fi
+  systemctl daemon-reload
   if [ ! -d /var/lib/ffs/git/tinc ]; then
     git clone https://github.com/freifunk-stuttgart/tinc.git /var/lib/ffs/git/tinc
   else
