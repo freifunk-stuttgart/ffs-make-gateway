@@ -14,6 +14,7 @@ Type=notify
 ExecStartPre=/bin/rm -f /var/run/fastd/fastd-%I.sock
 ExecStartPre=/bin/mkdir -p /var/run/fastd
 ExecStart=/usr/bin/fastd --syslog-level verbose --syslog-ident fastd@%I -c /etc/fastd/%I/fastd.conf
+ExecStopPost=/sbin/ifdown %I
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 
