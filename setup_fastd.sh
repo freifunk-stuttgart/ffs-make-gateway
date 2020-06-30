@@ -57,7 +57,7 @@ setup_fastd_config() {
 	peer group "${group}" {
 	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
 	}
-	on up "ifup $iface";
+	on up "ifup --force $iface";
 	EOF
       done
     fi
@@ -83,7 +83,7 @@ setup_fastd_config() {
 	peer group "${group}" {
 	  include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
 	}
-	on up "ifup $iface";
+	on up "ifup --force $iface";
 	EOF
   done
 }
@@ -115,7 +115,7 @@ setup_fastd_bb() {
 	peer group "${group}" {
 	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
 	}
-	on up "ifup bb${seg}";
+	on up "ifup --force bb${seg}";
 EOF
     VPNBBPUB=$(fastd -c /etc/fastd/bb${seg}/fastd.conf --show-key --machine-readable)
     if [ ! -e $FFSGIT/peers-ffs/vpn$seg/$group/$HOSTNAME ] || ! grep $VPNBBPUB $FFSGIT/peers-ffs/vpn$seg/$group/$HOSTNAME; then
