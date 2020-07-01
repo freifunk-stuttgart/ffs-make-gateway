@@ -12,7 +12,7 @@ setup_monitoring_updateff() {
 	killall -HUP tincd
 	
 	TEMPDIR=\$(mktemp -d /dev/shm/fastd-status-export.XXXXXXXXXX)
-	FASTD_STATUS_OUTDIR="\$WWWPFAD/fastd"
+	FASTD_STATUS_OUTDIR="\$WWWPFAD/data"
 	if [ -e /etc/default/freifunk ]; then
 	        . /etc/default/freifunk
 	fi
