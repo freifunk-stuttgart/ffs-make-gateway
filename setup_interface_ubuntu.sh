@@ -11,6 +11,7 @@ iface br$seg inet static
   netmask 255.255.248.0
 #  mtu 1280
   bridge_ports bat$seg
+  pre-up          /usr/sbin/batctl -m bat$seg if create || true
   # default route is unreachable. Nur einmal
   post-up         /sbin/ip route add unreachable default table nodefault || true
   # be sure all incoming traffic is handled by the appropriate rt_table
