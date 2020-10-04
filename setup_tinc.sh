@@ -22,12 +22,14 @@ setup_tinc_base() {
   fi
   for tinc in $TINCNETS; do
     mkdir -p /etc/tinc/$tinc
-    for ref_file in tinc.conf.sample subnet-up.sample subnet-down.sample conf.d hosts; do
+    for ref_file in tinc.conf.sample conf.d hosts; do
       dst_file=${ref_file%.sample}
       if [ ! -e /etc/tinc/ffsl3/$dst_file ]; then
         ln -s $TINCBASE/tinc/$tinc/$ref_file /etc/tinc/$tinc/$dst_file
       fi
     done
+    rm -f /etc/tinc/$tinc/subnet-up
+    rm -f /etc/tinc/$tinc/subnet-down
     cat <<-'EOF' >/etc/tinc/$tinc/tinc-up
 #!/bin/sh
 ifup --force $INTERFACE
@@ -186,6 +188,8 @@ setup_tinc_interface() {
 	    pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
+	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
+	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
 
 	EOF
   else
@@ -205,12 +209,27 @@ setup_tinc_interface() {
 	    pre-down        /sbin/ip rule del iif \$IFACE table nodefault priority 10001 || true
 	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE table stuttgart || true
 	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE table stuttgart || true
+	    post-up         /sbin/ip route add 10.191.255.0/24 dev \$IFACE table stuttgart || true
+	    post-down       /sbin/ip route del 10.191.255.0/24 dev \$IFACE table stuttgart || true
+	    post-up         /sbin/ip route add 10.190.0.0/15 dev \$IFACE table stuttgart || true
+	    post-down       /sbin/ip route del 10.190.0.0/15 dev \$IFACE table stuttgart || true
+	    post-up         /sbin/ip route add 10.191.254.0/24 dev \$IFACE || true
+	    post-down       /sbin/ip route del 10.191.254.0/24 dev \$IFACE || true
+	    post-up         /sbin/ip route add 10.191.255.0/24 dev \$IFACE || true
+	    post-down       /sbin/ip route del 10.191.255.0/24 dev \$IFACE || true
+	    post-up         /sbin/ip route add 10.190.0.0/15 dev \$IFACE || true
+	    post-down       /sbin/ip route del 10.190.0.0/15 dev \$IFACE || true
 
 	iface ffsl3 inet6 static
-	    address fd21:b4dc:4b00::a38:$(printf '%i%02i' $GWID $GWSUBID)
-	    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
-	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev ffsbb ||true
-	    netmask 64
+	    address fd21:b4dc:4b00::a38:$(printf '%i%02i' $GWID $GWSUBID)/128
+	    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 table stuttgart dev \$IFACE || true
+	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 table stuttgart dev \$IFACE || true
+	    post-up         /sbin/ip r a fd21:b4dc:4b00::/40 table stuttgart dev \$IFACE || true
+	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/40 table stuttgart dev \$IFACE || true
+	    post-up         /sbin/ip r a fd21:b4dc:4b00::/64 dev \$IFACE || true
+	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/64 dev \$IFACE || true
+	    post-up         /sbin/ip r a fd21:b4dc:4b00::/40 dev \$IFACE || true
+	    pre-down        /sbin/ip r d fd21:b4dc:4b00::/40 dev \$IFACE || true
 
 	EOF
   fi
