@@ -42,7 +42,7 @@ for seg in $SEGMENTLIST ; do
 	auto bat$seg
 	iface bat$seg inet6 manual
 	  mtu 1280
-          up              /usr/sbin/batctl meshif \$IFACE if create
+          up              /usr/sbin/batctl -m \$IFACE if create || true
 	  pre-up          /sbin/modprobe batman-adv || true
 	  post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
 	  post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
