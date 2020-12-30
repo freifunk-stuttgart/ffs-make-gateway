@@ -8,7 +8,7 @@ for seg in $SEGMENTLIST ; do
 	  bridge_hw 02:00:39:$seg:$GWLID:$GWLSUBID
 	  address 10.190.$netz.$GWID$GWSUBID
 	  netmask 255.255.248.0
-	  bridge_ports bat$seg
+	  bridge_ports bat$seg tap$seg
 	  bridge_fd 0
 	  bridge_maxwait 0
 	  mtu 1280
