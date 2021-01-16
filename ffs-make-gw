@@ -122,11 +122,11 @@ fi
 GWLID=$(printf "%02i" $GWID)
 GWLSUBID=$(printf "%02i" $GWSUBID)
 LEGIP=172.21.$((4*$GWID)).$GWSUBID
-EXT_IF_V4=$(ip r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}')
-EXT_IP_V4=$(ip -4 a l dev $EXT_IF_V4 | sed -n '/ inet /{s/.*inet //; s/[\/ ].*//;p}')
-EXT_GW_V4=$(ip r l table main | sed -n '/default/{s/.*via //; s/ .*//; p}')
-EXT_IF_V6=$(ip -6 r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}')
-EXT_IPS_V6=$(ip -6 a l dev $EXT_IF_V6 | sed -n '/inet6/{s/.*inet6 //; s/\/.*//; /fe80/d; p}')
+EXT_IF_V4=$(ip r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}' | head -n1)
+EXT_IP_V4=$(ip -4 a l dev $EXT_IF_V4 | sed -n '/ inet /{s/.*inet //; s/[\/ ].*//;p}' | head -n1)
+EXT_GW_V4=$(ip r l table main | sed -n '/default/{s/.*via //; s/ .*//; p}' | head -n1)
+EXT_IF_V6=$(ip -6 r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}' | head -n1)
+EXT_IPS_V6=$(ip -6 a l dev $EXT_IF_V6 | sed -n '/inet6/{s/.*inet6 //; s/\/.*//; /fe80/d; p}' | head -n1)
 HOSTNAME=gw${GWLID}n${GWLSUBID}
 cat <<EOF
 GatewayID (GWID): $GWID
