@@ -47,6 +47,7 @@ setup_monitoring() {
 cat <<'EOF' >/usr/local/bin/gw-watchdog
 #!/bin/bash
 
+PATH=$PATH:/usr/sbin
 ( LC_ALL=C
 
 error () {
@@ -114,6 +115,7 @@ awk 'BEGIN {req=0; rep=0; answer=0}
      $3 ~ /67$/ && $5 ~ /68:$/ {answer++} 
      END {print req " " rep " " answer; exit answer}' >/dev/null
 if [ $? == 0 ]; then
+    error "no dhcp replies - restarting dhcp relay"
     systemctl restart isc-dhcp-relay.service
 fi
 ) 2>&1 | logger --tag "$0"
