@@ -46,7 +46,6 @@ for seg in $SEGMENTLIST ; do
 	  pre-up          /sbin/modprobe batman-adv || true
 	  post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
 	  post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
-	  post-up         /usr/sbin/batctl -m \$IFACE fragmentation 0 || true
 	
 	iface vpn$seg inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
