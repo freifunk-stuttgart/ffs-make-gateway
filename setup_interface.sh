@@ -11,7 +11,7 @@ for seg in $SEGMENTLIST ; do
 	  bridge_ports bat$seg tap$seg
 	  bridge_fd 0
 	  bridge_maxwait 0
-	  mtu 1280
+	  mtu 1500
 	  # be sure all incoming traffic is handled by the appropriate rt_table
 	  post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
@@ -41,7 +41,7 @@ for seg in $SEGMENTLIST ; do
 
 	auto bat$seg
 	iface bat$seg inet6 manual
-	  mtu 1280
+	  mtu 1500
           up              /usr/sbin/batctl -m \$IFACE if create || true
 	  pre-up          /sbin/modprobe batman-adv || true
 	  post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
