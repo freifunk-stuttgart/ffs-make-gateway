@@ -229,19 +229,6 @@ show_progress setup_interface_segxx
 
 cd "$OLDPWD"
 
-TINCBASE=$FFSGIT
-TINCNETS=ffsl3
-setup_tinc_base
-show_progress setup_tinc_base
-cd $TINCBASE
-setup_tinc_key
-show_progress setup_tinc_key
-setup_tinc_config
-show_progress setup_tinc_config
-setup_tinc_interface
-show_progress setup_tinc_interface
-setup_tinc_update
-show_progress setup_tinc_update
 setup_backbone
 show_progress setup_backbone
 
