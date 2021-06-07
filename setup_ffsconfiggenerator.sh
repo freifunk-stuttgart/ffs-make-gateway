@@ -8,11 +8,13 @@ else
   git checkout -- config.json
   git pull
 fi
-segmentarray=$(echo $SEGMENTLIST | sed 's/ /, /g')
+
+echo $SEGMENTLIST > /tmp/segmentlist
 python -c '
 import json, sys
 GWID='$GWID'
 GWSUBID='$GWSUBID'
+SEGMENTLIST="'"$SEGMENTLIST"'"
 fp = open("config.json","rb")
 config = json.load(fp)
 fp.close()
@@ -25,7 +27,7 @@ if ( "$GWID,$GWSUBID" not in config["gws"] ):
   config["gws"]["'$GWID','$GWSUBID'"]["externalipv6"] = "'$EXT_IPS_V6'"
   config["gws"]["'$GWID','$GWSUBID'"]["ipv4start"] = "172.21.'$((4*$GWID))'.2"
   config["gws"]["'$GWID','$GWSUBID'"]["ipv4end"] = "172.21.'$((4*$((GWID+1))-1))'.254"
-  config["gws"]["'$GWID','$GWSUBID'"]["segments"] = ['$segmentarray']
+  config["gws"]["'$GWID','$GWSUBID'"]["segments"] = [int(s, 10) for s in filter(lambda s: len(s) > 0, SEGMENTLIST.split(" "))]
   json.dump(config, fp, indent=2)
   fp.close()
 '
