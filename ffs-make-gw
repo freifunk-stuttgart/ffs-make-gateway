@@ -232,6 +232,7 @@ cd "$OLDPWD"
 setup_backbone
 show_progress setup_backbone
 
+setup_fastd_loadbalancer
 if [ ! -d $FFSGIT/peers-ffs/.git ]; then
   mkdir -p $FFSGIT
   git clone https://github.com/freifunk-stuttgart/peers-ffs $FFSGIT/peers-ffs

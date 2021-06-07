@@ -1,4 +1,12 @@
 #!/bin/bash
+LOADBALANCER_PATH=/var/lib/ffs/loadbalancer
+setup_fastd_loadbalancer() {
+  if [ ! -d "$LOADBALANCER_PATH" ]; then
+    git clone https://github.com/freifunk-stuttgart/loadbalancer.git "$LOADBALANCER_PATH"
+  else
+    git -C "$LOADBALANCER_PATH" pull
+  fi
+}
 setup_fastd() {
   if ! getent passwd fastd 2>/dev/null 1>&2; then
     adduser --system --no-create-home fastd
@@ -54,9 +62,10 @@ setup_fastd_config() {
 	mtu 1340;
 	include "/etc/fastd/secret_vpn.conf";
 	status socket "/var/run/fastd/fastd-vpn${seg}$(if [ x$FASTD_SPLIT != x ] && [ $ipv == ip6 ]; then echo -n ip6; fi).sock";
-	peer group "${group}" {
-	    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
-	}
+	#peer group "${group}" {
+	#    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
+	#}
+        on verify "/var/lib/ffs/loadbalancer/fastd-verify.py -k /etc/fastd/peers-ffs/vpn${seg}/peers -g /var/www/html/data/gwstatus.json";
 	on up "ifup --force $iface";
 	EOF
       done
@@ -80,9 +89,10 @@ setup_fastd_config() {
 	mtu 1340; # Lowest possible MTU
 	include "/etc/fastd/secret_vpn.conf";
 	status socket "/var/run/fastd/fastd-vpy${seg}.sock";
-	peer group "${group}" {
-	  include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
-	}
+	#peer group "${group}" {
+	#    include peers from "/etc/fastd/peers-ffs/vpn${seg}/${group}";
+	#}
+        on verify "/var/lib/ffs/loadbalancer/fastd-verify.py -k /etc/fastd/peers-ffs/vpn${seg}/peers -g /var/www/html/data/gwstatus.json";
 	on up "ifup --force $iface";
 	EOF
   done
