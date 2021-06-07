@@ -173,7 +173,6 @@ fi
 . setup_batman.sh
 . setup_bird.sh
 . setup_fastd.sh
-. setup_ffsconfiggenerator.sh
 . setup_firewall.sh
 . setup_interface.sh
 . setup_logging.sh
@@ -210,24 +209,9 @@ show_progress setup_fastd
 # Networking
 ensureline "source-directory interfaces.d" /etc/network/interfaces
 
-OLDDIR=$(pwd)
-mkdir -p $FFSGIT
-cd $FFSGIT
-# Patch and run FfsConfigGenerator
-setup_ffsconfiggenerator_config
-show_progress setup_ffsconfiggenerator_config
-./gen_config.py --gwnum $GWID --instance $GWSUBID
-show_progress ./gen_config.py --gwnum $GWID --instance $GWSUBID
-# Deploy FfsConfigGenerator results
-# rsync -rlHpogDtvx --exclude etc/fastd etc /
-#sed -i "s/\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):\([0-9a-f]\{2\}\):$GWLID:00/\1:\2:\3:\4:$GWLID:$GWLSUBID/" /etc/network/interfaces.d/ffs-seg*
-#sed -i '/listen-on/d' /etc/bind/named.conf.options
-# FfsConfigGenerator Netzwerk ersetzt durch interne Version
 rm -f /etc/network/interfaces.d/br[0-8][0-9]
 setup_interface_segxx
 show_progress setup_interface_segxx
-
-cd "$OLDPWD"
 
 setup_backbone
 show_progress setup_backbone
