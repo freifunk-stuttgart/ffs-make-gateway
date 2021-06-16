@@ -34,6 +34,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --no-log-call:   Aufruf nicht unter /var/log/$0 speichern
 --local-segment: Segment das lokal verwendet wird
 --local-segment-interfaces: Interfaces die lokal Mesh haben
+--ip6:           IPv6 Netz fuer Clients (dumm, konkateniert einfach Segment in hex dran)
 EOF
 }
 CONFIRM=1
@@ -57,6 +58,7 @@ WWWPFAD="/var/www/html"
 FFSGIT=/var/lib/ffs/git
 LOCAL_SEGMENT=""
 LOCAL_SEGMENT_INTERFACES=""
+IP6=""
 error() {
   print_help
   echo "$*"
@@ -92,6 +94,7 @@ while true ; do
     --with-lihas-firewall) OPT_FWLIHAS=1; shift 1;;
     --with-checkmk) OPT_CHECKMK=1; shift 1;;
     --www)                WWWPFAD=$2; shift 2;;
+    --ip6)                IP6=$2; shift 2;;
     --help|-h) print_help; exit 1;;
     --) shift ; break ;;
     *) echo "Unknown parameter $1, try -h" ; exit 1 ;;
