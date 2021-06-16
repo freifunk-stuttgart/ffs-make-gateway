@@ -1,6 +1,7 @@
 setup_radvd() {
 rm -f /etc/radvd.conf
 for seg in $SEGMENTLIST ; do
+seghex=$(printf %02x ${seg#0})
 cat <<EOF >>/etc/radvd.conf
 interface br$seg
 {
@@ -12,23 +13,36 @@ interface br$seg
   prefix fd21:b4dc:4b$seg::/64 {};
   RDNSS fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID {};
   route fd21:b4dc:4b00::/40 {};
-  prefix $IP6$(printf %02x $seg)/64
+  # global gateway-independant IPs
+  prefix 2a03:2260:3016:$seghex::/64
   {
-      AdvOnLink on;
-      AdvAutonomous on;
-      AdvRouterAddr on;
-      AdvValidLifetime 7200;
-      AdvPreferredLifetime 300;
+      AdvValidLifetime 300;
+      AdvPreferredLifetime 0;
+  };
+  prefix 2a01:1e8:c003:$seghex::/64
+  {
+      AdvValidLifetime 300;
+      AdvPreferredLifetime 0;
   };
 
-#    prefix ${HE_IPS_V6_PRE}:4b${seg}::/64
-#    {
-#    AdvOnLink on;
-#    AdvAutonomous on;
-#    AdvRouterAddr on;
-#    };
-};
+EOF
+if [ ! -z $IP6 ]; then
+	cat <<-EOF >> /etc/radvd.conf
+	  prefix $IP6$seghex::/64
+	  {
+	      AdvOnLink on;
+	      AdvAutonomous on;
+	      AdvRouterAddr on;
+	      AdvValidLifetime 7200;
+	      AdvPreferredLifetime 300;
+	  };
+EOF
+else
+	echo "  AdvDefaultLifetime 0;" >> /etc/radvd.conf
+fi
 
+cat <<-EOF >> /etc/radvd.conf
+};
 EOF
 done
 }

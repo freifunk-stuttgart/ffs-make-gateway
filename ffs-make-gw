@@ -64,7 +64,7 @@ error() {
   echo "$*"
   exit 1
 }
-TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode,local-segment:,local-segment-interfaces: -- "$@"`
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode,local-segment:,local-segment-interfaces,ip6: -- "$@"`
 if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 while true ; do

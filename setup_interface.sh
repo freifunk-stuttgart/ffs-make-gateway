@@ -2,6 +2,7 @@ setup_interface_segxx() {
 for seg in $SEGMENTLIST ; do
   netz=$((${seg#0} - 1))
   netz=$(($netz * 8))
+  seghex=$(printf %02x ${seg#0})
   cat <<-EOF >/etc/network/interfaces.d/br$seg
 	allow-hotplug br$seg
 	iface br$seg inet static
@@ -38,7 +39,14 @@ for seg in $SEGMENTLIST ; do
 	  post-up         /sbin/ip -6 route add fd21:b4dc:4b$seg::/64 proto static dev \$IFACE table stuttgart || true
 	  post-down       /sbin/ip -6 route del fd21:b4dc:4b$seg::/64 proto static dev \$IFACE table stuttgart || true
 	  post-down       /sbin/ip addr del fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID/64 dev \$IFACE || true
-
+EOF
+if [ ! -z $IP6 ]; then
+cat <<-EOF >>/etc/network/interfaces.d/br$seg
+	  post-up         /sbin/ip addr add $IP6$seghex::$GWLID$GWLSUBID/64 dev \$IFACE || true
+	  post-down       /sbin/ip addr del $IP6$seghex::$GWLID$GWLSUBID/64 dev \$IFACE || true
+EOF
+fi
+cat <<-EOF >>/etc/network/interfaces.d/br$seg
 	auto bat$seg
 	iface bat$seg inet6 manual
 	  mtu 1500
