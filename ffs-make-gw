@@ -143,6 +143,7 @@ Externes Interface v4 (EXT_IF_V4): $EXT_IF_V4
 Externe IP v4 (EXT_IP_V4): $EXT_IP_V4
 Externes Interface v6 (EXT_IF_V6): $EXT_IF_V6
 Externe IPs v6 (EXT_IP_V6): $EXT_IPS_V6
+IP6 Ausleitung (IP6): $IP6::/56
 Segmente: $SEGMENTLIST
 Email: $EMAIL
 fastd VPN Key: $VPNKEY
