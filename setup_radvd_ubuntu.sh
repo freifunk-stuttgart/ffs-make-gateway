@@ -1,15 +1,15 @@
 has_segment_ip6() {
 	seg=$1
 
-	if [ -z $IP6 ]; then
+	if [ -z "$IP6" ]; then
 		return 1
 	fi
 
-	if [ -z $IP6_SEGMENTS ]; then
+	if [ -z "$IP6_SEGMENTS" ]; then
 		return 0
 	fi
 
-	if [[ $IP6_SEGMENTS =~ ^([0-9]+ )*"$seg"( [0-9]*)$ ]]; then
+	if [[ $IP6_SEGMENTS =~ ^([0-9]+ )*"$seg"( [0-9]*)*$ ]]; then
 		return 0
 	fi
 
@@ -45,6 +45,7 @@ interface br$seg
 
 EOF
 if has_segment_ip6 $seg; then
+	echo IP6 for $seg
 	cat <<-EOF >> /etc/radvd.conf
 	  prefix $IP6$seghex::/64
 	  {
@@ -56,6 +57,7 @@ if has_segment_ip6 $seg; then
 	  };
 EOF
 else
+	echo "No IP6 for $seg :-("
 	echo "  AdvDefaultLifetime 0;" >> /etc/radvd.conf
 fi
 
