@@ -9,7 +9,7 @@ has_segment_ip6() {
 		return 0
 	fi
 
-	if [[ $IP6_SEGMENTS =~ ^([0-9]+,)*"$seg"(,[0-9]*)$ ]]; then
+	if [[ $IP6_SEGMENTS =~ ^([0-9]+ )*"$seg"( [0-9]*)$ ]]; then
 		return 0
 	fi
 

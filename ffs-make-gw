@@ -134,7 +134,7 @@ EXT_IF_V6=$(ip -6 r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}' |
 EXT_IPS_V6=$(ip -6 a l dev $EXT_IF_V6 | sed -n '/inet6/{s/.*inet6 //; s/\/.*//; /fe80/d; p}' | head -n1)
 HOSTNAME=gw${GWLID}n${GWLSUBID}
 segmentlistv6="$IP6_SEGMENTS"
-if [ -z $IP6_SEGMENTS ]; then
+if [ -z "$IP6_SEGMENTS" ]; then
 	segmentlistv6="(alle)"
 fi
 cat <<EOF
