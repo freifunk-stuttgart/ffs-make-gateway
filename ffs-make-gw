@@ -35,6 +35,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --local-segment: Segment das lokal verwendet wird
 --local-segment-interfaces: Interfaces die lokal Mesh haben
 --ip6:           IPv6 Netz fuer Clients (dumm, konkateniert einfach Segment in hex dran)
+--ip6-seg:       Segmente in denen IPv6 RAs verschickt werden, default alle
 EOF
 }
 CONFIRM=1
@@ -64,7 +65,7 @@ error() {
   echo "$*"
   exit 1
 }
-TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode,local-segment:,local-segment-interfaces,ip6: -- "$@"`
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode,local-segment:,local-segment-interfaces,ip6,ip6-seg: -- "$@"`
 if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 while true ; do
@@ -95,6 +96,7 @@ while true ; do
     --with-checkmk) OPT_CHECKMK=1; shift 1;;
     --www)                WWWPFAD=$2; shift 2;;
     --ip6)                IP6=$2; shift 2;;
+    --ip6-seg)            IP6_SEGMENTS=$2; shift 2;;
     --help|-h) print_help; exit 1;;
     --) shift ; break ;;
     *) echo "Unknown parameter $1, try -h" ; exit 1 ;;
