@@ -133,6 +133,10 @@ EXT_GW_V4=$(ip r l table main | sed -n '/default/{s/.*via //; s/ .*//; p}' | hea
 EXT_IF_V6=$(ip -6 r l table main | sed -n '/default/{s/^.*dev //; s/ .*//; p}' | head -n1)
 EXT_IPS_V6=$(ip -6 a l dev $EXT_IF_V6 | sed -n '/inet6/{s/.*inet6 //; s/\/.*//; /fe80/d; p}' | head -n1)
 HOSTNAME=gw${GWLID}n${GWLSUBID}
+segmentlistv6="$IP6_SEGMENTS"
+if [ -z $IP6_SEGMENTS ]; then
+	segmentlistv6="(alle)"
+fi
 cat <<EOF
 GatewayID (GWID): $GWID
 Gateway Long ID (GWLID): $GWLID
@@ -145,6 +149,7 @@ Externes Interface v6 (EXT_IF_V6): $EXT_IF_V6
 Externe IPs v6 (EXT_IP_V6): $EXT_IPS_V6
 IP6 Ausleitung (IP6): $IP6::/56
 Segmente: $SEGMENTLIST
+Segments mit IPv6: $segmentlistv6
 Email: $EMAIL
 fastd VPN Key: $VPNKEY
 EOF
