@@ -37,11 +37,11 @@ interface br$seg
       AdvValidLifetime 300;
       AdvPreferredLifetime 0;
   };
-  prefix 2a01:1e8:c003:$seghex::/64
-  {
-      AdvValidLifetime 300;
-      AdvPreferredLifetime 0;
-  };
+  #prefix 2a01:1e8:c003:$seghex::/64
+  #{
+  #    AdvValidLifetime 300;
+  #    AdvPreferredLifetime 0;
+  #};
 
 EOF
 if has_segment_ip6 $seg; then
