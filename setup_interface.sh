@@ -16,8 +16,12 @@ for seg in $SEGMENTLIST ; do
 	  # be sure all incoming traffic is handled by the appropriate rt_table
 	  post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
+	  post-up         /sbin/ip -6 rule add iif \$IFACE table stuttgart priority 7000 || true
+	  pre-down        /sbin/ip -6 rule del iif \$IFACE table stuttgart priority 7000 || true
 	  post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
+	  post-up         /sbin/ip -6 rule add iif \$IFACE table ffsdefault priority 10000 || true
+	  pre-down        /sbin/ip -6 rule del iif \$IFACE table ffsdefault priority 10000 || true
 	EOF
   if [ $PROVIDERMODE -eq 0 ]; then
     cat <<-EOF >>/etc/network/interfaces.d/br$seg
