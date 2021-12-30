@@ -83,7 +83,7 @@ EOF
     for seg in $SEGMENTLIST ; do
       seghex=$(printf %02x ${seg#0})
       segdec=$(printf %02d ${seg#0})
-      echo "  route $IP6$seghex::$GWLID$GWLSUBID/64 via \"br$segdec\";" >> /etc/bird/bird6_ffs.conf
+      echo "  route $IP6$seghex::/64 via \"br$segdec\";" >> /etc/bird/bird6_ffs.conf
     done
     echo } >> /etc/bird/bird6_ffs.conf
   fi
