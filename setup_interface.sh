@@ -16,8 +16,8 @@ for seg in $SEGMENTLIST ; do
 	  # be sure all incoming traffic is handled by the appropriate rt_table
 	  post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
-	  post-up         /sbin/ip -6 rule add iif \$IFACE table stuttgart priority 7000 || true
-	  pre-down        /sbin/ip -6 rule del iif \$IFACE table stuttgart priority 7000 || true
+	  # doesn't belong here, no delete because it should never go away
+	  post-up         /sbin/ip -6 rule add from all table stuttgart priority 7000 || true
 	  post-up         /sbin/ip rule add iif \$IFACE table ffsdefault priority 10000 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
 	  post-up         /sbin/ip -6 rule add iif \$IFACE table ffsdefault priority 10000 || true
