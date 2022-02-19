@@ -22,6 +22,8 @@ for seg in $SEGMENTLIST ; do
 	  pre-down        /sbin/ip rule del iif \$IFACE table ffsdefault priority 10000 || true
 	  post-up         /sbin/ip -6 rule add iif \$IFACE table ffsdefault priority 10000 || true
 	  pre-down        /sbin/ip -6 rule del iif \$IFACE table ffsdefault priority 10000 || true
+	  # asume multicast router, see https://gluon.readthedocs.io/en/latest/package/gluon-mesh-batman-adv.html?highlight=multicast#igmp-mld-domain-segmentation
+	  post-up         echo 2 > /sys/class/net/bat$seg/brport/multicast_router || true
 	EOF
   if [ $PROVIDERMODE -eq 0 ]; then
     cat <<-EOF >>/etc/network/interfaces.d/br$seg
