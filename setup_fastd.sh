@@ -167,19 +167,8 @@ setup_fastd_key() {
   fi
 }
 setup_fastd_update() {
-  if [ ! -e /usr/local/bin/update_peers.py ]; then
-    wget https://raw.githubusercontent.com/poldy79/FfsScripts/master/update_peers.py -nd -P /usr/local/bin/
-    chmod +x /usr/local/bin/update_peers.py
-  fi
-  if [ ! -e /usr/local/bin/fastd-clean.py ]; then
-    wget https://raw.githubusercontent.com/poldy79/FfsScripts/master/fastd-clean.py -nd -P /usr/local/bin/
-    chmod +x /usr/local/bin/fastd-clean.py
-  fi
-#  cat <<-'EOF' >/usr/local/bin/fastd-status
-#	VPNS=\$(ls /var/run/fastd/fastd-*sock | sed 's/^.*\///; s/\.sock\$//')
-#	for i in \$VPNS; do
-#	  status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
-#	done
-#	EOF
-#  chmod +x /usr/local/bin/fastd-status
+  wget https://raw.githubusercontent.com/poldy79/FfsScripts/master/update_peers.py -nd -O /usr/local/bin/update_peers.py
+  chmod +x /usr/local/bin/update_peers.py
+  wget https://raw.githubusercontent.com/poldy79/FfsScripts/master/fastd-status.py -nd -O /usr/local/bin/fastd-status.py
+  chmod +x /usr/local/bin/fastd-status.py
 }
