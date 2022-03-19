@@ -108,13 +108,26 @@ if ! host www.freifunk-stuttgart.de 127.0.0.1 > /dev/null 2>&1; then
 	killall -9 named
 	/usr/sbin/service bind9 restart
 fi
-tcpdump -n -i any port 67 or port 68 -c 50 2>/dev/null |
-awk 'BEGIN {req=0; rep=0; answer=0} 
-     $7 ~ /^Request$/ {req++} 
-     $7 ~ /^Reply$/ {rep++} 
-     $3 ~ /67$/ && $5 ~ /68:$/ {answer++} 
-     END {print req " " rep " " answer; exit answer}' >/dev/null
-if [ $? == 0 ]; then
+read -d . deb_major < /etc/debian_version
+dhcpanswers=0
+if [ $deb_major -lt 11 ]; then
+	tcpdump -n -i any port 67 or port 68 -c 50 2>/dev/null |
+	awk 'BEGIN {req=0; rep=0; answer=0} 
+	     $7 ~ /^Request$/ {req++} 
+	     $7 ~ /^Reply$/ {rep++} 
+	     $3 ~ /67$/ && $5 ~ /68:$/ {answer++} 
+	     END {print req " " rep " " answer; exit answer}' >/dev/null
+	dhcpanswers=$?
+else
+	tcpdump -n -i any port 67 or port 68 -c 50 2>/dev/null |
+	awk 'BEGIN {req=0; rep=0; answer=0}
+	     $9 ~ /^Request/ {req++}
+	     $9 ~ /^Reply/ {rep++}
+	     $5 ~ /67$/ && $7 ~ /68:$/ {answer++}
+	     END {print req " " rep " " answer; exit answer}'
+	dhcpanswers=$?
+fi
+if [ $dhcpanswers == 0 ]; then
     error "no dhcp replies - restarting dhcp relay"
     systemctl restart isc-dhcp-relay.service
 fi
