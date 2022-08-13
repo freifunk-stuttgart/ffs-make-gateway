@@ -7,7 +7,7 @@ CALL="$*"
 
 print_help() {
 cat <<EOF >&2
-usage: $0 --gwid N [--vpnkey=xxxx] [--no-systemd] [--no-apt-update] [--no-apt-key] [--othergw=172.21.16.1] [--directtcp="443[ 995][...]"] [--with-lihas-firewall] [--segments N] [--gws N] [--with-backbone-vpn] [--no-log-call] [--www=/var/www/html]
+usage: $0 --gwid N [--vpnkey=xxxx] [--no-systemd] [--no-apt-update] [--no-apt-key] [--othergw=172.21.16.1] [--directtcp="443[ 995][...]"] [--with-lihas-firewall] [--segments N] [--gws N] [--no-log-call] [--www=/var/www/html]
 Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --help:          Dieser Text
 --name:          Gatewayname
@@ -27,7 +27,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --email:         Mailadresse an die Meldungen geschickt werden sollen
 --with-lihas-firewall: Installiere LiHAS Firewall fuer policy routing
 --with-checkmk:  Installiere checkmk agent aus LiHAS Repos
---with-backbone-vpn: Nimm das backbone-tinc, github-Schreibzugriff auf git+ssh://git@github.com/freifunk-stuttgart/tinc-ffsbb wird benoetigt
+--with-backbone-vpn: wird ignoriert
 --www:           Webroot
 --no-public:     GW hat keine fixe offizielle IP (fastd --remote nicht nutzen)
 --provider-mode: Alles direkt ausleiten
@@ -52,7 +52,6 @@ OPT_FWLIHAS=0
 OPT_CHECKMK=0
 SEGMENTS=4
 SEGMENTLIST=""
-TINC_BB=0
 PROVIDERMODE=0
 VPNKEY="Wird generiert"
 WWWPFAD="/var/www/html"
@@ -91,7 +90,7 @@ while true ; do
     --segmentlist)				SEGMENTLIST="$2"; shift 2;;
     --segments)						SEGMENTS="$2"; shift 2;;
     --vpnkey)             VPNKEY=$2; shift 2;;
-    --with-backbone-vpn)  TINC_BB=1; shift 1;;
+    --with-backbone-vpn) shift 1;; # for compatibility, no longer supported
     --with-lihas-firewall) OPT_FWLIHAS=1; shift 1;;
     --with-checkmk) OPT_CHECKMK=1; shift 1;;
     --www)                WWWPFAD=$2; shift 2;;
@@ -191,7 +190,6 @@ fi
 . setup_monitoring.sh
 . setup_radvd_ubuntu.sh
 . setup_system.sh
-. setup_tinc.sh
 . setup_backbone.sh
 
 add_apt_repositories
@@ -204,7 +202,7 @@ if [ x"$NEEDS_APTUPDATE" == x1 ]; then apt-get update; fi
 printf 'isc-dhcp-relay\tisc-dhcp-relay/servers\tstring\t%s\n' "$DHCPRELAYSERVERS" | debconf-set-selections
 printf 'isc-dhcp-relay\tisc-dhcp-relay/interfaces\tstring\t\n' | debconf-set-selections
 printf 'isc-dhcp-relay\tisc-dhcp-relay/options\tstring\t-q -a\n' | debconf-set-selections
-apt-get -y install resolvconf bind9 build-essential bridge-utils git batctl fastd openvpn tinc vnstat vnstati python3-pip bind9 radvd conntrack $([ "x$OPT_FWLIHAS" == "x1" ] && echo firewall-lihas) isc-dhcp-relay apt-transport-https libjson-xs-perl libdata-dump-perl sysfsutils $([ "x$OPT_CHECKMK" == "x1" ] && echo check-mk-agent) jq xinetd bird equivs socat apache2 python3-psutil psmisc etckeeper netcat-openbsd prometheus-node-exporter
+apt-get -y install resolvconf bind9 build-essential bridge-utils git batctl fastd openvpn vnstat vnstati python3-pip bind9 radvd conntrack $([ "x$OPT_FWLIHAS" == "x1" ] && echo firewall-lihas) isc-dhcp-relay apt-transport-https libjson-xs-perl libdata-dump-perl sysfsutils $([ "x$OPT_CHECKMK" == "x1" ] && echo check-mk-agent) jq xinetd bird equivs socat apache2 python3-psutil psmisc etckeeper netcat-openbsd prometheus-node-exporter
 
 show_progress setup_batman_dkms
 setup_batman_dkms
