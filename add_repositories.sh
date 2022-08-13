@@ -1,6 +1,6 @@
 add_apt_repositories() {
   apt-get install apt-transport-https
-  ensureline "deb http://deb.debian.org/debian buster-backports main" /etc/apt/sources.list.d/buster-backports.list
+  ensureline "deb http://deb.debian.org/debian bullseye-backports main" /etc/apt/sources.list.d/bullseye-backports.list
   # no need with buster
   if [ $(uname -r | awk '$1 > "4.19"' | wc -l ) -lt 1 ]; then
     ensureline "deb http://ppa.launchpad.net/freifunk-mwu/freifunk-ppa/ubuntu trusty main" /etc/apt/sources.list.d/freifunk.list
