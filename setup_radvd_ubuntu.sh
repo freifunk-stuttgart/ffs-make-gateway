@@ -27,7 +27,7 @@ interface br$seg
   IgnoreIfMissing on;
   MinRtrAdvInterval 60;
   MaxRtrAdvInterval 300;
-  MinDelayBetweenRAs 30;
+  MinDelayBetweenRAs 0.1;
   prefix fd21:b4dc:4b$seg::/64 {};
   RDNSS fd21:b4dc:4b$seg::a38:$GWLID$GWLSUBID {};
   route fd21:b4dc:4b00::/40 {};
