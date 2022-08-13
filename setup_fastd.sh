@@ -81,6 +81,7 @@ setup_fastd_config() {
     cat <<-EOF >$dir/fastd.conf
 	log to syslog level warn;
 	interface "$iface";
+	method "null@l2tp";
 	method "salsa2012+gmac";    # new method, between gateways for the moment (faster)
 	method "salsa2012+umac";  
 	method "null+salsa2012+umac";
