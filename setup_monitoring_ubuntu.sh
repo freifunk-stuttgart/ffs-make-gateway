@@ -493,7 +493,6 @@ LoadPlugin processes
 LoadPlugin rrdtool
 LoadPlugin swap
 LoadPlugin uptime
-LoadPlugin write_graphite
 
 <Plugin df>
     FSType rootfs
@@ -509,14 +508,6 @@ LoadPlugin write_graphite
 
 <Plugin rrdtool>
     DataDir "/var/lib/collectd/rrd"
-</Plugin>
-
-<Plugin write_graphite>
-    <Node "netinfo">
-        Host "10.191.255.243"
-        Port "2003"
-        Protocol "tcp"
-    </Node>
 </Plugin>
 EOF
 }
