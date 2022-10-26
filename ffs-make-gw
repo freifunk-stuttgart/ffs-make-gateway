@@ -266,7 +266,6 @@ setup_fastd_bb
 show_progress setup_fastd_bb
 
 # DHCP Relay
-set -x
 helper_options=""
 for s in $DHCPRELAYSERVERS; do
 	helper_options+="-s $s "
