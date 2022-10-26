@@ -129,7 +129,7 @@ else
 fi
 if [ $dhcpanswers == 0 ]; then
     error "no dhcp replies - restarting dhcp relay"
-    systemctl restart isc-dhcp-relay.service
+    systemctl restart dhcp-helper.service
 fi
 ) 2>&1 | logger --tag "$0"
 EOF
