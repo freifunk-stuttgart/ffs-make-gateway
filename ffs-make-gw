@@ -290,9 +290,6 @@ setup_monitoring_updateff
 show_progress setup_monitoring_updateff
 setup_monitoring_statuspl # setup_monitoring_ubuntu.sh
 show_progress setup_monitoring_statuspl
-setup_monitoring_munin    # setup_monitoring_ubuntu.sh
-show_progress setup_monitoring_munin
-service munin-node restart
 setup_monitoring_vnstat
 show_progress setup_monitoring_vnstat
 
