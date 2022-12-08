@@ -105,23 +105,6 @@ while : ; do
   echo "fastd-peers: \$back"
   /usr/local/bin/update_peers.py --repo /etc/fastd/peers
 #   ## ffsbb aktualisieren
-#   cd /root/tinc-ffsbb/
-#   back=\$( git pull )
-#   echo "tinc-ffsbb: \$back"
-#   tincd -n ffsbb -k HUP
-#   tincd -n ffsbb -k WINCH
-  ## ffsl3 aktualisieren
-  cd /root/tinc-ffsl3/
-  back=\$( git pull )
-  echo "tinc-ffsl3: \$back"
-  tincd -n ffsl3 -k HUP
-#  tincd -n ffsl3 -k WINCH
-  ((TINCWINCH++))
-  if [ \$TINCWINCH -gt 1000 ] ; then
-    # alles 2000 Minuten
-    TINCWINCH=0
-    tincd -n ffsl3 -k winch
-  fi
   # Status veroeffentlichen
   for i in \$VPNS; do
     status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
@@ -129,12 +112,6 @@ while : ; do
   for i in \$VPYS; do
      status.pl /var/run/fastd-\$i.status | jq . | grep -v "\"address\": " >\$WWWPFAD/data/\$i.json
   done
-  # tinc Grafik aktualisieren
-  if [ -x /usr/bin/circo ]; then
-    if [ -f /tmp/ffsl3.gv ]; then
-      circo -Tpng /tmp/ffsl3.gv -o /var/www/html/ffsl3.png
-    fi
-  fi
   # Segmentinfo generieren
 #  rm \$WWWPFAD/seg/*
 #  for seg in $SEGMENTLIST; do
@@ -200,24 +177,6 @@ cat <<EOF >/usr/local/bin/check-tasks
           service \$PRG stop
           sleep 5
           service \$PRG start
-          sleep 5
-      else
-          echo "OK"
-      fi
-
-      ####    tinc pruefen
-      PRG="tinc"
-      #BACK=\$(pgrep -x "tincd")
-      BACK=\$(pgrep -f "tincd .*\-n ffsl3")
-      echo -n "check \$PRG: "
-      if [ -z "\$BACK" ] ; then
-          echo "Error"
-          ANTWORT+="Fehler: \$PRG nicht gestartet\nFehler: \$BACK\n\n"
-          if [ -d /etc/systemd/system/tinc.service.wants ]; then
-            systemctl restart \$PRG@ffsl3
-          else
-            service \$PRG restart
-          fi
           sleep 5
       else
           echo "OK"

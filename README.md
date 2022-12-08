@@ -2,9 +2,8 @@
 
 Convert an empty server into a ffs gateway
 
-Setzt auf einem leeren Debian Jessie Server mit systemd ein Freifunk-Gateway auf.
+Setzt auf einem leeren Debian Server mit systemd ein Freifunk-Gateway auf.
 
-Damit der Tinc-VPN-Key auf github geladen werden kann wird Schreibzugriff auf https://github.com/freifunk-stuttgart/tinc-ffsbb benoetigt, Zugriff auf https://github.com/freifunk-stuttgart/tinc fuer die Segment-Tinc-VPNS
 Teile der Konfiguration werden vom FfsConfigGenerator erzeugt, https://github.com/freifunk-stuttgart/FfsConfigGenerator, die dort hinterlegte Konfiguration wird an die lokalen Gegebenheiten angepasst.
 Ausleitungs-VPN wird keines genutzt, auch DHCP-Server wird kein eigener genutzt. Diese Dienste werden von anderen GWs im Freifunknetz uebernommen.
 
@@ -16,18 +15,18 @@ Example:
 * DHCP-Relay (isc-relay-agent)
 * DNS-Server (bind)
 * IPv6-Announcements (radvd)
-* Backbone VPN (tinc, bird, bird6) mit Schluesselerzeugung
 * direktes Ausleitung bestimmter TCP-Verbindungen, alles andere geht ueber ein anderes GW
 * Subgateway Unterstuetzung
+* Backbone separat via `backbone`
 
 ### Geplante Features
 * eigener DHCP-Server (obsolet, ersetzt durch zentrale DHCP-Server)
 * eigenes Ausleitungs VPN
 
 
-# ffs-make-gateway-buster
+# ffs-make-gateway
 
-Setzt auf einem leeren Debian 10 ein Freifunk-Gateway auf.
+Setzt auf einem leeren Debian 11 ein Freifunk-Gateway auf.
 
 #### Beispiele:
 git clone https://github.com/freifunk-stuttgart/ffs-make-gateway.git
@@ -39,6 +38,6 @@ Erstellen eine Gateways gw06n02.freifunk-stuttgart.de der in Segment 3 arbeitet:
 Erstellen eine Gateways gw08n06.freifunk-stuttgart.de in Segment 1-24 mit direkter Ausleitung:
 ./ffs-make-gw-ubuntu --gwid 8 --gwsubid 6 --segmentlist "01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32" --providermode
 
-Nachdem das Script ohne Fehler gelaufen ist, ist ein reboot nötig.
+Nachdem das Script ohne Fehler gelaufen ist, ist ein reboot sinnvoll.
 
 

@@ -8,8 +8,6 @@ setup_monitoring_updateff() {
 	export LC_ALL=C
 	WWWPFAD="$WWWPFAD"
 	git -C $FFSGIT/peers-ffs pull > /dev/null
-	git -C $FFSGIT/tinc pull > /dev/null
-	killall -HUP tincd &> /dev/null || true
 	
 	TEMPDIR=\$(mktemp -d /dev/shm/fastd-status-export.XXXXXXXXXX)
 	FASTD_STATUS_OUTDIR="\$WWWPFAD/data"
