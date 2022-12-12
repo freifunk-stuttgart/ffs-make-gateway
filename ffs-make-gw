@@ -138,7 +138,7 @@ if [ -z "$IP6_SEGMENTS" ]; then
 fi
 if [ "x$IP6" != "x" ]; then
 	if egrep -q '[0-9a-fA-F]{4}$' <<<$IP6; then
-		$IP6="$IP6:00"
+		IP6="$IP6:00"
 	fi
 fi
 cat <<EOF
