@@ -6,9 +6,10 @@ setup_fastd_loadbalancer() {
   else
     git -C "$LOADBALANCER_PATH" pull
   fi
-  if [ ! -f /etc/cron.d/gw-loadbalancer ]; then
-    echo '/var/lib/ffs/loadbalancer/genGwStatus.py -o /var/www/html/data/gwstatus.json -b 1500 -s 33 -i eth0' > /etc/cron.d/gw-loadbalancer
-  fi
+  cat <<EOF >/etc/cron.d/gw-loadbalancer
+# ffs-make-gw generated
+*/5 * * * * root /var/lib/ffs/loadbalancer/genGwStatus.py -o /var/www/html/data/gwstatus.json -b $BWLIMIT -s 33 -i $EXT_IF_V4
+EOF
 }
 setup_fastd() {
   if ! getent passwd fastd 2>/dev/null 1>&2; then

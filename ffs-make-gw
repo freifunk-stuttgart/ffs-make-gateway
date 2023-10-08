@@ -7,7 +7,7 @@ CALL="$*"
 
 print_help() {
 cat <<EOF >&2
-usage: $0 --gwid N [--vpnkey=xxxx] [--no-systemd] [--no-apt-update] [--no-apt-key] [--othergw=172.21.16.1] [--directtcp="443[ 995][...]"] [--with-lihas-firewall] [--segments N] [--gws N] [--no-log-call] [--www=/var/www/html]
+usage: $0 --gwid N [--vpnkey=xxxx] [--no-systemd] [--no-apt-update] [--no-apt-key] [--othergw=172.21.16.1] [--directtcp="443[ 995][...]"] [--with-lihas-firewall] [--segments N] [--gws N] [--no-log-call] [--www=/var/www/html] [--bwlimit=300]
 Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --help:          Dieser Text
 --name:          Gatewayname
@@ -36,6 +36,7 @@ Verwandelt einen Debian Jessie Server mit systemd in ein Freifunk-GW
 --local-segment-interfaces: Interfaces die lokal Mesh haben
 --ip6:           IPv6 Netz fuer Clients (dumm, konkateniert einfach Segment in hex dran)
 --ip6-seg:       Segmente in denen IPv6 RAs verschickt werden, default alle
+--bwlimit:       Weiches Bandbreitenlimit in mbit/s für den Loadbalancer, default 300
 EOF
 }
 CONFIRM=1
@@ -59,16 +60,18 @@ FFSGIT=/var/lib/ffs/git
 LOCAL_SEGMENT=""
 LOCAL_SEGMENT_INTERFACES=""
 IP6=""
+BWLIMIT=300
 error() {
   print_help
   echo "$*"
   exit 1
 }
-TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode,local-segment:,local-segment-interfaces:,ip6:,ip6segs: -- "$@"`
+TEMP=`getopt -o h --long help,dhcp-relay-servers:,directtcp:,email:,fastdsplit,gwid:,gws:,gwsubid:,ip:,name:,no-apt-key,no-apt-update,no-public,no-log-call,no-systemd,othergw:,segmentlist:,segments:,vpnkey:,with-backbone-vpn,with-lihas-firewall,provider-mode,local-segment:,local-segment-interfaces:,ip6:,ip6segs:,bwlimit: -- "$@"`
 if [ $? != 0 ] ; then print_help >&2 ; exit 1 ; fi
 eval set -- "$TEMP"
 while true ; do
   case "$1" in
+    --bwlimit)	BWLIMIT="$2"; shift 2;;
     --dhcp-relay-servers)	DHCPRELAYSERVERS="$2"; shift 2;;
     --directtcp)		DIRECTTCP="$2"; shift 2;;
     --email)			EMAIL="$2"; shift 2;;
@@ -76,8 +79,10 @@ while true ; do
     --gwid)			GWID=$2; shift 2;;
     --gws)			GWS=$2; shift 2;;
     --gwsubid)			GWSUBID=$2; shift 2;;
-    --local-segment)		LOCAL_SEGMENT=$(printf "%02i" $2); shift 2;;
+    --ip6)                IP6=$2; shift 2;;
+    --ip6segs)            IP6_SEGMENTS=$2; shift 2;;
     --local-segment-interfaces)	LOCAL_SEGMENT_INTERFACES=$2; shift 2;;
+    --local-segment)		LOCAL_SEGMENT=$(printf "%02i" $2); shift 2;;
     --name)								GWNAME=$2; shift 2;;
     --no-apt-key)					NEEDS_APTKEY=0; shift 1;;
     --no-apt-update)			NEEDS_APTUPDATE=0; shift 1;;
@@ -91,11 +96,9 @@ while true ; do
     --segments)						SEGMENTS="$2"; shift 2;;
     --vpnkey)             VPNKEY=$2; shift 2;;
     --with-backbone-vpn) shift 1;; # for compatibility, no longer supported
-    --with-lihas-firewall) OPT_FWLIHAS=1; shift 1;;
     --with-checkmk) OPT_CHECKMK=1; shift 1;;
+    --with-lihas-firewall) OPT_FWLIHAS=1; shift 1;;
     --www)                WWWPFAD=$2; shift 2;;
-    --ip6)                IP6=$2; shift 2;;
-    --ip6segs)            IP6_SEGMENTS=$2; shift 2;;
     --help|-h) print_help; exit 1;;
     --) shift ; break ;;
     *) echo "Unknown parameter $1, try -h" ; exit 1 ;;
