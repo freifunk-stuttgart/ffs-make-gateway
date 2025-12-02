@@ -274,7 +274,14 @@ setup_fastd_bb
 show_progress setup_fastd_bb
 
 # DHCP Relay
-helper_options=""
+cat <<'EOF' >/etc/systemd/system/dhcp-helper.service.d/override.conf
+[Service]
+Type=simple
+Restart=always
+RestartSec=30s
+EOF
+
+helper_options="-n "
 for s in $DHCPRELAYSERVERS; do
 	helper_options+="-s $s "
 done

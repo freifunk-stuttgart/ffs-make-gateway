@@ -41,7 +41,7 @@ for seg in $SEGMENTLIST ; do
 	  bridge_ports bat$seg tap$seg
 	  bridge_fd 0
 	  bridge_maxwait 0
-	  mtu 1500
+	  #mtu 1500
 	  # be sure all incoming traffic is handled by the appropriate rt_table
 	  post-up         /sbin/ip rule add iif \$IFACE table stuttgart priority 7000 || true
 	  pre-down        /sbin/ip rule del iif \$IFACE table stuttgart priority 7000 || true
@@ -84,28 +84,28 @@ fi
 cat <<-EOF >>/etc/network/interfaces.d/br$seg
 	auto bat$seg
 	iface bat$seg inet6 manual
-	  mtu 1500
-          up              /usr/sbin/batctl -m \$IFACE if create || true
+	  #mtu 1500
+          up              /usr/sbin/batctl meshif \$IFACE if create || true
 	  pre-up          /sbin/modprobe batman-adv || true
-	  post-up         /usr/sbin/batctl -m \$IFACE it 10000 || true
-	  post-up         /usr/sbin/batctl -m \$IFACE gw server  64mbit/64mbit || true
+	  post-up         /usr/sbin/batctl meshif \$IFACE it 10000 || true
+	  post-up         /usr/sbin/batctl meshif \$IFACE gw server  64mbit/64mbit || true
 	
 	iface vpn$seg inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
 	  pre-up          /sbin/ip link set \$IFACE address 02:00:38:$seg:$GWLID:$GWLSUBID up || true
-	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
+	  post-up         /usr/sbin/batctl meshif bat$seg if add \$IFACE || true
 	  post-up         ifup br$seg || true
 	
 	iface vpy${seg} inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
 	  pre-up          /sbin/ip link set \$IFACE address 02:00:33:$seg:$GWLID:$GWLSUBID up || true
-	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
+	  post-up         /usr/sbin/batctl meshif bat$seg if add \$IFACE || true
 	  post-up         ifup br$seg || true
 	
 	iface bb${seg} inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
 	  pre-up          /sbin/ip link set \$IFACE address 02:00:35:$seg:$GWLID:$GWLSUBID up || true
-	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
+	  post-up         /usr/sbin/batctl meshif bat$seg if add \$IFACE || true
 	  post-up         ifup br$seg || true
 	
 	EOF
@@ -115,7 +115,7 @@ cat <<-EOF >>/etc/network/interfaces.d/br$seg
 	allow-hotplug $iface
 	iface $iface inet6 manual
 	  pre-up          /sbin/modprobe batman-adv || true
-	  post-up         /usr/sbin/batctl -m bat$seg if add \$IFACE || true
+	  post-up         /usr/sbin/batctl meshif bat$seg if add \$IFACE || true
 	  post-up         ifup br$seg || true
 	EOF
 	  done
