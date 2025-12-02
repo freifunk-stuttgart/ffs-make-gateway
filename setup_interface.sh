@@ -78,6 +78,8 @@ EOF
 if [ ! -z $IP6 ]; then
 cat <<-EOF >>/etc/network/interfaces.d/br$seg
 	  post-up         /sbin/ip addr add $IP6$seghex::$GWLID$GWLSUBID/64 dev \$IFACE || true
+	  post-up         /sbin/ip route add 2a03:2260:3016:$seghex::/64 dev \$IFACE || true
+	  post-up         /sbin/ip -6 route add 2a03:2260:3016:$seghex::/64 proto static dev \$IFACE table stuttgart || true
 	  post-down       /sbin/ip addr del $IP6$seghex::$GWLID$GWLSUBID/64 dev \$IFACE || true
 EOF
 fi
