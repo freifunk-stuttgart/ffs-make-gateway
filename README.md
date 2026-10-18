@@ -1,3 +1,5 @@
+# Migrated to https://gitlab.freifunk-stuttgart.de/infrastruktur/ffs-make-gateway
+
 # ffs-make-gateway
 
 Convert an empty server into a ffs gateway
